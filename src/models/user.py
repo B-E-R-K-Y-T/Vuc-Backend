@@ -16,13 +16,7 @@ class User(Base):
     platoon_number = Column(Integer, ForeignKey('platoon.platoon_number'))
     squad_number = Column(Integer)
     role = Column(String, default='Студент')
-    telegram_id = Column(Integer)
+    telegram_id = Column(Integer, unique=True, nullable=False)
     token = Column(String)
     group_study = Column(String)
 
-
-"""
-Indexes:
-    "student_name" UNIQUE, btree (id) INCLUDE (platoon_number, name)
-    "unique_tg_id" UNIQUE CONSTRAINT, btree (telegram_id)
-"""
