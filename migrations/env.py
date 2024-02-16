@@ -12,6 +12,7 @@ import sys
 
 sys.path.append(os.path.join(sys.path[0], 'src'))
 
+# Этот импорт нужен, чтобы наполнить метаданные
 import models
 from config import app_settings
 from services.database.connector import Base

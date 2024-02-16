@@ -1,3 +1,4 @@
+# Эти импорты заполняют переменную Base, в которой лежат метаданные
 from models.student import Student
 from models.admin import Admin
 from models.day import Day
