@@ -19,4 +19,3 @@ class User(Base):
     telegram_id = Column(Integer, unique=True, nullable=False)
     token = Column(String)
     group_study = Column(String)
-
