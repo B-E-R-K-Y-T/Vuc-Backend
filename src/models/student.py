@@ -4,7 +4,7 @@ from services.database.connector import Base
 
 
 class Student(Base):
-    __tablename__ = 'students'
+    __tablename__ = 'student'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     phone = Column(String)

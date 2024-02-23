@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Date
 
 from services.database.connector import Base
 
@@ -8,7 +8,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     name = Column(String, nullable=False)
     phone = Column(String)
-    date_of_birth = Column(String)
+    date_of_birth = Column(Date)
     mail = Column(String)
     address = Column(String)
     institute = Column(String)
