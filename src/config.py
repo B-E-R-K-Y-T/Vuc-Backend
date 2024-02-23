@@ -13,7 +13,7 @@ class AppSettings(BaseSettings):
     PROJECT_HOST: str = Field('127.0.0.1', env='PROJECT_HOST')
     PROJECT_PORT: int = Field(8000, env='PROJECT_PORT')
 
-    model_config = SettingsConfigDict(env_file=f'{BASE_DIR}\\.env')
+    model_config = SettingsConfigDict(env_file=f'{BASE_DIR}/.env')
 
 
 app_settings = AppSettings()
