@@ -1,4 +1,4 @@
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy_utils import create_view
 
 from models.user import User
@@ -15,7 +15,7 @@ class Users(Base, View):
         User.name,
         User.id,
         User.phone,
-        func.to_char(User.date_of_birth, 'DD/MM/YYYY').label('date_of_birth'),
+        User.date_of_birth,
         User.mail,
         User.address,
         User.institute,

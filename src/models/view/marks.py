@@ -1,4 +1,4 @@
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy_utils import create_view
 
 from models.subject import Subject
@@ -13,7 +13,7 @@ platoon_number = select(Subject.platoon_id).where(Subject.id == Grading.subj_id)
 
 class Marks(Base, View):
     selectable = select(
-        func.to_char(Grading.mark_date, 'DD/MM/YYYY').label('mark_date'),
+        Grading.mark_date,
         Grading.subj_id,
         subject,
         semester,

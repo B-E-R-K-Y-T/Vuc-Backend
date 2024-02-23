@@ -13,7 +13,7 @@ squad_number = select(User.squad_number).where(User.id == Attend.user_id).subque
 
 class Attendance(Base, View):
     selectable = select(
-        func.to_char(Attend.date_v, 'DD/MM/YYYY').label('date_v'),
+        Attend.date_v,
         Attend.user_id,
         name,
         Attend.visiting,
