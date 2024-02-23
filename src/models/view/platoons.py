@@ -3,7 +3,7 @@ from sqlalchemy_utils import create_view
 
 from models.user import User
 from models.platoon import Platoon
-from services.database.base_view import View
+from services.database.view import View
 from services.database.connector import Base
 
 commander = (select(User.name).

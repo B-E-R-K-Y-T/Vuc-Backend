@@ -8,5 +8,3 @@ from models.message_queue import MessageQueue
 from models.user import User
 from models.platoon import Platoon
 from models.subject import Subject
-from models.view.attendance import Attendance
-from models.view.marks import Marks

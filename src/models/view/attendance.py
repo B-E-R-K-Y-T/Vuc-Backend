@@ -3,7 +3,7 @@ from sqlalchemy_utils import create_view
 
 from models.user import User
 from models.attend import Attend
-from services.database.base_view import View
+from services.database.view import View
 from services.database.connector import Base
 
 name = select(User.name).where(User.id == Attend.user_id).subquery()

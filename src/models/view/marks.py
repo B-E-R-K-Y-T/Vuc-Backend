@@ -3,7 +3,7 @@ from sqlalchemy_utils import create_view
 
 from models.subject import Subject
 from models.grading import Grading
-from services.database.base_view import View
+from services.database.view import View
 from services.database.connector import Base
 
 subject = select(Subject.name).where(Subject.id == Grading.id).subquery()
