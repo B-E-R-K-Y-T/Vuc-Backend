@@ -1,21 +1,3 @@
-"""
-
-CREATE VIEW vuc.platoons AS
- SELECT platoon_number,
-    vus,
-    semester,
-    ( SELECT "user".name
-           FROM vuc."user"
-          WHERE (("user".platoon_number = pl.platoon_number) AND (("user".role)::text = 'Командир взвода'::text))) AS commander,
-    ( SELECT sum(1) AS sum
-           FROM ( SELECT 1 AS "?column?"
-                   FROM vuc."user"
-                  WHERE (("user".platoon_number = pl.platoon_number) AND (ARRAY["user".squad_number] <@ ARRAY[1, 2, 3]))
-                  GROUP BY "user".squad_number) unnamed_subquery) AS squads
-   FROM vuc.platoon pl;
-
-
-"""
 from sqlalchemy import select, func
 from sqlalchemy_utils import create_view
 
