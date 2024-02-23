@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, Date, String, ForeignKey
 
 from services.database.connector import Base
+from services.database.table import Table
 
 
-class Grading(Base):
+class Grading(Base, Table):
     __tablename__ = 'grading'
     id = Column(Integer, autoincrement=True, primary_key=True)
     subj_id = Column(Integer, ForeignKey('subject.id'), nullable=False)

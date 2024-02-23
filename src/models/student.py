@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, String, Date
 
 from services.database.connector import Base
+from services.database.table import Table
 
 
-class Student(Base):
+class Student(Base, Table):
     __tablename__ = 'student'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)

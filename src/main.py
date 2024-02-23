@@ -1,14 +1,19 @@
 from fastapi import FastAPI
 
-
-app = FastAPI()
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+from config import app_settings
+from api.v1.user import router as user_router
+from api.v1.platoon import router as platoon_router
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+app = FastAPI(
+    title=app_settings.APP_TITLE
+)
+
+app.include_router(
+    user_router,
+    tags=["User"],
+)
+app.include_router(
+    platoon_router,
+    tags=["Platoon"],
+)
