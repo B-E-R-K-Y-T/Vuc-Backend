@@ -1,11 +1,13 @@
-from sqlalchemy import Column, Integer
+from sqlalchemy.orm import Mapped, mapped_column
 
 from services.database.connector import Base
+from services.database.db_type import intpk
 from services.database.table import Table
 
 
 class Platoon(Base, Table):
     __tablename__ = 'platoon'
-    platoon_number = Column(Integer, primary_key=True, autoincrement=True)
-    vus = Column(Integer, nullable=False)
-    semester = Column(Integer, nullable=False, default=1)
+
+    platoon_number: Mapped[intpk]
+    vus: Mapped[int]
+    semester: Mapped[int] = mapped_column(default=1)

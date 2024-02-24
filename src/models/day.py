@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, Date
+import datetime
+
+from sqlalchemy.orm import Mapped, mapped_column
 
 from services.database.connector import Base
 from services.database.table import Table
@@ -6,6 +8,7 @@ from services.database.table import Table
 
 class Day(Base, Table):
     __tablename__ = 'day'
-    date = Column(Date, primary_key=True, nullable=False)
-    weekday = Column(Integer, nullable=False)
-    semester = Column(Integer, nullable=False)
+
+    date: Mapped[datetime.date] = mapped_column(primary_key=True)
+    weekday: Mapped[int]
+    semester: Mapped[int]

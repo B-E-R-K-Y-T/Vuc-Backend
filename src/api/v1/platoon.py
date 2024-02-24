@@ -53,6 +53,6 @@ async def get_platoon(platoon_number: int, session: AsyncSession = Depends(get_a
             response_model=platoon_schema.CountSquad,
             status_code=HTTPStatus.OK)
 async def get_count_squad_in_platoon(platoon_number: int, session: AsyncSession = Depends(get_async_session)):
-    count = await DatabaseWorker.get_count_squad_in_platoon(platoon_number, session)
+    count_squad = await DatabaseWorker.get_count_squad_in_platoon(platoon_number, session)
 
-    return {'count': count}
+    return {'count_squad': count_squad}

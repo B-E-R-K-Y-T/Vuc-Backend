@@ -1,14 +1,19 @@
-from sqlalchemy import Column, Integer, Date, String, ForeignKey
+import datetime
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
 
 from services.database.connector import Base
+from services.database.db_type import intpk
 from services.database.table import Table
 
 
 class Grading(Base, Table):
     __tablename__ = 'grading'
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    subj_id = Column(Integer, ForeignKey('subject.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    mark = Column(Integer, nullable=False)
-    mark_date = Column(Date, nullable=False)
-    theme = Column(String)
+
+    id: Mapped[intpk]
+    subj_id: Mapped[int] = mapped_column(ForeignKey('subject.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    mark: Mapped[int]
+    mark_date: Mapped[datetime.date]
+    theme: Mapped[str]
