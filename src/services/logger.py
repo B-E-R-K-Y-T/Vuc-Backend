@@ -1,6 +1,8 @@
 import logging
 
-_FILE_NAME = 'vuc_backend_app-log.log'
+from config import BASE_DIR
+
+_FILE_NAME = f'{BASE_DIR}/vuc_backend_app-log.log'
 _LOG_MODE = logging.DEBUG
 
 
