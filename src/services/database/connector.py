@@ -1,4 +1,6 @@
-from typing import AsyncGenerator
+import asyncio
+from functools import wraps
+from typing import AsyncGenerator, Callable
 
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -18,3 +20,19 @@ async_session_factory = sessionmaker(engine, class_=AsyncSession, expire_on_comm
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_factory() as session:
         yield session
+
+
+def session_init(func: Callable) -> Callable:
+    """
+    Декоратор для неявной инициализации сессии к бд в функции через аргумент
+    """
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        session = await anext(get_async_session())
+
+        if asyncio.iscoroutinefunction(func):
+            return await func(*args, **kwargs, session=session)
+        else:
+            return func(*args, **kwargs, session=session)
+
+    return wrapper

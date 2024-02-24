@@ -14,6 +14,7 @@ class AppSettings(BaseSettings):
     PROJECT_HOST: str = Field('127.0.0.1', env='PROJECT_HOST')
     PROJECT_PORT: int = Field(8000, env='PROJECT_PORT')
     TOKEN_LENGTH: int = Field(25, env='TOKEN_LENGTH')
+    SECRET_JWT_KEY: str
 
     model_config = SettingsConfigDict(env_file=f'{BASE_DIR}/.env')
 

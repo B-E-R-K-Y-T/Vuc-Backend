@@ -1,11 +1,13 @@
 import asyncio
 import random
 import string
+from enum import Enum
 from http import HTTPStatus
 from functools import wraps
 from typing import Callable
 
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from config import app_settings
 from exceptions import MainVucException
@@ -34,7 +36,20 @@ class TokenWorker:
     alphabet = string.ascii_letters + string.digits
 
     @classmethod
-    def generate_new_token(cls):
-        token = [random.choice(cls.alphabet) for _ in range(app_settings.TOKEN_LENGTH)]
+    def generate_new_token(cls, token_len: int = app_settings.TOKEN_LENGTH):
+        token = [random.choice(cls.alphabet) for _ in range(token_len)]
 
         return ''.join(token)
+
+
+def convert_schema_to_dict(schema: BaseModel) -> dict:
+    schema_dict = dict(schema)
+    res = {}
+
+    for key, value in schema_dict.items():
+        if isinstance(value, Enum):
+            res[key] = value.value
+        else:
+            res[key] = value
+
+    return res

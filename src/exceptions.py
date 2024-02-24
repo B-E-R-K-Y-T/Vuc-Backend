@@ -21,3 +21,11 @@ class MainVucException(Exception):
 
 class TelegramIDError(MainVucException):
     pass
+
+
+class PlatoonError(MainVucException):
+    pass
+
+
+class RoleError(MainVucException):
+    pass

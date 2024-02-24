@@ -15,7 +15,7 @@ class Students(Base, View):
         User.id,
         User.phone,
         User.date_of_birth,
-        User.mail,
+        User.email,
         User.address,
         User.institute,
         User.direction_of_study,

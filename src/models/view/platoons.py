@@ -11,7 +11,7 @@ commander = (select(User.name).
                    User.role == 'Командир взвода').subquery())
 squads = (select(
     func.sum(1)).
-          select_from(select(User.id).
+          select_from(select(User.squad_number).
                       where(User.platoon_number == Platoon.platoon_number,
                             User.squad_number.in_([1, 2, 3])).
                       group_by(User.squad_number).subquery()
