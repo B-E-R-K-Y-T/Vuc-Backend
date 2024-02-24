@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 
 from config import app_settings
 from api.v1.user import router as user_router
@@ -8,7 +9,12 @@ from schemas.user import UserRead, UserCreate
 from services.auth.auth import auth_backend, auth_fastapi_users
 
 app = FastAPI(
-    title=app_settings.APP_TITLE
+    title=app_settings.APP_TITLE,
+    # Адрес документации в красивом интерфейсе
+    docs_url='/api/openapi',
+    # Адрес документации в формате OpenAPI
+    openapi_url='/api/openapi.json',
+    default_response_class=ORJSONResponse,
 )
 
 app.include_router(
