@@ -22,4 +22,3 @@ class AppSettings(BaseSettings):
 
 
 app_settings = AppSettings()
-

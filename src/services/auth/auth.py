@@ -97,3 +97,9 @@ auth_fastapi_users = AuthUser(
     get_user_manager,
     [auth_backend],
 )
+
+
+__all__ = (
+    'auth_fastapi_users',
+    Roles.__name__
+)

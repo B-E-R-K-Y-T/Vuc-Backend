@@ -8,10 +8,10 @@ from services.database.connector import get_async_session
 from services.util import exception_handler
 from services.database.worker import DatabaseWorker
 
-router = APIRouter(
-    prefix="/users"
-)
 current_user = auth_fastapi_users.current_user()
+router = APIRouter(
+    prefix="/users",
+)
 
 
 # @router.post("/register",
@@ -33,5 +33,5 @@ def admin_protected_route(user: User = Depends(auth_fastapi_users.access_from_ad
 
 @router.get("/student-protected-route")
 @exception_handler
-def admin_protected_route(user: User = Depends(auth_fastapi_users.access_from_student(current_user))):
+def student_protected_route(user: User = Depends(auth_fastapi_users.access_from_student(current_user))):
     return f"Hello, {user.name}"

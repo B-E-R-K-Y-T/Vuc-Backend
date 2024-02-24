@@ -28,18 +28,18 @@ app.include_router(
 app.include_router(
     auth_fastapi_users.get_auth_router(auth_backend),
     prefix="/auth/jwt",
-    tags=["auth"],
+    tags=["Auth"],
 )
 app.include_router(
     auth_fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/auth",
-    tags=["auth"],
+    tags=["Auth"],
 )
 
 
 if __name__ == '__main__':
     # Приложение может запускаться командой
-    # `uvicorn main:app --host 127.0.0.1 --port 8080`
+    # `uvicorn main:app --host 127.0.0.1 --port 8080 --reload`
     # но чтобы не терять возможность использовать дебагер,
     # запустим uvicorn сервер через python
     uvicorn.run(
