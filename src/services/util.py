@@ -44,7 +44,28 @@ class TokenGenerator:
 
 def convert_schema_to_dict(schema: BaseModel) -> dict:
     """
-    Конвертирует схемы в словари таким образом, чтобы Enum становились типом своих полей.
+    Конвертирует схемы в словари таким образом, чтобы поле Enum'ки переопределялось тем значением,
+    которое было установлено в классе.
+
+    Пример:
+    class SquadRange(Enum):
+        one = 1
+        two = 2
+        three = 3
+
+
+    class Platoon(BaseModel):
+        squad_num: SquadRange
+        platoon_id: int
+
+
+    При запросе с телом: {'squad_num': 3, 'platoon_id': 1}
+    Имеем:
+
+    @router.post("/")
+    async def f(platoon: Platoon):
+        dict(platoon) # {'squad_num': SquadRange, 'platoon_id': 1}
+        convert_schema_to_dict(platoon) # {'squad_num': 3, 'platoon_id': 1}
     """
     schema_dict = dict(schema)
     res = {}
