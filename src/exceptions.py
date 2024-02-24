@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 
 class MainVucException(Exception):
-    def __init__(self, *args, message=None, status=HTTPStatus.INTERNAL_SERVER_ERROR, **kwargs):
+    def __init__(self, message=None, *args, status=HTTPStatus.INTERNAL_SERVER_ERROR, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.__status = status

@@ -12,4 +12,3 @@ class Platoon(PlatoonNumber):
 
 class CountSquad(BaseModel):
     count: int
-
