@@ -5,6 +5,8 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 from fastapi_users import schemas
 
+from services.auth.auth import Roles
+
 
 class SquadRange(Enum):
     one = 1
@@ -13,11 +15,11 @@ class SquadRange(Enum):
 
 
 class RoleRange(Enum):
-    student = 'Студент'
-    squad_commander = 'Командир отделения'
-    platoon_commander = 'Командир взвода'
-    professor = 'Преподаватель'
-    admin = 'Admin'
+    admin = Roles.admin
+    professor = Roles.professor
+    platoon_commander = Roles.platoon_commander
+    squad_commander = Roles.squad_commander
+    student = Roles.student
 
 
 class UserRead(schemas.BaseUser[int]):
