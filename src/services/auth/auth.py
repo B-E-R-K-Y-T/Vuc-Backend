@@ -8,6 +8,7 @@ from fastapi_users.authentication import CookieTransport, AuthenticationBackend
 from fastapi_users.authentication import JWTStrategy
 
 from config import app_settings
+from models.user import User
 from services.auth.manager import get_user_manager
 
 cookie_transport = CookieTransport(cookie_name="bonds", cookie_max_age=3600)
@@ -37,7 +38,7 @@ class Roles:
 class AuthUser(FastAPIUsers):
     def __init__(self, user_manager, auth_backends):
         super().__init__(user_manager, auth_backends)
-        self.role_hierarchy = {
+        self._role_hierarchy = {
             Roles.admin: 4,
             Roles.professor: 3,
             Roles.platoon_commander: 2,
@@ -48,7 +49,7 @@ class AuthUser(FastAPIUsers):
     def access_from_admin(self, func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            user = await func(*args, **kwargs)
+            user: User = await func(*args, **kwargs)
             return self._check_role(user, Roles.admin)
 
         return wrapper
@@ -56,7 +57,7 @@ class AuthUser(FastAPIUsers):
     def access_from_professor(self, func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            user = await func(*args, **kwargs)
+            user: User = await func(*args, **kwargs)
             return self._check_role(user, Roles.professor)
 
         return wrapper
@@ -64,7 +65,7 @@ class AuthUser(FastAPIUsers):
     def access_from_platoon_commander(self, func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            user = await func(*args, **kwargs)
+            user: User = await func(*args, **kwargs)
             return self._check_role(user, Roles.platoon_commander)
 
         return wrapper
@@ -72,7 +73,7 @@ class AuthUser(FastAPIUsers):
     def access_from_squad_commander(self, func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            user = await func(*args, **kwargs)
+            user: User = await func(*args, **kwargs)
             return self._check_role(user, Roles.squad_commander)
 
         return wrapper
@@ -85,8 +86,8 @@ class AuthUser(FastAPIUsers):
 
         return wrapper
 
-    def _check_role(self, user, role: str):
-        if self.role_hierarchy[user.role] < self.role_hierarchy[role]:
+    def _check_role(self, user: User, role: str) -> User:
+        if self._role_hierarchy[user.role] < self._role_hierarchy[role]:
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN)
 
         return user

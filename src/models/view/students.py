@@ -5,6 +5,7 @@ from models.user import User
 from models.platoon import Platoon
 from services.database.view import View
 from services.database.connector import Base
+from services.auth.auth import Roles
 
 vus = select(Platoon.vus).where(User.platoon_number == Platoon.platoon_number).subquery()
 
@@ -26,7 +27,7 @@ class Students(Base, View):
         User.telegram_id,
         User.token,
         User.role
-    ).where(str(User.role) != 'Admin')
+    ).where(User.role != Roles.admin)
 
     __table__ = create_view(
         "students",

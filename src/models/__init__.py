@@ -1,4 +1,4 @@
-# Эти импорты заполняют переменную Base, в которой лежат метаданные
+# Эти импорты заполняют переменную Base, в которой лежат метаданные, это нужно, чтобы модели были видны при миграциях
 from models.student import Student
 from models.admin import Admin
 from models.day import Day

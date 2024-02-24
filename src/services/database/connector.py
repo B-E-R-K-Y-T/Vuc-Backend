@@ -24,7 +24,16 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 def session_init(func: Callable) -> Callable:
     """
-    Декоратор для неявной инициализации сессии к бд в функции через аргумент
+    Декоратор для неявной инициализации сессии, для подключения к бд в функции, через аргумент
+
+    Пример:
+
+    @session_init
+    async def platoon_is_exist(platoon_number: int, session: AsyncSession):
+        ...
+
+    # Не надо явно открывать сессию при вызове.
+    await platoon_is_exist(115)
     """
     @wraps(func)
     async def wrapper(*args, **kwargs):

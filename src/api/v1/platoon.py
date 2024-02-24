@@ -1,18 +1,17 @@
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from schemas import platoon as platoon_schema
 from services.auth.auth import auth_fastapi_users
-from services.database.connector import get_async_session
 from services.util import exception_handler
 from services.database.worker import DatabaseWorker
 
-router = APIRouter(
-    prefix="/platoons"
-)
 current_user = auth_fastapi_users.current_user()
+router = APIRouter(
+    prefix="/platoons",
+    dependencies=[Depends(auth_fastapi_users.access_from_platoon_commander(current_user))]
+)
 
 
 @router.post("/create",
@@ -27,6 +26,7 @@ async def register(platoon: platoon_schema.Platoon):
 
 
 """
+
 @app.route(EndPoint.GET_COUNT_PLATOON_SQUAD)
 def get_count_platoon_squad():
     platoon_number = request.args.get('platoon_number')

@@ -2,12 +2,12 @@ from http import HTTPStatus
 
 
 class MainVucException(Exception):
-    def __init__(self, *args, status=HTTPStatus.INTERNAL_SERVER_ERROR, **kwargs):
+    def __init__(self, *args, message=None, status=HTTPStatus.INTERNAL_SERVER_ERROR, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.__status = status
-        if args:
-            self.__message = args[0]
+        if message is not None:
+            self.__message = message
         else:
             self.__message = f'Unknown error. Detail: {self.__status=}: {self.__class__=}'
 
@@ -24,8 +24,4 @@ class TelegramIDError(MainVucException):
 
 
 class PlatoonError(MainVucException):
-    pass
-
-
-class RoleError(MainVucException):
     pass

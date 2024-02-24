@@ -3,19 +3,21 @@ from typing import Optional
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, schemas
 
+from config import app_settings
 from services.auth.database import get_user_db
 from models.user import User
-from services.util import TokenWorker, convert_schema_to_dict
+from services.logger import LOGGER
+from services.util import TokenGenerator, convert_schema_to_dict
 
-SECRET = "SECRET"
+USER_SECRET_TOKEN = app_settings.USER_SECRET_TOKEN
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
-    reset_password_token_secret = SECRET
-    verification_token_secret = SECRET
+    reset_password_token_secret = USER_SECRET_TOKEN
+    verification_token_secret = USER_SECRET_TOKEN
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
-        print(f"User {user.id} has registered.")
+        LOGGER.info(f"User {user.id} has registered.")
 
     async def create(
         self,
@@ -33,7 +35,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
-        user_dict["token"] = TokenWorker.generate_new_token()
+        user_dict["token"] = TokenGenerator.generate_new_token()
 
         created_user = await self.user_db.create(user_dict)
 

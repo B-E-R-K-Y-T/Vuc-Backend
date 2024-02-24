@@ -14,9 +14,9 @@ from exceptions import MainVucException
 from services.logger import LOGGER
 
 
-def exception_handler(func: Callable):
+def exception_handler(func: Callable) -> Callable:
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> JSONResponse:
         try:
             if asyncio.iscoroutinefunction(func):
                 return await func(*args, **kwargs)
@@ -32,17 +32,20 @@ def exception_handler(func: Callable):
     return wrapper
 
 
-class TokenWorker:
+class TokenGenerator:
     alphabet = string.ascii_letters + string.digits
 
     @classmethod
-    def generate_new_token(cls, token_len: int = app_settings.TOKEN_LENGTH):
+    def generate_new_token(cls, token_len: int = app_settings.TOKEN_LENGTH) -> str:
         token = [random.choice(cls.alphabet) for _ in range(token_len)]
 
         return ''.join(token)
 
 
 def convert_schema_to_dict(schema: BaseModel) -> dict:
+    """
+    Конвертирует схемы в словари таким образом, чтобы Enum становились типом своих полей.
+    """
     schema_dict = dict(schema)
     res = {}
 

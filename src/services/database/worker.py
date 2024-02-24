@@ -2,7 +2,6 @@ from http import HTTPStatus
 
 from sqlalchemy import insert, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
 
 from exceptions import PlatoonError
 from schemas.platoon import Platoon
@@ -26,22 +25,41 @@ class DatabaseWorker:
     @classmethod
     @session_init
     async def get_platoon(cls, platoon_number: int, session: AsyncSession) -> dict:
+        if not await cls.platoon_is_exist(platoon_number):
+            raise PlatoonError(
+                f"{platoon_number=} not found",
+                status=HTTPStatus.NOT_FOUND
+            )
+
         query = select(Platoon).where(Platoon.platoon_number == platoon_number)
 
         platoon = await session.scalar(query)
         await session.commit()
 
-        if platoon is None:
-            raise PlatoonError(
-                f"{platoon_number=} not found",
-                status=status.HTTP_404_NOT_FOUND
-            )
-
         return platoon.as_dict()
+
+    @staticmethod
+    @session_init
+    async def platoon_is_exist(platoon_number: int, session: AsyncSession) -> bool:
+        query = select(Platoon).where(Platoon.platoon_number == platoon_number)
+
+        platoon = await session.scalar(query)
+        await session.commit()
+
+        if platoon is not None:
+            return True
+
+        return False
 
     @classmethod
     @session_init
     async def create_platoon(cls, platoon: Platoon, session: AsyncSession):
+        if await cls.platoon_is_exist(platoon.platoon_number):
+            raise PlatoonError(
+                f"{platoon.platoon_number=} already exist",
+                status=HTTPStatus.BAD_REQUEST
+            )
+
         stmt = insert(Platoon).values(**dict(platoon))
 
         await session.execute(stmt)
