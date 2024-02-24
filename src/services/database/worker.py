@@ -1,4 +1,6 @@
-from sqlalchemy import insert, select, update, func
+from http import HTTPStatus
+
+from sqlalchemy import insert, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from schemas.user import UserCreate
@@ -10,14 +12,14 @@ from exceptions import TelegramIDError
 
 class DatabaseWorker:
     @classmethod
-    async def register_user(cls, user: UserCreate, session: AsyncSession):
+    async def register_user(cls, user: UserCreate, session: AsyncSession) -> str:
         query = select(User.telegram_id).where(User.telegram_id == user.telegram_id)
 
-        res = await session.scalars(query)
-        await session.commit()
+        telegram_id = await session.scalar(query)
 
-        if res.all():
-            raise TelegramIDError('Telegram ID уже есть')
+        if telegram_id is not None:
+            raise TelegramIDError(f'Telegram ID: "{telegram_id}" уже зарегистрирован',
+                                  status=HTTPStatus.CONFLICT)
 
         token = TokenWorker.generate_new_token()
         stmt = insert(User).values(**dict(user), token=token)
@@ -35,7 +37,7 @@ class DatabaseWorker:
         await session.commit()
 
     @classmethod
-    async def get_platoon(cls, platoon_number: int, session: AsyncSession):
+    async def get_platoon(cls, platoon_number: int, session: AsyncSession) -> dict:
         query = select(Platoon).where(Platoon.platoon_number == platoon_number)
 
         platoon = await session.scalar(query)

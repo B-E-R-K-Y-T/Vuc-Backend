@@ -8,7 +8,7 @@ from typing import Callable
 from fastapi.responses import JSONResponse
 
 from config import app_settings
-from exceptions import TelegramIDError
+from exceptions import MainVucException
 from services.logger import LOGGER
 
 
@@ -20,9 +20,9 @@ def exception_handler(func: Callable):
                 return await func(*args, **kwargs)
             else:
                 return func(*args, **kwargs)
-        except TelegramIDError as e:
+        except MainVucException as e:
             LOGGER.err(f'{e=}, {e.__class__=}', exc_info=True)
-            return JSONResponse(status_code=HTTPStatus.CONFLICT, content=str(e))
+            return JSONResponse(status_code=e.status, content=str(e))
         except Exception as e:
             LOGGER.err(f'{e=}, {e.__class__=}', exc_info=True)
             return JSONResponse(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, content='Internal Server Error')
