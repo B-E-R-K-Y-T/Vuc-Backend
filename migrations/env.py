@@ -6,15 +6,10 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-import alembic_postgresql_enum
+# Этот импорт позволяет подхватывать ENUM'ки в postgres
+import alembic_postgresql_enum # noqa
 
-import os
-import sys
-
-sys.path.append(os.path.join(sys.path[0], 'src'))
-
-# Этот импорт нужен, чтобы наполнить метаданные
-import models
+import models  # noqa
 from config import app_settings
 from services.database.connector import BaseTable
 
@@ -27,7 +22,7 @@ section = config.config_ini_section
 config.set_section_option(
     section,
     'DATABASE_DSN',
-    str(app_settings.DATABASE_DSN)
+    str(app_settings.DATABASE_DSN) + '?async_fallback=True'
 )
 
 # Interpret the config file for Python logging.
@@ -88,7 +83,7 @@ async def run_async_migrations() -> None:
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+        poolclass=pool.NullPool
     )
 
     async with connectable.connect() as connection:

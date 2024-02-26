@@ -1,9 +1,10 @@
 import datetime
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped
 
 from services.database.connector import BaseTable
 from services.database.db_types import intpk
+
 
 class Student(BaseTable):
     __tablename__ = 'student'

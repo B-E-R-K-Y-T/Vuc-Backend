@@ -1,14 +1,14 @@
 from pydantic import BaseModel
 
 
-class PlatoonNumber(BaseModel):
+class PlatoonNumberDTO(BaseModel):
     platoon_number: int
 
 
-class Platoon(PlatoonNumber):
+class PlatoonDTO(PlatoonNumberDTO):
     vus: int
     semester: int
 
 
-class CountSquad(BaseModel):
+class CountSquadDTO(BaseModel):
     count: int

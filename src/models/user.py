@@ -1,7 +1,7 @@
 import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from services.database.connector import BaseTable
@@ -27,9 +27,14 @@ class User(SQLAlchemyBaseUserTable[int], BaseTable):
     email: Mapped[str] = mapped_column(
         String(length=320), unique=True, index=True, nullable=False
     )
-    # password: Mapped[str] = mapped_column(nullable=True)
     registered_at: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.utcnow())
     hashed_password: Mapped[str] = mapped_column(nullable=True)
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     is_superuser: Mapped[bool] = mapped_column(default=False, nullable=False)
     is_verified: Mapped[bool] = mapped_column(default=False, nullable=False)
+
+    # alembic не видит изменений в этом поле. Так что надо будет провести миграции, а изменения из __table_args__
+    # добавлять вручную.
+    __table_args__ = (
+        CheckConstraint('squad_number IN (1, 2, 3)', name='squad_number_check_c'),
+    )
