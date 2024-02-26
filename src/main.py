@@ -10,7 +10,7 @@ from services.auth.auth import auth_backend, auth_fastapi_users
 
 app = FastAPI(
     title=app_settings.APP_TITLE,
-    # Адрес документации в красивом интерфейсе
+    # Адрес документации в Swagger интерфейсе
     docs_url=app_settings.DOCS_URL,
     # Адрес документации в формате OpenAPI
     openapi_url='/api/openapi.json',

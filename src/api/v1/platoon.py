@@ -49,7 +49,7 @@ def get_platoon_commander():
 async def get_platoon(platoon_number: int):
     platoon = await DatabaseWorker.get_platoon(platoon_number)
 
-    return platoon
+    return platoon.convert_to_dict()
 
 
 @router.get("/get_count_squad_in_platoon",

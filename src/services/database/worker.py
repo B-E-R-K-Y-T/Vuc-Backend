@@ -12,7 +12,7 @@ from services.database.connector import session_init, BaseTable
 class DatabaseWorker:
     @classmethod
     @session_init
-    async def get_platoon(cls, platoon_number: int, session: AsyncSession) -> dict:
+    async def get_platoon(cls, platoon_number: int, session: AsyncSession) -> Platoon:
         if not await cls.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
                 f"{platoon_number=} not found",
@@ -21,10 +21,10 @@ class DatabaseWorker:
 
         query = select(Platoon).where(platoon_number == Platoon.platoon_number)
 
-        platoon = await session.scalar(query)
+        platoon: Platoon = await session.scalar(query)
         await session.commit()
 
-        return platoon.as_dict()
+        return platoon
 
     @classmethod
     @session_init
