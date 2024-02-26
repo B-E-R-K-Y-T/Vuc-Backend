@@ -33,5 +33,5 @@ def admin_protected_route(user: User = Depends(auth_fastapi_users.access_from_ad
 
 @router.get("/student-protected-route")
 @exception_handler
-def student_protected_route(user: User = Depends(auth_fastapi_users.access_from_student(current_user))):
-    return f"Hello, {user.name}"
+async def student_protected_route(user: User = Depends(auth_fastapi_users.access_from_student(current_user))):
+    return f"Hello, {user.name}, {await DatabaseWorker.platoon_number_is_exist(236666660)}"

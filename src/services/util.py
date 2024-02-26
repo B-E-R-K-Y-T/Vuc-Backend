@@ -6,7 +6,7 @@ from http import HTTPStatus
 from functools import wraps
 from typing import Callable
 
-from fastapi.responses import JSONResponse
+from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
 
 from config import app_settings
@@ -16,7 +16,7 @@ from services.logger import LOGGER
 
 def exception_handler(func: Callable) -> Callable:
     @wraps(func)
-    async def wrapper(*args, **kwargs) -> JSONResponse:
+    async def wrapper(*args, **kwargs) -> ORJSONResponse:
         try:
             if asyncio.iscoroutinefunction(func):
                 return await func(*args, **kwargs)
@@ -24,10 +24,10 @@ def exception_handler(func: Callable) -> Callable:
                 return func(*args, **kwargs)
         except MainVucException as e:
             LOGGER.err(f'{e=}, {e.__class__=}', exc_info=True)
-            return JSONResponse(status_code=e.status, content=str(e))
+            return ORJSONResponse(status_code=e.status, content=str(e))
         except Exception as e:
             LOGGER.err(f'{e=}, {e.__class__=}', exc_info=True)
-            return JSONResponse(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, content='Internal Server Error')
+            return ORJSONResponse(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, content='Internal Server Error')
 
     return wrapper
 

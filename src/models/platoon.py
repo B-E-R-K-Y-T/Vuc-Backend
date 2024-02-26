@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
 from services.database.connector import Base
-from services.database.db_type import intpk
+from services.database.db_types import intpk
 from services.database.table import Table
 
 

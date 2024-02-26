@@ -7,54 +7,30 @@ from exceptions import PlatoonError
 from schemas.platoon import Platoon
 from models import User, Platoon
 from services.database.connector import session_init
+from services.database.table import Table
 
 
 class DatabaseWorker:
     @classmethod
     @session_init
-    async def telegram_id_is_exist(cls, user, session: AsyncSession) -> bool:
-        query = select(User.telegram_id).where(User.telegram_id == user.telegram_id).limit(1)
-
-        telegram_id = await session.scalar(query)
-
-        if telegram_id is not None:
-            return True
-
-        return False
-
-    @classmethod
-    @session_init
     async def get_platoon(cls, platoon_number: int, session: AsyncSession) -> dict:
-        if not await cls.platoon_is_exist(platoon_number):
+        if not await cls.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
                 f"{platoon_number=} not found",
                 status=HTTPStatus.NOT_FOUND
             )
 
-        query = select(Platoon).where(Platoon.platoon_number == platoon_number)
+        query = select(Platoon).where(platoon_number == Platoon.platoon_number)
 
         platoon = await session.scalar(query)
         await session.commit()
 
         return platoon.as_dict()
 
-    @staticmethod
-    @session_init
-    async def platoon_is_exist(platoon_number: int, session: AsyncSession) -> bool:
-        query = select(Platoon).where(Platoon.platoon_number == platoon_number)
-
-        platoon = await session.scalar(query)
-        await session.commit()
-
-        if platoon is not None:
-            return True
-
-        return False
-
     @classmethod
     @session_init
     async def create_platoon(cls, platoon: Platoon, session: AsyncSession):
-        if await cls.platoon_is_exist(platoon.platoon_number):
+        if await cls.platoon_number_is_exist(platoon.platoon_number):
             raise PlatoonError(
                 f"{platoon.platoon_number=} already exist",
                 status=HTTPStatus.BAD_REQUEST
@@ -79,3 +55,32 @@ class DatabaseWorker:
         await session.commit()
 
         return count
+
+    @classmethod
+    async def platoon_number_is_exist(cls, platoon_number: int) -> bool:
+        return await cls._check_exist_entity(Platoon, platoon_number)
+
+    @staticmethod
+    @session_init
+    async def _check_exist_entity(entity: Table, entity_id: int, session: AsyncSession) -> bool:
+        ent = await session.get(entity, entity_id)
+
+        if ent is not None:
+            return True
+
+        return False
+
+    @classmethod
+    async def telegram_id_is_exist(cls, telegram_id: int) -> bool:
+        return await cls._check_exist_entity_column(User, {User.telegram_id.name: telegram_id})
+
+    @staticmethod
+    @session_init
+    async def _check_exist_entity_column(entity: Table, columns: dict, session: AsyncSession) -> bool:
+        query = select(entity).filter_by(**columns)
+        res = await session.scalar(query)
+
+        if res is not None:
+            return True
+
+        return False
