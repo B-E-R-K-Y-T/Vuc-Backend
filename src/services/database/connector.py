@@ -2,13 +2,24 @@ import asyncio
 from functools import wraps
 from typing import AsyncGenerator, Callable
 
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import String
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 from config import app_settings
 
-Base = declarative_base()
+
+class _Base(DeclarativeBase):
+    type_annotation_map = {
+        str: String().with_variant(String(255), "postgresql")
+    }
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+BaseTable = _Base
 
 engine = create_async_engine(url=str(app_settings.DATABASE_DSN),
                              echo=True,

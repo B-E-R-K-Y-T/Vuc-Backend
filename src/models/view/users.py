@@ -4,13 +4,13 @@ from sqlalchemy_utils import create_view
 from models.user import User
 from models.platoon import Platoon
 from services.database.view import View
-from services.database.connector import Base
+from services.database.connector import BaseTable
 
 vus = select(Platoon.vus).where(User.platoon_number == Platoon.platoon_number).subquery()
 course_number = select(Platoon.semester).where(User.platoon_number == Platoon.platoon_number).subquery()
 
 
-class Users(Base, View):
+class Users(BaseTable, View):
     selectable = select(
         User.name,
         User.id,
@@ -33,5 +33,5 @@ class Users(Base, View):
     __table__ = create_view(
         "users",
         selectable,
-        Base.metadata
+        BaseTable.metadata
     )

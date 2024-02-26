@@ -7,6 +7,14 @@ from pydantic import PostgresDsn, Field
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+class Roles:
+    admin = 'Admin'
+    professor = 'Преподаватель'
+    platoon_commander = 'Командир взвода'
+    squad_commander = 'Командир отделения'
+    student = 'Студент'
+
+
 class AppSettings(BaseSettings):
     APP_TITLE: str = "DefaultApp"
     DATABASE_DSN: PostgresDsn

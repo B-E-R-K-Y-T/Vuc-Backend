@@ -1,1 +1,1 @@
-from services.database.connector import Base
+from services.database.connector import BaseTable

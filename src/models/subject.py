@@ -1,12 +1,11 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from services.database.connector import Base
+from services.database.connector import BaseTable
 from services.database.db_types import intpk
-from services.database.table import Table
 
 
-class Subject(Base, Table):
+class Subject(BaseTable):
     __tablename__ = 'subject'
 
     id: Mapped[intpk]

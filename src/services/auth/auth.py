@@ -7,7 +7,7 @@ from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import CookieTransport, AuthenticationBackend
 from fastapi_users.authentication import JWTStrategy
 
-from config import app_settings
+from config import app_settings, Roles
 from models.user import User
 from services.auth.manager import get_user_manager
 
@@ -25,15 +25,6 @@ auth_backend = AuthenticationBackend(
     transport=cookie_transport,
     get_strategy=get_jwt_strategy,
 )
-
-
-class Roles:
-    admin = 'Admin'
-    professor = 'Преподаватель'
-    platoon_commander = 'Командир взвода'
-    squad_commander = 'Командир отделения'
-    student = 'Студент'
-
 
 class AuthUser(FastAPIUsers):
     def __init__(self, user_manager, auth_backends):

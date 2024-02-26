@@ -4,8 +4,8 @@ from sqlalchemy_utils import create_view
 from models.user import User
 from models.platoon import Platoon
 from services.database.view import View
-from services.database.connector import Base
-from services.auth.auth import Roles
+from services.database.connector import BaseTable
+from config import Roles
 
 commander = (select(User.name).
              where(User.platoon_number == Platoon.platoon_number,
@@ -20,7 +20,7 @@ squads = (select(
           ).subquery()
 
 
-class Platoons(Base, View):
+class Platoons(BaseTable, View):
     selectable = select(
         Platoon.vus,
         Platoon.semester,
@@ -31,5 +31,5 @@ class Platoons(Base, View):
     __table__ = create_view(
         "platoons",
         selectable,
-        Base.metadata
+        BaseTable.metadata
     )

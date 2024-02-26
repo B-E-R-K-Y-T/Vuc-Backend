@@ -4,12 +4,11 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from services.database.connector import Base
+from services.database.connector import BaseTable
 from services.database.db_types import intpk
-from services.database.table import Table
 
 
-class User(SQLAlchemyBaseUserTable[int], Base, Table):
+class User(SQLAlchemyBaseUserTable[int], BaseTable):
     __tablename__ = 'user'
 
     id: Mapped[intpk]

@@ -1,11 +1,10 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from services.database.connector import Base
+from services.database.connector import BaseTable
 from services.database.db_types import intpk
-from services.database.table import Table
 
 
-class Admin(Base, Table):
+class Admin(BaseTable):
     __tablename__ = 'admins'
 
     id: Mapped[intpk]

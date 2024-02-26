@@ -1,11 +1,10 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from services.database.connector import Base
+from services.database.connector import BaseTable
 from services.database.db_types import intpk
-from services.database.table import Table
 
 
-class Platoon(Base, Table):
+class Platoon(BaseTable):
     __tablename__ = 'platoon'
 
     platoon_number: Mapped[intpk]

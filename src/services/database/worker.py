@@ -6,8 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from exceptions import PlatoonError
 from schemas.platoon import Platoon
 from models import User, Platoon
-from services.database.connector import session_init
-from services.database.table import Table
+from services.database.connector import session_init, BaseTable
 
 
 class DatabaseWorker:
@@ -62,7 +61,7 @@ class DatabaseWorker:
 
     @staticmethod
     @session_init
-    async def _check_exist_entity(entity: Table, entity_id: int, session: AsyncSession) -> bool:
+    async def _check_exist_entity(entity: BaseTable, entity_id: int, session: AsyncSession) -> bool:
         ent = await session.get(entity, entity_id)
 
         if ent is not None:
@@ -76,7 +75,7 @@ class DatabaseWorker:
 
     @staticmethod
     @session_init
-    async def _check_exist_entity_column(entity: Table, columns: dict, session: AsyncSession) -> bool:
+    async def _check_exist_entity_column(entity: BaseTable, columns: dict, session: AsyncSession) -> bool:
         query = select(entity).filter_by(**columns)
         res = await session.scalar(query)
 
