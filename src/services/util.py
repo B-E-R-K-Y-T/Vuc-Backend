@@ -24,7 +24,7 @@ def exception_handler(func: Callable) -> Callable:
                 return func(*args, **kwargs)
         except MainVucException as e:
             LOGGER.err(f'{e=}, {e.__class__=}', exc_info=True)
-            return ORJSONResponse(status_code=e.status, content=str(e))
+            return ORJSONResponse(status_code=e.status_code, content=str(e))
         except Exception as e:
             LOGGER.err(f'{e=}, {e.__class__=}', exc_info=True)
             return ORJSONResponse(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, content='Internal Server Error')

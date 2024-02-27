@@ -16,7 +16,7 @@ class DatabaseWorker:
         if not await cls.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
                 f"{platoon_number=} not found",
-                status=HTTPStatus.NOT_FOUND
+                status_code=HTTPStatus.NOT_FOUND
             )
 
         query = select(User).where(platoon_number == User.platoon_number)
@@ -56,7 +56,7 @@ class DatabaseWorker:
         if await cls.platoon_number_is_exist(platoon.platoon_number):
             raise PlatoonError(
                 f"{platoon.platoon_number=} already exist",
-                status=HTTPStatus.BAD_REQUEST
+                status_code=HTTPStatus.BAD_REQUEST
             )
 
         stmt = insert(Platoon).values(**dict(platoon))
@@ -67,11 +67,12 @@ class DatabaseWorker:
     @classmethod
     @session_init
     async def get_count_squad_in_platoon(cls, platoon_number: int, session: AsyncSession) -> int:
-        query = (select(func.sum(1)).
-        select_from(
-            select(User.squad_number).
-            where(User.platoon_number == platoon_number, User.squad_number.in_([1, 2, 3])).
-            group_by(User.squad_number).subquery())
+        query = (
+            select(func.sum(1)).
+            select_from(
+                select(User.squad_number).
+                where(User.platoon_number == platoon_number, User.squad_number.in_([1, 2, 3])).
+                group_by(User.squad_number).subquery())
         )
 
         count = await session.scalar(query)
@@ -88,13 +89,29 @@ class DatabaseWorker:
         return await cls._check_exist_entity(Platoon, platoon_number)
 
     @classmethod
-    async def platoon_commander_is_exist(cls, platoon_number: int) -> bool:
-        return await cls._check_exist_entity(User, Roles.platoon_commander, platoon_number)
+    @session_init
+    async def platoon_commander_is_exist(cls, platoon_number: int, session: AsyncSession) -> bool:
+        query = (
+            select(User).
+            where(
+                and_(
+                    User.platoon_number == platoon_number,
+                    User.role == Roles.platoon_commander
+                )
+            )
+        )
+
+        commander = await session.scalar(query)
+
+        if commander is not None:
+            return True
+
+        return False
 
     @staticmethod
     @session_init
-    async def _check_exist_entity(entity: BaseTable, *entity_id, session: AsyncSession) -> bool:
-        ent = await session.get(entity, list[entity_id])
+    async def _check_exist_entity(entity: BaseTable, entity_id, session: AsyncSession) -> bool:
+        ent = await session.get(entity, entity_id)
 
         if ent is not None:
             return True

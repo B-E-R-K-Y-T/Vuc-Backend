@@ -12,7 +12,7 @@ from services.database.worker import DatabaseWorker
 from services.logger import LOGGER
 from services.util import TokenGenerator, convert_schema_to_dict
 
-USER_SECRET_TOKEN = app_settings.USER_SECRET_TOKEN
+USER_SECRET_TOKEN = app_settings.AUTH_USER_SECRET_TOKEN
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
@@ -23,23 +23,23 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         LOGGER.info(f"User {user.id} has registered.")
 
     async def create(
-        self,
-        user_create: schemas.UC,
-        safe: bool = False,
-        request: Optional[Request] = None,
+            self,
+            user_create: schemas.UC,
+            safe: bool = False,
+            request: Optional[Request] = None,
     ) -> models.UP:
         await self.validate_password(user_create.password, user_create)
 
         existing_user = await self.user_db.get_by_email(user_create.email)
 
-        if not await DatabaseWorker.platoon_commander_is_exist(user_create.platoon_number):
-            raise PlatoonError(
-                f"Взвод {user_create.platoon_number} уже имеет командира!",
-                status=HTTPStatus.BAD_REQUEST
-            )
-
         if existing_user is not None:
             raise exceptions.UserAlreadyExists()
+
+        if await DatabaseWorker.platoon_commander_is_exist(user_create.platoon_number):
+            raise PlatoonError(
+                f"Взвод {user_create.platoon_number} уже имеет командира!",
+                status_code=HTTPStatus.BAD_REQUEST
+            )
 
         user_dict = convert_schema_to_dict(user_create)
 
