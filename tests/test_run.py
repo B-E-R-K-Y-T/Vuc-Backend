@@ -142,7 +142,7 @@ async def test_get_platoon(ac: AsyncClient):
     ]
 
 
-async def test_get_platoon_commander(ac: AsyncClient, test_async_session: AsyncSession):
+async def test_get_platoon_commander(ac: AsyncClient, tst_async_session: AsyncSession):
     response = await ac.get("/platoons/get_platoon_commander",
                             params={"platoon_number": 0},
                             cookies={'bonds': jwt_token}
@@ -150,7 +150,7 @@ async def test_get_platoon_commander(ac: AsyncClient, test_async_session: AsyncS
 
     query = select(User).where(User.telegram_id == 817)
 
-    user: User = await test_async_session.scalar(query)
+    user: User = await tst_async_session.scalar(query)
 
     user: dict = user.convert_to_dict()
 
@@ -166,7 +166,7 @@ async def test_get_platoon_commander(ac: AsyncClient, test_async_session: AsyncS
     }
 
 
-async def test_get_count_squad_in_platoon(ac: AsyncClient, test_async_session: AsyncSession):
+async def test_get_count_squad_in_platoon(ac: AsyncClient, tst_async_session: AsyncSession):
     response = await ac.get("/platoons/get_count_squad_in_platoon",
                             params={"platoon_number": 0},
                             cookies={'bonds': jwt_token}

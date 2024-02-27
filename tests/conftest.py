@@ -30,7 +30,7 @@ async def override_get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest.fixture(autouse=True, scope='session')
-async def test_async_session() -> AsyncGenerator[AsyncSession, None]:
+async def tst_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
 
