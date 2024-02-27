@@ -13,7 +13,6 @@ import models # noqa
 from services.database.connector import get_async_session
 from config import app_settings
 from src import BaseTable
-
 from main import app
 
 # DATABASE
@@ -37,10 +36,6 @@ async def test_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 app.dependency_overrides[get_async_session] = override_get_async_session
-
-
-def pytest_configure(config):
-    config.option.file_or_dir = ['test_file1.py', 'test_file2.py', 'test_file3.py']
 
 
 @pytest.fixture(autouse=True, scope='session')
