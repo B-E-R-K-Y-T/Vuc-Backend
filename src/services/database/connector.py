@@ -52,11 +52,10 @@ def session_init(func: Callable) -> Callable:
     """
     @wraps(func)
     async def wrapper(*args, **kwargs):
-        session: AsyncSession = await anext(get_async_session())
-
-        if asyncio.iscoroutinefunction(func):
-            return await func(*args, **kwargs, session=session)
-        else:
-            return func(*args, **kwargs, session=session)
+        async with async_session_factory() as session:
+            if asyncio.iscoroutinefunction(func):
+                return await func(*args, **kwargs, session=session)
+            else:
+                return func(*args, **kwargs, session=session)
 
     return wrapper

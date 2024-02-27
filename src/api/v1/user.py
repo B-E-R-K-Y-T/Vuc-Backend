@@ -19,7 +19,7 @@ router = APIRouter(
 #              response_model=schemas.user.UserCreateResponse,
 #              status_code=HTTPStatus.CREATED)
 @exception_handler
-async def register(user: schemas.user.UserDTO, session: AsyncSession = Depends(get_async_session)):
+async def register(user: schemas.user.UserCreateDTO, session: AsyncSession = Depends(get_async_session)):
     token = await DatabaseWorker.register_user(user, session)
 
     return {'token': token}

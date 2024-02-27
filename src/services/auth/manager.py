@@ -1,11 +1,14 @@
+from http import HTTPStatus
 from typing import Optional
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, schemas
 
 from config import app_settings
+from exceptions import PlatoonError
 from services.auth.database import get_user_db
 from models.user import User
+from services.database.worker import DatabaseWorker
 from services.logger import LOGGER
 from services.util import TokenGenerator, convert_schema_to_dict
 
@@ -28,6 +31,13 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         await self.validate_password(user_create.password, user_create)
 
         existing_user = await self.user_db.get_by_email(user_create.email)
+
+        if not await DatabaseWorker.platoon_commander_is_exist(user_create.platoon_number):
+            raise PlatoonError(
+                f"Взвод {user_create.platoon_number} уже имеет командира!",
+                status=HTTPStatus.BAD_REQUEST
+            )
+
         if existing_user is not None:
             raise exceptions.UserAlreadyExists()
 

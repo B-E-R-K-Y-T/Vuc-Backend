@@ -34,12 +34,11 @@ class UserReadDTO(fastapi_users_schemas.BaseUser[int]):
     class Config:
         from_attributes = True
 
-
 class UserIDDTO(BaseModel):
     id: int
 
 
-class UserDTO(fastapi_users_schemas.BaseUserCreate):
+class UserCreateDTO(fastapi_users_schemas.BaseUserCreate):
     name: str
     date_of_birth: datetime
     phone: str
@@ -57,3 +56,18 @@ class UserDTO(fastapi_users_schemas.BaseUserCreate):
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
+
+
+class UserDTO(BaseModel):
+    name: str
+    date_of_birth: datetime
+    phone: str
+    email: EmailStr
+    address: str
+    institute: str
+    direction_of_study: str
+    group_study: str
+    platoon_number: int
+    squad_number: _SquadRange
+    role: _RoleRange
+    telegram_id: int

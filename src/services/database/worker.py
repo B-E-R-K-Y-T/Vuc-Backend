@@ -1,31 +1,54 @@
 from http import HTTPStatus
 
-from fastapi import Depends
-from sqlalchemy import insert, select, func
+from sqlalchemy import insert, select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config import Roles
 from exceptions import PlatoonError
-from schemas.platoon import PlatoonDTO as PlatoonDTO
 from models import User, Platoon
-from services.database.connector import session_init, BaseTable, get_async_session
+from services.database.connector import session_init, BaseTable
 
 
 class DatabaseWorker:
     @classmethod
     @session_init
-    async def get_platoon(cls, platoon_number: int, session: AsyncSession) -> PlatoonDTO:
+    async def get_platoon(cls, platoon_number: int, session: AsyncSession):
         if not await cls.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
                 f"{platoon_number=} not found",
                 status=HTTPStatus.NOT_FOUND
             )
 
-        query = select(Platoon).where(platoon_number == Platoon.platoon_number)
+        query = select(User).where(platoon_number == User.platoon_number)
 
-        platoon: Platoon = await session.scalar(query)
+        users = await session.scalars(query)
         await session.commit()
 
-        return PlatoonDTO.model_validate(platoon.convert_to_dict())
+        return users
+
+    @classmethod
+    @session_init
+    async def get_platoons(cls, session: AsyncSession):
+        query = select(Platoon)
+
+        platoons = await session.scalars(query)
+        await session.commit()
+
+        return platoons
+
+    @classmethod
+    @session_init
+    async def get_platoon_commander(cls, platoon_number: int, session: AsyncSession) -> dict:
+        query = (select(User)
+                 .where(and_(User.role == Roles.platoon_commander,
+                             User.platoon_number == platoon_number)
+                        )
+                 )
+
+        commander = await session.scalar(query)
+        await session.commit()
+
+        return commander.convert_to_dict()
 
     @classmethod
     @session_init
@@ -64,10 +87,14 @@ class DatabaseWorker:
     async def platoon_number_is_exist(cls, platoon_number: int) -> bool:
         return await cls._check_exist_entity(Platoon, platoon_number)
 
+    @classmethod
+    async def platoon_commander_is_exist(cls, platoon_number: int) -> bool:
+        return await cls._check_exist_entity(User, Roles.platoon_commander, platoon_number)
+
     @staticmethod
     @session_init
-    async def _check_exist_entity(entity: BaseTable, entity_id: int, session: AsyncSession) -> bool:
-        ent = await session.get(entity, entity_id)
+    async def _check_exist_entity(entity: BaseTable, *entity_id, session: AsyncSession) -> bool:
+        ent = await session.get(entity, list[entity_id])
 
         if ent is not None:
             return True
