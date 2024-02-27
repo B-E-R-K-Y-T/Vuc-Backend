@@ -38,6 +38,9 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 def session_init(func: Callable) -> Callable:
+    raise DeprecationWarning(
+        "This function is deprecated and will be removed in"
+    )
     """
     Декоратор для неявной инициализации сессии, для подключения к бд в функции, через аргумент
 

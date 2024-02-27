@@ -14,17 +14,6 @@ router = APIRouter(
 )
 
 
-# @router.post("/register",
-#              description='Регистрация пользователя',
-#              response_model=schemas.user.UserCreateResponse,
-#              status_code=HTTPStatus.CREATED)
-@exception_handler
-async def register(user: schemas.user.UserCreateDTO, session: AsyncSession = Depends(get_async_session)):
-    token = await DatabaseWorker.register_user(user, session)
-
-    return {'token': token}
-
-
 @router.get("/admin-protected-route")
 @exception_handler
 async def admin_protected_route(user: User = Depends(auth_user.access_from_admin(current_user))):
@@ -36,5 +25,6 @@ async def admin_protected_route(user: User = Depends(auth_user.access_from_admin
 
 @router.get("/student-protected-route")
 @exception_handler
-async def student_protected_route(user: User = Depends(auth_user.access_from_student(current_user))):
-    return f"Hello, {user.name}, {await DatabaseWorker.platoon_number_is_exist(236666660)}"
+async def student_protected_route(user: User = Depends(auth_user.access_from_student(current_user)),
+                                  session: AsyncSession = Depends(get_async_session)):
+    return f"Hello, {user.name}, {await DatabaseWorker(session).platoon_number_is_exist(236666660)}"
