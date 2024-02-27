@@ -4,7 +4,7 @@ A backend base on fastAPI framework.
 
 ## Getting Started
 
-1. python -m venv .venv
+1. python -m venv .venv (if it does not exist or is incompatible)
 2. ./.venv/Scripts/activate
 3. pip install -r .\requirements.txt
 4. *Up your database*
