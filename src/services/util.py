@@ -77,22 +77,3 @@ def convert_schema_to_dict(schema: BaseModel) -> dict:
             res[key] = value
 
     return res
-
-
-def build_response_schema_by_field(data: list[dict], name_field: str) -> list[dict]:
-    transformed_data = [{}]
-
-    for item in data:
-        key = item[name_field]
-        item.pop(name_field)
-        transformed_data[0][key] = item
-
-    return transformed_data
-
-    #
-    # for item in seq:
-    #     for k, v in item.items():
-    #         if k == name_field:
-    #             continue
-    #         else:
-    #             ...
