@@ -4,12 +4,15 @@ from typing import AsyncGenerator
 import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
-from services.database.connector import get_async_session, BaseTable
+import models # noqa
+from services.database.connector import get_async_session
 from config import app_settings
+from src import BaseTable
 
 from main import app
 
@@ -18,7 +21,7 @@ DATABASE_URL_TEST = str(app_settings.TEST_DATABASE_DSN)
 
 metadata = BaseTable.metadata
 engine_test = create_async_engine(DATABASE_URL_TEST, poolclass=NullPool)
-async_session_maker = sessionmaker(engine_test, class_=AsyncSession, expire_on_commit=False)
+async_session_maker = sessionmaker(bind=engine_test, class_=AsyncSession, expire_on_commit=False)
 metadata.bind = engine_test
 
 
@@ -27,13 +30,24 @@ async def override_get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
+@pytest.fixture(autouse=True, scope='session')
+async def test_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        yield session
+
+
 app.dependency_overrides[get_async_session] = override_get_async_session
+
+
+def pytest_configure(config):
+    config.option.file_or_dir = ['test_file1.py', 'test_file2.py', 'test_file3.py']
 
 
 @pytest.fixture(autouse=True, scope='session')
 async def prepare_database():
     async with engine_test.begin() as conn:
         await conn.run_sync(metadata.create_all)
+        await conn.execute(text('INSERT INTO platoon (vus, platoon_number, semester)VALUES(0,0,0);'))
     yield
     async with engine_test.begin() as conn:
         await conn.run_sync(metadata.drop_all)
@@ -48,7 +62,10 @@ def event_loop(request):
     loop.close()
 
 
-client = TestClient(app)
+@pytest.fixture(scope='function')
+def client() -> TestClient:
+    with TestClient(app) as test_client:
+        yield test_client
 
 
 @pytest.fixture(scope="session")

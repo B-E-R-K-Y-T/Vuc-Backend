@@ -13,4 +13,4 @@ class PlatoonDTO(PlatoonNumberDTO):
 
 
 class CountSquadDTO(BaseModel):
-    count: int
+    count_squad: int

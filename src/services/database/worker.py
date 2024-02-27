@@ -40,6 +40,12 @@ class DatabaseWorker:
         commander = await self.session.scalar(query)
         await self.session.commit()
 
+        if commander is None:
+            raise PlatoonError(
+                message=f'Командир во взводе "{platoon_number}" не найден',
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
         return commander.convert_to_dict()
 
     async def create_platoon(self, platoon: PlatoonDTO):

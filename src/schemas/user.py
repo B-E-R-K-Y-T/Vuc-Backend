@@ -24,7 +24,7 @@ class _RoleRange(Enum):
 
 class UserReadDTO(fastapi_users_schemas.BaseUser[int]):
     id: int
-    email: str
+    email: EmailStr
     name: str
     is_active: bool = True
     is_superuser: bool = False
@@ -33,6 +33,7 @@ class UserReadDTO(fastapi_users_schemas.BaseUser[int]):
 
     class Config:
         from_attributes = True
+
 
 class UserIDDTO(BaseModel):
     id: int

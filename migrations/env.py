@@ -13,6 +13,7 @@ import models  # noqa
 from config import app_settings
 from services.database.connector import BaseTable
 
+print(BaseTable.metadata)
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
