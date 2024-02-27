@@ -31,11 +31,15 @@ class DatabaseWorker:
         return platoons
 
     async def get_platoon_commander(self, platoon_number: int) -> dict:
-        query = (select(User)
-                 .where(and_(User.role == Roles.platoon_commander,
-                             User.platoon_number == platoon_number)
-                        )
-                 )
+        query = (
+            select(User).
+            where(
+                and_(
+                    User.role == Roles.platoon_commander,
+                    User.platoon_number == platoon_number
+                )
+            )
+        )
 
         commander = await self.session.scalar(query)
         await self.session.commit()
@@ -65,7 +69,10 @@ class DatabaseWorker:
             select(func.sum(1)).
             select_from(
                 select(User.squad_number).
-                where(User.platoon_number == platoon_number, User.squad_number.in_([1, 2, 3])).
+                where(
+                    and_(
+                        User.platoon_number == platoon_number,
+                        User.squad_number.in_([1, 2, 3]))).
                 group_by(User.squad_number).subquery())
         )
 

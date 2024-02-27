@@ -1,6 +1,4 @@
-import asyncio
-from functools import wraps
-from typing import AsyncGenerator, Callable
+from typing import AsyncGenerator
 
 from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase
@@ -35,30 +33,3 @@ async_session_factory = sessionmaker(engine, class_=AsyncSession, expire_on_comm
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_factory() as session:
         yield session
-
-
-def session_init(func: Callable) -> Callable:
-    raise DeprecationWarning(
-        "This function is deprecated and will be removed in"
-    )
-    """
-    Декоратор для неявной инициализации сессии, для подключения к бд в функции, через аргумент
-
-    Пример:
-
-    @session_init
-    async def platoon_is_exist(platoon_number: int, session: AsyncSession):
-        ...
-
-    # Не надо явно открывать сессию при вызове.
-    await platoon_is_exist(115)
-    """
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        async with async_session_factory() as session:
-            if asyncio.iscoroutinefunction(func):
-                return await func(*args, **kwargs, session=session)
-            else:
-                return func(*args, **kwargs, session=session)
-
-    return wrapper
