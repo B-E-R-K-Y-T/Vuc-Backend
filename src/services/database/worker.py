@@ -20,7 +20,15 @@ class DatabaseWorker:
         users = await self.session.scalars(query)
         await self.session.commit()
 
-        return users
+        result = users.all()
+
+        if not result:
+            raise PlatoonError(
+                message="Platoon not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        return result
 
     async def get_platoons(self):
         query = select(Platoon)
