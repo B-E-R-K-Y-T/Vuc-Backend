@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from typing import Any
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +13,7 @@ from services.database.worker import DatabaseWorker
 current_user = auth_user.current_user()
 router = APIRouter(
     prefix="/users",
+    dependencies=[Depends(auth_user.access_from_student(current_user))]
 )
 
 
@@ -40,7 +40,7 @@ async def get_user(user_id: int, session: AsyncSession = Depends(get_async_sessi
 
 
 @router.get("/get_user_by_tg",
-            description='Получить пользователя',
+            description='Получить пользователя по его телеграм id',
             response_model=UserRead,
             status_code=HTTPStatus.OK)
 @exception_handler
@@ -80,7 +80,7 @@ async def set_user_email(u_email: UserSetMail, session: AsyncSession = Depends(g
 async def set_user_telegram_id(u_telegram_id: UserSetTelegramID, session: AsyncSession = Depends(get_async_session)):
     if await DatabaseWorker(session).telegram_id_is_exist(u_telegram_id.telegram_id):
         raise TelegramIDError(
-            message=f'Telegram ID{u_telegram_id.telegram_id} already exists.',
+            message=f'Telegram ID {u_telegram_id.telegram_id} already exists.',
             status_code=HTTPStatus.BAD_REQUEST
         )
 
