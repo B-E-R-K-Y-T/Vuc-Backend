@@ -324,7 +324,16 @@ async def test_get_user(ac: AsyncClient, tst_async_session: AsyncSession):
     }
 
 
-async def test_get_user_by_rg(ac: AsyncClient, tst_async_session: AsyncSession):
+async def test_get_user_error(ac: AsyncClient):
+    response = await ac.get("/users/get_user",
+                            params={"user_id": -10},
+                            cookies={'bonds': jwt_token}
+                            )
+
+    assert response.status_code == 404
+
+
+async def test_get_user_by_tg(ac: AsyncClient, tst_async_session: AsyncSession):
     query = (
         select(User).
         where(User.role == 'Admin')
@@ -349,6 +358,15 @@ async def test_get_user_by_rg(ac: AsyncClient, tst_async_session: AsyncSession):
         "name": "string",
         "token": token
     }
+
+
+async def test_get_user_by_tg_error(ac: AsyncClient):
+    response = await ac.get("/users/get_user_by_tg",
+                            params={"telegram_id": -10},
+                            cookies={'bonds': jwt_token}
+                            )
+
+    assert response.status_code == 404
 
 
 async def test_logout_user(ac: AsyncClient):
