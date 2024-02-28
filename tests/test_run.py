@@ -1,4 +1,3 @@
-import pytest  # noqa
 from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -367,6 +366,131 @@ async def test_get_user_by_tg_error(ac: AsyncClient):
                             )
 
     assert response.status_code == 404
+
+
+async def test_set_attrs_to_user(ac: AsyncClient):
+    new_attrs = {
+        "id": 0,
+        "data": {
+            "name": "TEST",
+            "email": "<EMAIL>",
+            "password": "<PASSWORD>",
+            "phone": "123456789",
+            "dob": "1999-12-31",
+            "address": "123 Main Street",
+            "institute": "Test Institute",
+            "group_study": "Test Group Study",
+            "squad_number": 1,
+            "platoon_number": 818,
+            "direction_of_study": "Test Direction Of Study",
+        }
+    }
+    response = await ac.post(
+        url="/users/set_user_attr",
+        json=new_attrs,
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 204
+
+
+async def test_set_attrs_to_user_error(ac: AsyncClient):
+    new_attrs = {
+        "id": 0,
+        "data": {
+            "name": 1,
+            "email": 123,
+            "password": [],
+            "phone": [],
+            "dob": "1999-12-31asdq23easd",
+            "address": [],
+            "institute": [],
+            "group_study": [],
+            "squad_number": [],
+            "platoon_number": [],
+            "direction_of_study": [],
+        }
+    }
+    response = await ac.post(
+        url="/users/set_user_attr",
+        json=new_attrs,
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 422
+
+
+async def test_set_user_mail(ac: AsyncClient):
+    response = await ac.post(
+        url="/users/set_user_mail",
+        json={
+            "id": 1,
+            "email": "user@example.com"
+        },
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 204
+
+
+async def test_set_user_mail_error(ac: AsyncClient):
+    response = await ac.post(
+        url="/users/set_user_mail",
+        json={
+            "id": 1,
+            "email": "-------------"
+        },
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 422
+
+    response = await ac.post(
+        url="/users/set_user_mail",
+        json={
+            "id": 1,
+            "email": "user@example.com"
+        },
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 400
+
+async def test_set_user_telegram_id(ac: AsyncClient):
+    response = await ac.post(
+        url="/users/set_user_telegram_id",
+        json={
+            "id": 1,
+            "telegram_id": 818 + 818
+        },
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 204
+
+
+async def test_set_user_telegram_id_error(ac: AsyncClient):
+    response = await ac.post(
+        url="/users/set_user_telegram_id",
+        json={
+            "id": 1,
+            "telegram_id": "-"
+        },
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 422
+
+    response = await ac.post(
+        url="/users/set_user_telegram_id",
+        json={
+            "id": 1,
+            "telegram_id": 818 + 818
+        },
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 400
 
 
 async def test_logout_user(ac: AsyncClient):

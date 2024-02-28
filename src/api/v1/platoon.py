@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO, PlatoonsDTO
-from schemas.user import UserDTO, UserCreateDTO, UserReadDTO
+from schemas.user import UserDTO, UserCreate, UserRead
 from services.auth.auth import auth_user
 from services.util import exception_handler
 from services.database.worker import DatabaseWorker
@@ -30,7 +30,7 @@ async def register(platoon: PlatoonDTO, session: AsyncSession = Depends(get_asyn
 
 @router.get("/get_platoon",
             description='Получить список взвода',
-            response_model=list[UserCreateDTO],
+            response_model=list[UserCreate],
             status_code=HTTPStatus.OK)
 @exception_handler
 async def get_platoon(platoon_number: int, session: AsyncSession = Depends(get_async_session)):
@@ -63,13 +63,13 @@ async def get_platoons(session: AsyncSession = Depends(get_async_session)):
 
 @router.get("/get_platoon_commander",
             description='Получить командира взвода',
-            response_model=UserReadDTO,
+            response_model=UserRead,
             status_code=HTTPStatus.OK)
 @exception_handler
 async def get_platoons(platoon_number: int, session: AsyncSession = Depends(get_async_session)):
     commander = await DatabaseWorker(session).get_platoon_commander(platoon_number)
 
-    return UserReadDTO.model_validate(commander, from_attributes=True)
+    return UserRead.model_validate(commander, from_attributes=True)
 
 
 @router.get("/get_count_squad_in_platoon",

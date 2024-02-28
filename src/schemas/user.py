@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Extra
 from fastapi_users import schemas as fastapi_users_schemas
 
 from services.auth.auth import Roles
@@ -26,7 +26,7 @@ class UserRole(BaseModel):
     role: _RoleRange
 
 
-class UserReadDTO(fastapi_users_schemas.BaseUser[int]):
+class UserRead(fastapi_users_schemas.BaseUser[int]):
     id: int
     email: EmailStr
     name: str
@@ -39,11 +39,11 @@ class UserReadDTO(fastapi_users_schemas.BaseUser[int]):
         from_attributes = True
 
 
-class UserIDDTO(BaseModel):
+class UserID(BaseModel):
     id: int
 
 
-class UserCreateDTO(fastapi_users_schemas.BaseUserCreate):
+class UserCreate(fastapi_users_schemas.BaseUserCreate):
     name: str
     date_of_birth: datetime
     phone: str
@@ -75,4 +75,28 @@ class UserDTO(BaseModel):
     platoon_number: int
     squad_number: _SquadRange
     role: _RoleRange
+    telegram_id: int
+
+
+class EditUser(BaseModel):
+    name: Optional[str] = None
+    date_of_birth: Optional[datetime] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    institute: Optional[str] = None
+    direction_of_study: Optional[str] = None
+    group_study: Optional[str] = None
+    platoon_number: Optional[int] = None
+    squad_number: Optional[_SquadRange] = None
+
+
+class UserSetAttr(UserID):
+    data: EditUser
+
+
+class UserSetMail(UserID):
+    email: EmailStr
+
+
+class UserSetTelegramID(UserID):
     telegram_id: int

@@ -1,6 +1,7 @@
 from http import HTTPStatus
+from typing import Any
 
-from sqlalchemy import insert, select, func, and_
+from sqlalchemy import insert, select, func, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
@@ -85,6 +86,17 @@ class DatabaseWorker:
 
         return user
 
+    async def set_user_attr(self, user_id: int, **kwargs):
+        stmt = (
+            update(User).
+            values(**kwargs).
+            where(User.id == user_id)
+        )
+
+        await self.session.execute(stmt)
+        await self.session.commit()
+
+
     async def get_platoon_commander(self, platoon_number: int) -> dict:
         query = (
             select(User).
@@ -147,6 +159,9 @@ class DatabaseWorker:
 
     async def telegram_id_is_exist(self, telegram_id: int) -> bool:
         return await self._check_exist_entity_column(User, {User.telegram_id.name: telegram_id})
+
+    async def email_is_exist(self, email: str) -> bool:
+        return await self._check_exist_entity_column(User, {User.email.name: email})
 
     async def platoon_number_is_exist(self, platoon_number: int) -> bool:
         return await self._check_exist_entity(Platoon, platoon_number)
