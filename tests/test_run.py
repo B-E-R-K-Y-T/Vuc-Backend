@@ -271,7 +271,7 @@ async def test_get_count_squad_in_platoon_error(ac: AsyncClient):
     assert response.status_code == 404
 
 
-async def get_user_role(ac: AsyncClient, tst_async_session: AsyncSession):
+async def test_get_user_role(ac: AsyncClient, tst_async_session: AsyncSession):
     query = (
         select(User).
         where(User.role == 'Admin')
@@ -289,13 +289,66 @@ async def get_user_role(ac: AsyncClient, tst_async_session: AsyncSession):
     }
 
 
-async def get_user_role_error(ac: AsyncClient):
+async def test_get_user_role_error(ac: AsyncClient):
     response = await ac.get("/users/get_user_role",
                             params={"user_id": -1},
                             cookies={'bonds': jwt_token}
                             )
 
     assert response.status_code == 404
+
+
+async def test_get_user(ac: AsyncClient, tst_async_session: AsyncSession):
+    query = (
+        select(User).
+        where(User.role == 'Admin')
+    )
+    user = await tst_async_session.scalar(query)
+    token = user.convert_to_dict()['token']
+    user_id = user.convert_to_dict()['id']
+
+    response = await ac.get("/users/get_user",
+                            params={"user_id": user_id},
+                            cookies={'bonds': jwt_token}
+                            )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": user_id,
+        "email": "user818@example.com",
+        "is_active": true,
+        "is_superuser": false,
+        "is_verified": false,
+        "name": "string",
+        "token": token
+    }
+
+
+async def test_get_user_by_rg(ac: AsyncClient, tst_async_session: AsyncSession):
+    query = (
+        select(User).
+        where(User.role == 'Admin')
+    )
+    user = await tst_async_session.scalar(query)
+    token = user.convert_to_dict()['token']
+    user_id = user.convert_to_dict()['id']
+    telegram_id = user.convert_to_dict()['telegram_id']
+
+    response = await ac.get("/users/get_user_by_tg",
+                            params={"telegram_id": telegram_id},
+                            cookies={'bonds': jwt_token}
+                            )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": user_id,
+        "email": "user818@example.com",
+        "is_active": true,
+        "is_superuser": false,
+        "is_verified": false,
+        "name": "string",
+        "token": token
+    }
 
 
 async def test_logout_user(ac: AsyncClient):

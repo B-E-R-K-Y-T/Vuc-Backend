@@ -53,6 +53,38 @@ class DatabaseWorker:
 
         return user.convert_to_dict()['role']
 
+    async def get_user(self, user_id: int) -> User:
+        if not await self.user_is_exist(user_id):
+            raise UserNotFoundError(
+                message=f"User {user_id=} not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = (
+            select(User).
+            filter_by(id=user_id)
+        )
+
+        user = await self.session.scalar(query)
+
+        return user
+
+    async def get_user_by_tg(self, telegram_id: int) -> User:
+        query = (
+            select(User).
+            filter_by(telegram_id=telegram_id)
+        )
+
+        user = await self.session.scalar(query)
+
+        if not user:
+            raise UserNotFoundError(
+                message=f"User {telegram_id=} not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        return user
+
     async def get_platoon_commander(self, platoon_number: int) -> dict:
         query = (
             select(User).
