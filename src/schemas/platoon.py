@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from pydantic import BaseModel
 
@@ -10,6 +10,15 @@ class PlatoonNumberDTO(BaseModel):
 class PlatoonDTO(PlatoonNumberDTO):
     vus: int
     semester: int
+
+
+class PlatoonDataDTO(BaseModel):
+    vus: int
+    semester: int
+
+
+class PlatoonsDTO(BaseModel):
+    data: Dict[int, PlatoonDataDTO]
 
 
 class CountSquadDTO(BaseModel):

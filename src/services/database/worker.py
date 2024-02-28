@@ -93,8 +93,6 @@ class DatabaseWorker:
         count = await self.session.scalar(query)
         await self.session.commit()
 
-
-
         return count
 
     async def telegram_id_is_exist(self, telegram_id: int) -> bool:
@@ -115,8 +113,6 @@ class DatabaseWorker:
         )
 
         commander = await self.session.scalar(query)
-
-        print(f'{commander=}')
 
         if commander is not None:
             return True

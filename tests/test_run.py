@@ -58,6 +58,50 @@ async def test_register_user_commander_platoon(ac: AsyncClient):
 
     assert response.status_code == 201
 
+    response = await ac.post("/auth/register", json={
+        "email": "user816@example.com",
+        "password": "string",
+        "is_active": true,
+        "is_superuser": false,
+        "is_verified": false,
+        "name": "string",
+        "date_of_birth": "2024-02-27T20:01:46.326Z",
+        "phone": "string",
+        "address": "string",
+        "institute": "string",
+        "direction_of_study": "string",
+        "group_study": "string",
+        "platoon_number": 0,
+        "squad_number": 1,
+        "role": "Командир взвода",
+        "telegram_id": 816
+    })
+
+    assert response.status_code == 400
+
+
+async def test_register_user_commander_squad(ac: AsyncClient):
+    response = await ac.post("/auth/register", json={
+        "email": "user816@example.com",
+        "password": "string",
+        "is_active": true,
+        "is_superuser": false,
+        "is_verified": false,
+        "name": "string",
+        "date_of_birth": "2024-02-27T20:01:46.326Z",
+        "phone": "string",
+        "address": "string",
+        "institute": "string",
+        "direction_of_study": "string",
+        "group_study": "string",
+        "platoon_number": 0,
+        "squad_number": 1,
+        "role": "Командир отделения",
+        "telegram_id": 816
+    })
+
+    assert response.status_code == 201
+
 
 async def test_login_user(ac: AsyncClient):
     global jwt_token
@@ -142,6 +186,36 @@ async def test_get_platoon(ac: AsyncClient):
     ]
 
 
+async def test_get_platoons(ac: AsyncClient):
+    response = await ac.get(
+        url="/platoons/get_platoons",
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "data": {
+            "0": {
+                "vus": 0,
+                "semester": 0
+            },
+            "818": {
+                "vus": 818,
+                "semester": 818
+            }
+        }
+    }
+
+
+async def test_get_platoon(ac: AsyncClient):
+    response = await ac.get("/platoons/get_platoon",
+                            params={"platoon_number": -10},
+                            cookies={'bonds': jwt_token}
+                            )
+
+    assert response.status_code == 404
+
+
 async def test_get_platoon_commander(ac: AsyncClient, tst_async_session: AsyncSession):
     response = await ac.get("/platoons/get_platoon_commander",
                             params={"platoon_number": 0},
@@ -166,7 +240,16 @@ async def test_get_platoon_commander(ac: AsyncClient, tst_async_session: AsyncSe
     }
 
 
-async def test_get_count_squad_in_platoon(ac: AsyncClient, tst_async_session: AsyncSession):
+async def test_get_platoon_commander_error(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get("/platoons/get_platoon_commander",
+                            params={"platoon_number": -10},
+                            cookies={'bonds': jwt_token}
+                            )
+
+    assert response.status_code == 404
+
+
+async def test_get_count_squad_in_platoon(ac: AsyncClient):
     response = await ac.get("/platoons/get_count_squad_in_platoon",
                             params={"platoon_number": 0},
                             cookies={'bonds': jwt_token}
@@ -178,8 +261,16 @@ async def test_get_count_squad_in_platoon(ac: AsyncClient, tst_async_session: As
     }
 
 
+async def test_get_count_squad_in_platoon_error(ac: AsyncClient):
+    response = await ac.get("/platoons/get_count_squad_in_platoon",
+                            params={"platoon_number": -10},
+                            cookies={'bonds': jwt_token}
+                            )
+
+    assert response.status_code == 404
+
+
 async def test_logout_user(ac: AsyncClient):
-    global jwt_token
     response = await ac.post("/auth/jwt/logout",
                              cookies={'bonds': jwt_token}
                              )

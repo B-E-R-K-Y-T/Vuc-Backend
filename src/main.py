@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi import Request
 from fastapi.responses import ORJSONResponse
 
 from config import app_settings
@@ -7,6 +8,7 @@ from api.v1.user import router as user_router
 from api.v1.platoon import router as platoon_router
 from schemas.user import UserReadDTO, UserCreateDTO
 from services.auth.auth import auth_backend, auth_user
+from exceptions import MainVucException
 
 app = FastAPI(
     title=app_settings.APP_TITLE,
@@ -35,6 +37,11 @@ app.include_router(
     prefix="/auth",
     tags=["Auth"],
 )
+
+
+@app.exception_handler(MainVucException)
+async def exception_handler(request: Request, exc: MainVucException):
+    return ORJSONResponse(status_code=exc.status_code, content=f'Detail: {str(exc)}, JSON: {request.json()}')
 
 
 if __name__ == '__main__':

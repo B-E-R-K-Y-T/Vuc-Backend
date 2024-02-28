@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO
+from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO, PlatoonsDTO
 from schemas.user import UserDTO, UserCreateDTO, UserReadDTO
 from services.auth.auth import auth_user
 from services.util import exception_handler
@@ -39,18 +39,26 @@ async def get_platoon(platoon_number: int, session: AsyncSession = Depends(get_a
     return [UserDTO.model_validate(user, from_attributes=True) for user in platoon]
 
 
-# @router.get("/get_platoons",
-#             description='Получить список взводов',
-#             response_model=list[PlatoonsDTO],
-#             status_code=HTTPStatus.OK)
-# @exception_handler
-# async def get_platoons():
-#     platoons = await DatabaseWorker.get_platoons()
-#     platoons = [PlatoonDTO.model_validate(platoon, from_attributes=True).dict() for platoon in platoons]
-#
-#     print(build_response_schema_by_field(platoons, 'platoon_number'))
-#
-#     return platoons
+@router.get("/get_platoons",
+            description='Получить список взводов',
+            response_model=PlatoonsDTO,
+            status_code=HTTPStatus.OK)
+@exception_handler
+async def get_platoons(session: AsyncSession = Depends(get_async_session)):
+    platoons = await DatabaseWorker(session).get_platoons()
+
+    data = platoons.all()
+    transformed_data = {}
+
+    for model in data:
+        item = model.convert_to_dict()
+        platoon_number = item['platoon_number']
+        transformed_data[platoon_number] = {
+            "vus": item["vus"],
+            "semester": item["semester"]
+        }
+
+    return PlatoonsDTO(data=transformed_data)
 
 
 @router.get("/get_platoon_commander",
