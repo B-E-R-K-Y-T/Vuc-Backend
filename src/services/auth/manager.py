@@ -5,7 +5,7 @@ from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, schemas
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from config import app_settings
+from config import app_settings, Roles
 from exceptions import PlatoonError
 from services.auth.database import get_user_db
 from models.user import User
@@ -41,11 +41,12 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         if existing_user is not None:
             raise exceptions.UserAlreadyExists()
 
-        if await DatabaseWorker(self.session).platoon_commander_is_exist(user_create.platoon_number):
-            raise PlatoonError(
-                f"Взвод {user_create.platoon_number} уже имеет командира!",
-                status_code=HTTPStatus.BAD_REQUEST
-            )
+        if user_create.role.value == Roles.platoon_commander:
+            if await DatabaseWorker(self.session).platoon_commander_is_exist(user_create.platoon_number):
+                raise PlatoonError(
+                    f"Взвод {user_create.platoon_number} уже имеет командира!",
+                    status_code=HTTPStatus.BAD_REQUEST
+                )
 
         user_dict = convert_schema_to_dict(user_create)
 
