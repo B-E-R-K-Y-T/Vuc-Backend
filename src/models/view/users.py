@@ -6,8 +6,18 @@ from models.platoon import Platoon
 from services.database.view import View
 from services.database.connector import BaseTable
 
-vus = select(Platoon.vus).where(User.platoon_number == Platoon.platoon_number).subquery()
-course_number = select(Platoon.semester).where(User.platoon_number == Platoon.platoon_number).subquery()
+vus = (
+    select(Platoon.vus)
+    .where(
+        User.platoon_number == Platoon.platoon_number
+    )
+).scalar_subquery().label('vus')
+course_number = (
+    select(Platoon.semester)
+    .where(
+        User.platoon_number == Platoon.platoon_number
+    )
+).scalar_subquery().label('course_number')
 
 
 class Users(BaseTable, View):

@@ -1,12 +1,11 @@
 from http import HTTPStatus
-from typing import Any
 
 from sqlalchemy import insert, select, func, and_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
 from exceptions import PlatoonError, UserNotFoundError
-from models import User, Platoon
+from models import User, Platoon, Subject
 from schemas.platoon import PlatoonDTO
 from services.database.connector import BaseTable
 
@@ -38,6 +37,26 @@ class DatabaseWorker:
         await self.session.commit()
 
         return platoons
+
+    async def get_subjects(self, platoon_number: int, semester: int):
+        if not await self.platoon_number_is_exist(platoon_number):
+            raise PlatoonError(
+                message="Platoon not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = (
+            select(Subject).
+            filter_by(
+                platoon_id=platoon_number,
+                semester=semester
+            )
+        )
+
+        subjects = await self.session.scalars(query)
+        await self.session.commit()
+
+        return subjects
 
     async def get_user_role(self, user_id: int) -> str:
         if not await self.user_is_exist(user_id):
@@ -96,7 +115,6 @@ class DatabaseWorker:
         await self.session.execute(stmt)
         await self.session.commit()
 
-
     async def get_platoon_commander(self, platoon_number: int) -> dict:
         query = (
             select(User).
@@ -154,18 +172,23 @@ class DatabaseWorker:
 
         return count
 
+    # TODO: Попробовать использовать функцию exists()
     async def user_is_exist(self, user_id: int) -> bool:
         return await self._check_exist_entity(User, user_id)
 
+    # TODO: Попробовать использовать функцию exists()
     async def telegram_id_is_exist(self, telegram_id: int) -> bool:
         return await self._check_exist_entity_column(User, {User.telegram_id.name: telegram_id})
 
+    # TODO: Попробовать использовать функцию exists()
     async def email_is_exist(self, email: str) -> bool:
         return await self._check_exist_entity_column(User, {User.email.name: email})
 
+    # TODO: Попробовать использовать функцию exists()
     async def platoon_number_is_exist(self, platoon_number: int) -> bool:
         return await self._check_exist_entity(Platoon, platoon_number)
 
+    # TODO: Попробовать использовать функцию exists()
     async def platoon_commander_is_exist(self, platoon_number: int) -> bool:
         query = (
             select(User).

@@ -1,8 +1,8 @@
 from httpx import AsyncClient
-from sqlalchemy import select
+from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import User
+from models import User, Subject
 
 # Чтобы можно было просто скопировать тело ответа и запроса из Swagger и ничо не менять
 true = True
@@ -456,6 +456,7 @@ async def test_set_user_mail_error(ac: AsyncClient):
 
     assert response.status_code == 400
 
+
 async def test_set_user_telegram_id(ac: AsyncClient):
     response = await ac.post(
         url="/users/set_user_telegram_id",
@@ -493,9 +494,49 @@ async def test_set_user_telegram_id_error(ac: AsyncClient):
     assert response.status_code == 400
 
 
+async def test_get_subjects(ac: AsyncClient, tst_async_session: AsyncSession):
+    for i in range(3):
+        stmt = (
+            insert(
+                Subject
+            ).values(
+                name=f"Test Subject_{i}",
+                admin_id=0,
+                platoon_id=0,
+                semester=1,
+            )
+        )
+        await tst_async_session.execute(stmt)
+        await tst_async_session.commit()
+
+    response = await ac.get(
+        url="/professor/get_subjects",
+        params={"platoon_number": 0, "semester": 1},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {'id': 1, 'platoon_id': 0, 'semester': 1, 'admin_id': 0, 'name': 'Test Subject_0'},
+        {'id': 2, 'platoon_id': 0, 'semester': 1, 'admin_id': 0, 'name': 'Test Subject_1'},
+        {'id': 3, 'platoon_id': 0, 'semester': 1, 'admin_id': 0, 'name': 'Test Subject_2'}
+    ]
+
+
+async def test_get_subjects_error(ac: AsyncClient):
+    response = await ac.get(
+        url="/professor/get_subjects",
+        params={"platoon_number": 352, "semester": 1},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 404
+
+
 async def test_logout_user(ac: AsyncClient):
-    response = await ac.post("/auth/jwt/logout",
-                             cookies={'bonds': jwt_token}
-                             )
+    response = await ac.post(
+        url="/auth/jwt/logout",
+        cookies={'bonds': jwt_token}
+    )
 
     assert response.status_code == 204

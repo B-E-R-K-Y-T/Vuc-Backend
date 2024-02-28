@@ -1,8 +1,8 @@
-"""delete all view
+"""drop all view
 
-Revision ID: 71c750d86098
-Revises: 0e950a63d9e8
-Create Date: 2024-02-24 21:34:38.339978
+Revision ID: 2861b12e4b13
+Revises: 6df322921ecc
+Create Date: 2024-02-28 23:44:37.497303
 
 """
 from typing import Sequence, Union
@@ -17,8 +17,8 @@ from models.view.students import Students
 from models.view.users import Users
 
 # revision identifiers, used by Alembic.
-revision: str = '71c750d86098'
-down_revision: Union[str, None] = '0e950a63d9e8'
+revision: str = "2861b12e4b13"
+down_revision: Union[str, None] = "6df322921ecc"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

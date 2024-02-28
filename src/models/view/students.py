@@ -7,7 +7,10 @@ from services.database.view import View
 from services.database.connector import BaseTable
 from config import Roles
 
-vus = select(Platoon.vus).where(User.platoon_number == Platoon.platoon_number).subquery()
+vus = (
+    select(Platoon.vus).
+    where(User.platoon_number == Platoon.platoon_number)
+).scalar_subquery().label('vus')
 
 
 class Students(BaseTable, View):

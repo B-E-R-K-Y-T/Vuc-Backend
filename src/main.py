@@ -5,6 +5,7 @@ from fastapi.responses import ORJSONResponse
 
 from config import app_settings
 from api.v1.user import router as user_router
+from api.v1.professor import router as professor_router
 from api.v1.platoon import router as platoon_router
 from schemas.user import UserRead, UserCreate
 from services.auth.auth import auth_backend, auth_user
@@ -26,6 +27,10 @@ app.include_router(
 app.include_router(
     platoon_router,
     tags=["Platoon"],
+)
+app.include_router(
+    professor_router,
+    tags=["Professor"],
 )
 app.include_router(
     auth_user.get_auth_router(auth_backend),

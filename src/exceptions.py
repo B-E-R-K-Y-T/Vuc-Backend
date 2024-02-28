@@ -32,10 +32,13 @@ class PlatoonError(MainVucException):
     pass
 
 
+class SubjectError(MainVucException):
+    pass
+
+
 class UserError(MainVucException):
     pass
 
 
 class UserNotFoundError(UserError):
     pass
-
