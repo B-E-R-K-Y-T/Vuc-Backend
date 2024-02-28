@@ -57,7 +57,7 @@ def event_loop(request):
     loop.close()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def client() -> TestClient:
     with TestClient(app) as test_client:
         yield test_client

@@ -1,7 +1,10 @@
+from http import HTTPStatus
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import User
+from schemas.user import UserRole
 from services.auth.auth import auth_user
 from services.database.connector import get_async_session
 from services.util import exception_handler
@@ -13,17 +16,12 @@ router = APIRouter(
 )
 
 
-@router.get("/admin-protected-route")
+@router.get("/get_user_role",
+            description='Получить роль пользователя',
+            response_model=UserRole,
+            status_code=HTTPStatus.OK)
 @exception_handler
-async def admin_protected_route(user: User = Depends(auth_user.access_from_admin(current_user))):
-    p = await DatabaseWorker.get_platoon(0)
-    print(p.vus)
+async def get_user_role(user_id: int, session: AsyncSession = Depends(get_async_session)):
+    commander = await DatabaseWorker(session).get_platoon_commander(user_id)
 
-    return p
-
-
-@router.get("/student-protected-route")
-@exception_handler
-async def student_protected_route(user: User = Depends(auth_user.access_from_student(current_user)),
-                                  session: AsyncSession = Depends(get_async_session)):
-    return f"Hello, {user.name}, {await DatabaseWorker(session).platoon_number_is_exist(23666660)}"
+    return UserRole.model_validate(commander, from_attributes=True)

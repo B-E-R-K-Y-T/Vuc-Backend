@@ -58,6 +58,7 @@ async def test_register_user_commander_platoon(ac: AsyncClient):
 
     assert response.status_code == 201
 
+    # Намеренная ошибка.
     response = await ac.post("/auth/register", json={
         "email": "user816@example.com",
         "password": "string",
@@ -264,6 +265,33 @@ async def test_get_count_squad_in_platoon(ac: AsyncClient):
 async def test_get_count_squad_in_platoon_error(ac: AsyncClient):
     response = await ac.get("/platoons/get_count_squad_in_platoon",
                             params={"platoon_number": -10},
+                            cookies={'bonds': jwt_token}
+                            )
+
+    assert response.status_code == 404
+
+
+async def get_user_role(ac: AsyncClient, tst_async_session: AsyncSession):
+    query = (
+        select(User).
+        where(User.role == 'Admin')
+    )
+    user = await tst_async_session.scalar(query)
+    user_id = user.convert_to_dict()['id']
+    response = await ac.get("/users/get_user_role",
+                            params={"user_id": user_id},
+                            cookies={'bonds': jwt_token}
+                            )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "role": "Admin"
+    }
+
+
+async def get_user_role_error(ac: AsyncClient):
+    response = await ac.get("/users/get_user_role",
+                            params={"user_id": -1},
                             cookies={'bonds': jwt_token}
                             )
 

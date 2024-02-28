@@ -4,7 +4,7 @@ from sqlalchemy import insert, select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
-from exceptions import PlatoonError
+from exceptions import PlatoonError, UserNotFoundError
 from models import User, Platoon
 from schemas.platoon import PlatoonDTO
 from services.database.connector import BaseTable
@@ -37,6 +37,21 @@ class DatabaseWorker:
         await self.session.commit()
 
         return platoons
+
+    async def get_user_role(self, user_id: int) -> str:
+        if not await self.user_is_exist(user_id):
+            raise UserNotFoundError(
+                message=f"User {user_id=} not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = (
+            select(User).
+            where(User.id == user_id)
+        )
+        user = await self.session.scalar(query)
+
+        return user.convert_to_dict()['role']
 
     async def get_platoon_commander(self, platoon_number: int) -> dict:
         query = (
@@ -94,6 +109,9 @@ class DatabaseWorker:
         await self.session.commit()
 
         return count
+
+    async def user_is_exist(self, user_id: int) -> bool:
+        return await self._check_exist_entity(User, user_id)
 
     async def telegram_id_is_exist(self, telegram_id: int) -> bool:
         return await self._check_exist_entity_column(User, {User.telegram_id.name: telegram_id})

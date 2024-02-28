@@ -22,6 +22,10 @@ class _RoleRange(Enum):
     student = Roles.student
 
 
+class UserRole(BaseModel):
+    role: _RoleRange
+
+
 class UserReadDTO(fastapi_users_schemas.BaseUser[int]):
     id: int
     email: EmailStr
