@@ -15,18 +15,18 @@ class DatabaseWorker:
         self.session = session
 
     async def get_platoon(self, platoon_number: int):
+        if not await self.platoon_number_is_exist(platoon_number):
+            raise PlatoonError(
+                message="Platoon not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
         query = select(User).where(platoon_number == User.platoon_number)
 
         users = await self.session.scalars(query)
         await self.session.commit()
 
         result = users.all()
-
-        if not result:
-            raise PlatoonError(
-                message="Platoon not found",
-                status_code=HTTPStatus.NOT_FOUND
-            )
 
         return result
 
@@ -73,6 +73,12 @@ class DatabaseWorker:
         await self.session.commit()
 
     async def get_count_squad_in_platoon(self, platoon_number: int) -> int:
+        if not await self.platoon_number_is_exist(platoon_number):
+            raise PlatoonError(
+                message="Platoon not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
         query = (
             select(func.sum(1)).
             select_from(
@@ -86,6 +92,8 @@ class DatabaseWorker:
 
         count = await self.session.scalar(query)
         await self.session.commit()
+
+
 
         return count
 
@@ -107,6 +115,8 @@ class DatabaseWorker:
         )
 
         commander = await self.session.scalar(query)
+
+        print(f'{commander=}')
 
         if commander is not None:
             return True
