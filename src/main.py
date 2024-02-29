@@ -8,7 +8,7 @@ from api.v1.user import router as user_router
 from api.v1.professor import router as professor_router
 from api.v1.platoon import router as platoon_router
 from schemas.user import UserRead, UserCreate
-from services.admin_panel.admin import init_admin_models
+from services.admin_panel.admin import init_admin_panel
 from services.auth.auth import auth_backend, auth_user
 from exceptions import MainVucException
 from services.database.connector import engine
@@ -46,12 +46,13 @@ app.include_router(
     tags=["Auth"],
 )
 
+init_admin_panel(app, engine)
+
 
 @app.exception_handler(MainVucException)
 async def exception_handler(request: Request, exc: MainVucException):
     return ORJSONResponse(status_code=exc.status_code, content=f'Detail: {str(exc)}, JSON: {request.json()}')
 
-init_admin_models(app, engine)
 
 if __name__ == '__main__':
     # Приложение может запускаться командой

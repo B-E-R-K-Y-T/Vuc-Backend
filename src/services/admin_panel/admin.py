@@ -49,7 +49,7 @@ class PlatoonAdmin(ModelView, model=Platoon):
 ADMIN_MODELS = _model_builder.models
 
 
-def init_admin_models(app, engine):
+def init_admin_panel(app, engine):
     from sqladmin import Admin
 
     administrator = Admin(app=app, engine=engine)
