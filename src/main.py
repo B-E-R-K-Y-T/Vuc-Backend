@@ -51,7 +51,10 @@ init_admin_panel(app, engine)
 
 @app.exception_handler(MainVucException)
 async def exception_handler(request: Request, exc: MainVucException):
-    return ORJSONResponse(status_code=exc.status_code, content=f'Detail: {str(exc)}, JSON: {request.json()}')
+    return ORJSONResponse(
+        status_code=exc.status_code,
+        content=f'Detail: {str(exc)}, JSON: {request.json()}'
+    )
 
 
 if __name__ == '__main__':
