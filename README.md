@@ -22,5 +22,5 @@ docker run --rm --name db-vuc -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES
 
 ### Other
 
-Admin panel URL: /admin
-Docs URL: /api/openapi
+* Admin panel URL: /admin
+* Docs URL: /api/openapi
