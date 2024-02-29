@@ -33,3 +33,11 @@ async_session_factory = sessionmaker(engine, class_=AsyncSession, expire_on_comm
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_factory() as session:
         yield session
+
+
+__all__ = (
+    get_async_session.__name__,
+    'async_session_factory',
+    'engine',
+    BaseTable.__name__
+)

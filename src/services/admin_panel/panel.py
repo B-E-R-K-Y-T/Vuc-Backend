@@ -65,3 +65,9 @@ def init_admin_panel(app, engine):
         administrator.add_view(model)
 
     return administrator
+
+
+__all__ = (
+    init_admin_panel.__name__,
+    'MODELS'
+)
