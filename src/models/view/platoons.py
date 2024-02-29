@@ -16,7 +16,7 @@ commander = (
             User.role == Roles.platoon_commander
         )
     )
-).correlate(Platoon).label('commander')
+).correlate(Platoon).scalar_subquery().label('commander')
 
 squads = (
     select(
@@ -32,7 +32,7 @@ squads = (
         ).
         group_by(User.squad_number).correlate(Platoon).subquery()
     )
-).correlate(Platoon).label('squads')
+).correlate(Platoon).scalar_subquery().label('squads')
 
 
 class Platoons(BaseTable, View):

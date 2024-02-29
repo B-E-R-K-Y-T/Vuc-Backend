@@ -31,8 +31,5 @@ async def get_subjects(platoon_number: int, semester: int, session: AsyncSession
             response_model=list[SubjectDTO],
             status_code=HTTPStatus.OK)
 @exception_handler
-async def get_subjects(platoon_number: int, semester: int, session: AsyncSession = Depends(get_async_session)):
-    subjects = await DatabaseWorker(session).get_subjects(platoon_number, semester)
-
-    return [SubjectDTO.model_validate(subject, from_attributes=True) for subject in subjects]
-
+async def get_marks(session: AsyncSession = Depends(get_async_session)):
+    pass
