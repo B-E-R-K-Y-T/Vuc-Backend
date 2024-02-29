@@ -70,23 +70,7 @@ async def prepare_database():
     async with engine_test.begin() as conn:
         await conn.run_sync(metadata.drop_all)
 
-"""
- id                 | integer           |           | not null | nextval('student_id_seq'::regclass)
- name               | character varying |           | not null |
- phone              | character varying |           | not null |
- date_of_birth      | date              |           | not null |
- mail               | character varying |           | not null |
- address            | character varying |           | not null |
- institute          | character varying |           | not null |
- direction_of_study | character varying |           | not null |
- group_study        | character varying |           | not null |
- platoon_number     | integer           |           | not null |
- vus                | integer           |           | not null |
- squad_number       | integer           |           | not null |
- telegram_id        | integer           |           | not null |
- token              | character varying |           | not null |
- role               | character varying |           | not null |
- """
+
 # SETUP
 @pytest.fixture(scope='session')
 def event_loop(request):
