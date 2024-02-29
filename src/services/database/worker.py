@@ -5,7 +5,7 @@ from sqlalchemy import insert, select, func, and_, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
-from exceptions import PlatoonError, UserNotFound, UserError
+from exceptions import PlatoonError, UserNotFound
 from models import User, Platoon, Subject, Attend
 from models.view.users import Users
 from schemas.platoon import PlatoonDTO
@@ -45,7 +45,8 @@ class DatabaseWorker:
             raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
 
         query = (
-            select(Users.c.course_number).where(Users.c.id == user_id)
+            select(Users.c.course_number).
+            where(Users.c.id == user_id)
         )
 
         semester = await self.session.scalar(query)
