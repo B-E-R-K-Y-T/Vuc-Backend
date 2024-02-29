@@ -29,8 +29,8 @@ class AdminAuth(AuthenticationBackend):
             return False
 
         token = secrets.token_hex(16)
-        request.session.update({"token": token})
 
+        request.session.update({"token": token})
         self.tokens.append(token)
 
         return True
