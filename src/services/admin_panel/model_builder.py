@@ -1,11 +1,11 @@
 from typing import Callable
 
 
-class ModelBuilder:
+class ModelCollector:
     def __init__(self):
         self.admin_models = []
 
-    def attach_model(self):
+    def target_model(self):
         def decorator(model: Callable):
             self.admin_models.append(model)
 
