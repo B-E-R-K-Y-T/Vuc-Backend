@@ -1,6 +1,5 @@
 from sqlalchemy import select, func, and_
 from sqlalchemy_utils import create_view
-from sqlalchemy.orm import aliased
 
 from models.user import User
 from models.platoon import Platoon
