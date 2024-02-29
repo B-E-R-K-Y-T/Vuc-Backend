@@ -17,3 +17,8 @@ class View:
     def drop(cls, op):
         drop_sql = DropView(cls.__table__.fullname, cascade=True)
         op.execute(drop_sql)
+
+    @classmethod
+    @property
+    def c(cls):
+        return cls.__table__.c

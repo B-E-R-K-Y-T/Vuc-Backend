@@ -17,24 +17,27 @@ jwt_token = None
 
 
 async def test_register_user(ac: AsyncClient):
-    response = await ac.post("/auth/register", json={
-        "email": "user818@example.com",
-        "password": "string",
-        "is_active": true,
-        "is_superuser": false,
-        "is_verified": false,
-        "name": "string",
-        "date_of_birth": "2024-02-27T20:01:46.326Z",
-        "phone": "string",
-        "address": "string",
-        "institute": "string",
-        "direction_of_study": "string",
-        "group_study": "string",
-        "platoon_number": 0,
-        "squad_number": 1,
-        "role": "Admin",
-        "telegram_id": 818
-    })
+    response = await ac.post(
+        url="/auth/register",
+        json={
+            "email": "user818@example.com",
+            "password": "string",
+            "is_active": true,
+            "is_superuser": false,
+            "is_verified": false,
+            "name": "string",
+            "date_of_birth": "2024-02-27T20:01:46.326Z",
+            "phone": "string",
+            "address": "string",
+            "institute": "string",
+            "direction_of_study": "string",
+            "group_study": "string",
+            "platoon_number": 0,
+            "squad_number": 1,
+            "role": "Admin",
+            "telegram_id": 818
+        }
+    )
 
     assert response.status_code == 201
 
@@ -553,6 +556,99 @@ async def test_get_semesters(ac: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == {'semesters': [1]}
+
+
+async def test_get_id_from_tg(ac: AsyncClient):
+    response = await ac.get(
+        url="/users/get_id_from_tg",
+        params={"telegram_id": 818},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {'id': 2}
+
+
+async def test_set_visit_user(ac: AsyncClient):
+    response = await ac.post(
+        url="/professor/set_visit_user",
+        json={
+            "date_v": "2024-02-29",
+            "visiting": 1,
+            "user_id": 1
+        }
+        ,
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 204
+
+
+async def test_set_visit_user_error(ac: AsyncClient):
+    response = await ac.post(
+        url="/professor/set_visit_user",
+        json={
+            "date_v": "2024-02-29",
+            "visiting": 3,
+            "user_id": 1
+        }
+        ,
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 422
+
+    response = await ac.post(
+        url="/professor/set_visit_user",
+        json={
+            "date_v": "2024-02-111",
+            "visiting": 1,
+            "user_id": 1
+        }
+        ,
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 422
+
+    response = await ac.post(
+        url="/professor/set_visit_user",
+        json={
+            "date_v": "2024-13-29",
+            "visiting": 1,
+            "user_id": 1
+        }
+        ,
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 422
+
+    response = await ac.post(
+        url="/professor/set_visit_user",
+        json={
+            "date_v": "202-12-29",
+            "visiting": 1,
+            "user_id": 1
+        }
+        ,
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 422
+
+    response = await ac.post(
+        url="/professor/set_visit_user",
+        json={
+            "date_v": "2022-12-29",
+            "visiting": 1,
+            "user_id": -1
+        }
+        ,
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 404
 
 
 async def test_logout_user(ac: AsyncClient):

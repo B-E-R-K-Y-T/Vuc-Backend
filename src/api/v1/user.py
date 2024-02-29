@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from exceptions import TelegramIDError
-from schemas.user import UserRole, UserRead, UserSetAttr, UserSetMail, UserSetTelegramID
+from schemas.user import UserRole, UserRead, UserSetAttr, UserSetMail, UserSetTelegramID, UserID
 from services.auth.auth import auth_user
 from services.database.connector import get_async_session
 from services.util import exception_handler, convert_schema_to_dict
@@ -48,6 +48,17 @@ async def get_user_by_tg(telegram_id: int, session: AsyncSession = Depends(get_a
     user = await DatabaseWorker(session).get_user_by_tg(telegram_id)
 
     return UserRead.model_validate(user, from_attributes=True)
+
+
+@router.get("/get_id_from_tg",
+            description='Получить id пользователя по его телеграм id',
+            response_model=UserID,
+            status_code=HTTPStatus.OK)
+@exception_handler
+async def get_id_from_tg(telegram_id: int, session: AsyncSession = Depends(get_async_session)):
+    user_id = await DatabaseWorker(session).get_tg_from_id(telegram_id)
+
+    return {'id': user_id}
 
 
 @router.post("/set_user_attr",

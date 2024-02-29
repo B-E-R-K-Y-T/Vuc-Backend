@@ -5,8 +5,9 @@ from sqlalchemy import insert, select, func, and_, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
-from exceptions import PlatoonError, UserNotFound
-from models import User, Platoon, Subject
+from exceptions import PlatoonError, UserNotFound, UserError
+from models import User, Platoon, Subject, Attend
+from models.view.users import Users
 from schemas.platoon import PlatoonDTO
 from services.database.connector import BaseTable
 
@@ -38,6 +39,64 @@ class DatabaseWorker:
         await self.session.commit()
 
         return platoons
+
+    async def set_visit_user(self, date_v: str, visiting: int, user_id: int):
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
+
+        query = (
+            select(Users.c.course_number).where(Users.c.id == user_id)
+        )
+
+        semester = await self.session.scalar(query)
+
+        is_exist_query = (
+            exists(Attend.id).
+            where(
+                and_(
+                    Attend.user_id == user_id,
+                    Attend.date_v == date_v
+                )
+            ).
+            select()
+        )
+
+        is_exist = await self.session.scalar(is_exist_query)
+
+        if not is_exist:
+            stmt = (
+                insert(Attend).
+                values(
+                    user_id=user_id,
+                    date_v=date_v,
+                    visiting=visiting,
+                    semester=semester
+                )
+            )
+        else:
+            stmt = (
+                update(Attend).
+                values(
+                    user_id=user_id,
+                    date_v=date_v,
+                    visiting=visiting,
+                    semester=semester
+                )
+            )
+
+        await self.session.execute(stmt)
+        await self.session.commit()
+
+    async def get_tg_from_id(self, telegram_id: int):
+        query = (
+            select(User.id).
+            where(User.telegram_id == telegram_id)
+        )
+
+        telegram_id = await self.session.scalar(query)
+        await self.session.commit()
+
+        return telegram_id
 
     async def get_semesters(self, user_id: int) -> dict[str, Sequence]:
         sub_query = (
@@ -218,9 +277,7 @@ class DatabaseWorker:
             select()
         )
 
-        commander = await self.session.scalar(query)
-
-        return commander
+        return await self.session.scalar(query)
 
     async def _check_exist_entity(self, entity: BaseTable, entity_id) -> bool:
         ent = await self.session.get(entity, entity_id)

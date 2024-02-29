@@ -1,3 +1,6 @@
+from datetime import date
+from enum import Enum
+
 from pydantic import BaseModel
 
 
@@ -26,3 +29,14 @@ class ProfessorID(BaseModel):
 
 class Semesters(BaseModel):
     semesters: list
+
+
+class Visit(Enum):
+    one = 1
+    two = 2
+
+
+class AttendanceDTO(BaseModel):
+    date_v: date
+    visiting: Visit
+    user_id: int
