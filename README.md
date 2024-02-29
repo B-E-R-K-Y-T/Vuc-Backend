@@ -2,6 +2,10 @@
 
 A backend base on fastAPI framework.
 
+## Requirements
+
+Python 3.12
+
 ## Getting Started
 
 1. ```python -m venv .venv``` (if it does not exist or is incompatible)
