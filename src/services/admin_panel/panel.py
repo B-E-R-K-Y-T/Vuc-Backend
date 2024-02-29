@@ -1,7 +1,7 @@
 from sqladmin import ModelView
 
 from models import *
-from .model_builder import ModelCollector
+from .model_worker import ModelCollector
 
 _model_collector = ModelCollector()
 
