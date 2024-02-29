@@ -1,4 +1,5 @@
 import logging
+from logging.handlers import RotatingFileHandler
 
 from config import BASE_DIR
 
@@ -8,13 +9,12 @@ _LOG_MODE = logging.DEBUG
 
 class Logger:
     def __init__(self, file_name=_FILE_NAME):
-        logging.basicConfig(
-            filename=file_name,
-            filemode='a',
-            format='%(asctime)s: %(name)s - %(levelname)s - %(message)s',
-            level=_LOG_MODE
-        )
         self.__logger = logging.getLogger()
+        self.__logger.setLevel(_LOG_MODE)
+
+        handler = RotatingFileHandler(filename=file_name, maxBytes=1024 * 1024, backupCount=2)
+        handler.setFormatter(logging.Formatter('%(asctime)s: %(name)s - %(levelname)s - %(message)s'))
+        self.__logger.addHandler(handler)
 
     def warn(self, *args, **kwargs):
         self.__logger.warning(*args, **kwargs)
