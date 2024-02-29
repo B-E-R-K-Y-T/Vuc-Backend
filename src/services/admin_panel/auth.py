@@ -36,11 +36,12 @@ class AdminAuth(AuthenticationBackend):
         return True
 
     async def logout(self, request: Request) -> bool:
-        request.session.clear()
         token = request.session.get("token")
 
         if token is not None:
             self.tokens.remove(token)
+
+        request.session.clear()
 
         return True
 
