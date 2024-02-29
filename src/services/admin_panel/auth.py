@@ -6,7 +6,7 @@ from fastapi.requests import Request
 from config import app_settings
 
 
-class AdminAuth(AuthenticationBackend):
+class AdminPanelAuth(AuthenticationBackend):
     def __init__(self, secret_key: str = None):
         if secret_key is None:
             super().__init__(secret_key=secrets.token_hex(16))

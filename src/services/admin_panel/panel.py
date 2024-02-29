@@ -56,9 +56,9 @@ MODELS = _model_collector.models
 
 def init_admin_panel(app, engine):
     from sqladmin import Admin
-    from .auth import AdminAuth
+    from .auth import AdminPanelAuth
 
-    authentication_backend = AdminAuth()
+    authentication_backend = AdminPanelAuth()
     administrator = Admin(app=app, engine=engine, authentication_backend=authentication_backend)
 
     for model in MODELS:

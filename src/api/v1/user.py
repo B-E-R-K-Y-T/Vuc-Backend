@@ -73,11 +73,14 @@ async def set_user_email(u_email: UserSetMail, session: AsyncSession = Depends(g
     await DatabaseWorker(session).set_user_attr(u_email.id, email=u_email.email)
 
 
-@router.post("/set_user_telegram_id",
-             description='Установить телеграм id пользователя в некоторое значение',
-             status_code=HTTPStatus.NO_CONTENT)
+# @router.post("/set_user_telegram_id",
+#              description='Установить телеграм id пользователя в некоторое значение',
+#              status_code=HTTPStatus.NO_CONTENT)
 @exception_handler
 async def set_user_telegram_id(u_telegram_id: UserSetTelegramID, session: AsyncSession = Depends(get_async_session)):
+    """
+    Временно вырезано
+    """
     if await DatabaseWorker(session).telegram_id_is_exist(u_telegram_id.telegram_id):
         raise TelegramIDError(
             message=f'Telegram ID {u_telegram_id.telegram_id} already exists.',

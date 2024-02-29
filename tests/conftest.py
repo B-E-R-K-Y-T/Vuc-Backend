@@ -43,11 +43,50 @@ async def prepare_database():
     async with engine_test.begin() as conn:
         await conn.run_sync(metadata.create_all)
         await conn.execute(text('INSERT INTO platoon (vus, platoon_number, semester)VALUES(0,0,0);'))
+        await conn.execute(
+            text("INSERT INTO public.user (name, phone, date_of_birth, address, institute, direction_of_study,"
+                 "platoon_number, squad_number, role, telegram_id, token, group_study, email, registered_at, "
+                 "is_active, is_superuser, is_verified, hashed_password)"
+                 "VALUES('Nik', '89012345678', '2024-02-29T15:07:16.345'::date, 'улица 20', 'IKB',"
+                 "'direction_of_study', 0, 1, 'Студент', 98765, 'token', 'group_study',"
+                 "'email', '2024-02-29T15:07:16.345'::date, 't', 'f', 'f', 'hashed_password');")
+        )
+        await conn.execute(text("INSERT INTO admins (name, email, password)VALUES('Tim','mail@mail.ru','123');"))
+        await conn.execute(text("INSERT INTO day (date, weekday, semester)VALUES('12-22-2023'::date, 0, 0);"))
+        await conn.execute(text("INSERT INTO attend (user_id, date_v, visiting, semester)"
+                                "VALUES(1,'12-22-2023'::date, 1, 1);"))
+        await conn.execute(text("INSERT INTO subject (platoon_id, semester, admin_id, name)"
+                                "VALUES(0, 1, 1, 'subject');"))
+        await conn.execute(text("INSERT INTO grading (subj_id, user_id, mark, mark_date, theme)"
+                                "VALUES(1, 1, 1, '12-22-2023'::date, 'theme');"))
+        await conn.execute(text("INSERT INTO message_queue (telegram_id, message)"
+                                "VALUES(98765, 'message');"))
+        await conn.execute(
+            text("INSERT INTO student (name, phone, date_of_birth, mail, address, institute, direction_of_study,"
+                 "group_study, platoon_number, vus, squad_number, telegram_id, token, role)"
+                 "VALUES('tim', '89012345678', '12-22-2023'::date, 'mail', 'address', 'institute',"
+                 "'direction_of_study', 'group_study', 0, 1, 1, 1000, 'token', 'Студент');"))
     yield
     async with engine_test.begin() as conn:
         await conn.run_sync(metadata.drop_all)
 
-
+"""
+ id                 | integer           |           | not null | nextval('student_id_seq'::regclass)
+ name               | character varying |           | not null |
+ phone              | character varying |           | not null |
+ date_of_birth      | date              |           | not null |
+ mail               | character varying |           | not null |
+ address            | character varying |           | not null |
+ institute          | character varying |           | not null |
+ direction_of_study | character varying |           | not null |
+ group_study        | character varying |           | not null |
+ platoon_number     | integer           |           | not null |
+ vus                | integer           |           | not null |
+ squad_number       | integer           |           | not null |
+ telegram_id        | integer           |           | not null |
+ token              | character varying |           | not null |
+ role               | character varying |           | not null |
+ """
 # SETUP
 @pytest.fixture(scope='session')
 def event_loop(request):
