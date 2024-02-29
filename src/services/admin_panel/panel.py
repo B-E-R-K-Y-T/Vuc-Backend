@@ -2,6 +2,7 @@ from sqladmin import ModelView
 
 from models import *
 from .model_builder import ModelCollector
+from .auth import AdminAuth
 
 _model_collector = ModelCollector()
 
@@ -52,7 +53,8 @@ ADMIN_MODELS = _model_collector.models
 def init_admin_panel(app, engine):
     from sqladmin import Admin
 
-    administrator = Admin(app=app, engine=engine)
+    authentication_backend = AdminAuth()
+    administrator = Admin(app=app, engine=engine, authentication_backend=authentication_backend)
 
     for model in ADMIN_MODELS:
         administrator.add_view(model)

@@ -25,6 +25,8 @@ class AppSettings(BaseSettings):
     SECRET_JWT_KEY: str
     AUTH_USER_SECRET_TOKEN: str
     DOCS_URL: str
+    PASSWORD_ADMIN_PANEL: str
+    LOGIN_ADMIN_PANEL: str
 
     model_config = SettingsConfigDict(env_file=f'{BASE_DIR}/.env')
 

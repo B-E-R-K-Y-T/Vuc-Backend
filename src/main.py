@@ -8,7 +8,7 @@ from api.v1.user import router as user_router
 from api.v1.professor import router as professor_router
 from api.v1.platoon import router as platoon_router
 from schemas.user import UserRead, UserCreate
-from services.admin_panel.admin import init_admin_panel
+from services.admin_panel.panel import init_admin_panel
 from services.auth.auth import auth_backend, auth_user
 from exceptions import MainVucException
 from services.database.connector import engine
