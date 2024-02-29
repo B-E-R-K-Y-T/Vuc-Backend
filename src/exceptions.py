@@ -40,5 +40,11 @@ class UserError(MainVucException):
     pass
 
 
-class UserNotFoundError(UserError):
-    pass
+class UserNotFound(UserError):
+    def __init__(self, message=None, *args, status_code=HTTPStatus.BAD_REQUEST):
+        super().__init__(*args, message='Пользователь не существует', status_code=status_code)
+
+
+class UserAlreadyExists(UserError):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, message='Пользователь уже существует')

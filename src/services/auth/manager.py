@@ -2,11 +2,11 @@ from http import HTTPStatus
 from typing import Optional
 
 from fastapi import Depends, Request
-from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, schemas
+from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import app_settings, Roles
-from exceptions import PlatoonError
+from exceptions import PlatoonError, UserAlreadyExists
 from services.auth.database import get_user_db
 from models.user import User
 from services.database.connector import get_async_session
@@ -39,7 +39,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         existing_user = await self.user_db.get_by_email(user_create.email)
 
         if existing_user is not None:
-            raise exceptions.UserAlreadyExists()
+            raise UserAlreadyExists()
 
         if user_create.role.value == Roles.platoon_commander:
             if await DatabaseWorker(self.session).platoon_commander_is_exist(user_create.platoon_number):
