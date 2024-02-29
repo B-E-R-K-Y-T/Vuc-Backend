@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Any
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from services.auth.auth import auth_user
 from services.database.connector import get_async_session
 from services.util import exception_handler
-from schemas.professor import SubjectDTO
+from schemas.professor import SubjectDTO, Semesters
 from services.database.worker import DatabaseWorker
 
 current_user = auth_user.current_user()
@@ -33,3 +34,15 @@ async def get_subjects(platoon_number: int, semester: int, session: AsyncSession
 @exception_handler
 async def get_marks(session: AsyncSession = Depends(get_async_session)):
     pass
+
+
+@router.get("/get_semesters",
+            description='Получить список семестров',
+            response_model=Semesters,
+            status_code=HTTPStatus.OK,
+            dependencies=[Depends(auth_user.access_from_professor(current_user))])
+@exception_handler
+async def get_semesters(user_id: int, session: AsyncSession = Depends(get_async_session)):
+    semesters = await DatabaseWorker(session).get_semesters(user_id)
+
+    return Semesters.model_validate(semesters, from_attributes=True)

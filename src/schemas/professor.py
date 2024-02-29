@@ -22,3 +22,7 @@ class SubjectDTO(SubjectID):
 
 class ProfessorID(BaseModel):
     id: int
+
+
+class Semesters(BaseModel):
+    semesters: list

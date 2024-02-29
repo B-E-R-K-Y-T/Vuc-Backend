@@ -1,6 +1,7 @@
 from http import HTTPStatus
+from typing import Sequence
 
-from sqlalchemy import insert, select, func, and_, update
+from sqlalchemy import insert, select, func, and_, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
@@ -37,6 +38,27 @@ class DatabaseWorker:
         await self.session.commit()
 
         return platoons
+
+    async def get_semesters(self, user_id: int) -> dict[str, Sequence]:
+        sub_query = (
+            select(User.platoon_number).
+            where(
+                User.id == user_id
+            )
+        ).scalar_subquery()
+
+        query = (
+            select(Subject.semester).
+            where(
+                Subject.platoon_id == sub_query
+            ).
+            group_by(Subject.semester)
+        )
+
+        semesters = await self.session.scalars(query)
+        await self.session.commit()
+
+        return {'semesters': semesters.all()}
 
     async def get_subjects(self, platoon_number: int, semester: int):
         if not await self.platoon_number_is_exist(platoon_number):
@@ -172,40 +194,33 @@ class DatabaseWorker:
 
         return count
 
-    # TODO: Попробовать использовать функцию exists()
     async def user_is_exist(self, user_id: int) -> bool:
         return await self._check_exist_entity(User, user_id)
 
-    # TODO: Попробовать использовать функцию exists()
     async def telegram_id_is_exist(self, telegram_id: int) -> bool:
         return await self._check_exist_entity_column(User, {User.telegram_id.name: telegram_id})
 
-    # TODO: Попробовать использовать функцию exists()
     async def email_is_exist(self, email: str) -> bool:
         return await self._check_exist_entity_column(User, {User.email.name: email})
 
-    # TODO: Попробовать использовать функцию exists()
     async def platoon_number_is_exist(self, platoon_number: int) -> bool:
         return await self._check_exist_entity(Platoon, platoon_number)
 
-    # TODO: Попробовать использовать функцию exists()
     async def platoon_commander_is_exist(self, platoon_number: int) -> bool:
         query = (
-            select(User).
+            exists(User).
             where(
                 and_(
                     User.platoon_number == platoon_number,
                     User.role == Roles.platoon_commander
                 )
-            )
+            ).
+            select()
         )
 
         commander = await self.session.scalar(query)
 
-        if commander is not None:
-            return True
-
-        return False
+        return commander
 
     async def _check_exist_entity(self, entity: BaseTable, entity_id) -> bool:
         ent = await self.session.get(entity, entity_id)

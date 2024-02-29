@@ -544,6 +544,17 @@ async def test_get_subjects_error(ac: AsyncClient):
     assert response.status_code == 404
 
 
+async def test_get_semesters(ac: AsyncClient):
+    response = await ac.get(
+        url="/professor/get_semesters",
+        params={"user_id": 1},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {'semesters': [1]}
+
+
 async def test_logout_user(ac: AsyncClient):
     response = await ac.post(
         url="/auth/jwt/logout",
