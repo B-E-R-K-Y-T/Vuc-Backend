@@ -36,9 +36,21 @@ class DatabaseWorker:
         query = select(Platoon)
 
         platoons = await self.session.scalars(query)
-        await self.session.commit()
+        # await self.session.commit()
 
         return platoons
+
+    async def get_students_list(self):
+        query = (
+            select(User).
+            where(
+                User.role.not_in([Roles.admin, Roles.professor])
+            )
+        )
+
+        students = await self.session.scalars(query)
+
+        return students
 
     async def set_visit_user(self, date_v: str, visiting: int, user_id: int):
         if not await self.user_is_exist(user_id):
@@ -136,7 +148,6 @@ class DatabaseWorker:
         )
 
         subjects = await self.session.scalars(query)
-        await self.session.commit()
 
         return subjects
 

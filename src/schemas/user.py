@@ -39,6 +39,15 @@ class UserRead(fastapi_users_schemas.BaseUser[int]):
         from_attributes = True
 
 
+class Student(BaseModel):
+    id: int
+    name: str
+    role: str
+    platoon_number: int
+    squad_number: _SquadRange
+    group_study: str
+
+
 class UserID(BaseModel):
     id: int
 

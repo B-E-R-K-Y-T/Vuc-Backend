@@ -12,7 +12,7 @@ class Logger:
         self.__logger = logging.getLogger()
         self.__logger.setLevel(_LOG_MODE)
 
-        handler = RotatingFileHandler(filename=file_name, maxBytes=1024 * 1024, backupCount=3)
+        handler = RotatingFileHandler(filename=file_name, maxBytes=1024, backupCount=3)
         handler.setFormatter(logging.Formatter('%(asctime)s: %(name)s - %(levelname)s - %(message)s'))
         self.__logger.addHandler(handler)
 

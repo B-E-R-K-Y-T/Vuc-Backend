@@ -651,6 +651,22 @@ async def test_set_visit_user_error(ac: AsyncClient):
     assert response.status_code == 404
 
 
+async def test_get_students_list(ac: AsyncClient):
+    response = await ac.get(
+        url="/users/get_students_list",
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {'id': 3, 'name': 'string', 'role': 'Командир взвода', 'platoon_number': 0, 'squad_number': 1,
+         'group_study': 'string'},
+        {'id': 4, 'name': 'string', 'role': 'Командир отделения', 'platoon_number': 0, 'squad_number': 1,
+         'group_study': 'string'}, {'id': 1, 'name': 'Nik', 'role': 'Студент', 'platoon_number': 0, 'squad_number': 1,
+                                    'group_study': 'group_study'}
+    ]
+
+
 async def test_logout_user(ac: AsyncClient):
     response = await ac.post(
         url="/auth/jwt/logout",
