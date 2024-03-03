@@ -720,6 +720,31 @@ async def test_get_subject_by_now_semester(ac: AsyncClient, tst_async_session: A
     assert response.json() == [{'id': 5, 'platoon_id': 818, 'semester': 2, 'admin_id': 0, 'name': 'Test Subject_818'}]
 
 
+async def test_get_subject_by_semester(ac: AsyncClient, tst_async_session: AsyncSession):
+    stmt = (
+        insert(
+            Subject
+        ).values(
+            name=f"Test Subject_818",
+            admin_id=0,
+            platoon_id=818,
+            semester=1,
+        )
+    )
+
+    await tst_async_session.execute(stmt)
+    await tst_async_session.commit()
+
+    response = await ac.get(
+        url="/professor/get_subject_by_semester",
+        params={'platoon_number': 818, 'semester': 1},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [{'id': 6, 'platoon_id': 818, 'semester': 1, 'admin_id': 0, 'name': 'Test Subject_818'}]
+
+
 async def test_get_subject_by_now_semester_error(ac: AsyncClient):
     response = await ac.get(
         url="/professor/get_subject_by_now_semester",
