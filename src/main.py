@@ -19,7 +19,7 @@ app = FastAPI(
     # Адрес документации в Swagger интерфейсе
     docs_url=app_settings.DOCS_URL,
     # Адрес документации в формате OpenAPI
-    openapi_url='/api/openapi.json',
+    openapi_url="/api/openapi.json",
     default_response_class=ORJSONResponse,
 )
 
@@ -53,17 +53,17 @@ init_admin_panel(app, engine)
 async def exception_handler(request: Request, exc: MainVucException):
     return ORJSONResponse(
         status_code=exc.status_code,
-        content=f'Detail: {str(exc)}, JSON: {request.json()}'
+        content=f"Detail: {str(exc)}, JSON: {request.json()}",
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Приложение может запускаться командой
     # `uvicorn main:app --host 127.0.0.1 --port 8080 --reload`
     # но чтобы не терять возможность использовать дебагер,
     # запусти uvicorn сервер через python
     uvicorn.run(
-        'main:app',
+        "main:app",
         host=app_settings.PROJECT_HOST,
         port=app_settings.PROJECT_PORT,
         reload=True,

@@ -7,17 +7,18 @@ from services.database.view import View
 from services.database.connector import BaseTable
 
 name = (
-    select(User.name).
-    where(User.id == Attend.user_id)
-).scalar_subquery().label('name')
+    (select(User.name).where(User.id == Attend.user_id)).scalar_subquery().label("name")
+)
 platoon_number = (
-    select(User.platoon_number).
-    where(User.id == Attend.user_id)
-).scalar_subquery().label('platoon_number')
+    (select(User.platoon_id).where(User.id == Attend.user_id))
+    .scalar_subquery()
+    .label("platoon_number")
+)
 squad_number = (
-    select(User.squad_number).
-    where(User.id == Attend.user_id)
-).scalar_subquery().label('squad_number')
+    (select(User.squad_number).where(User.id == Attend.user_id))
+    .scalar_subquery()
+    .label("squad_number")
+)
 
 
 class Attendance(BaseTable, View):
@@ -28,11 +29,7 @@ class Attendance(BaseTable, View):
         Attend.visiting,
         platoon_number,
         squad_number,
-        Attend.semester
+        Attend.semester,
     )
 
-    __table__ = create_view(
-        "attendance",
-        selectable,
-        BaseTable.metadata
-    )
+    __table__ = create_view("attendance", selectable, BaseTable.metadata)

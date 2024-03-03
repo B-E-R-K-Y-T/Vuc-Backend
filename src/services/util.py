@@ -23,11 +23,14 @@ def exception_handler(func: Callable) -> Callable:
             else:
                 return func(*args, **kwargs)
         except MainVucException as e:
-            LOGGER.err(f'{e=}, {e.__class__=}', exc_info=True)
+            LOGGER.err(f"{e=}, {e.__class__=}", exc_info=True)
             return ORJSONResponse(status_code=e.status_code, content=str(e))
         except Exception as e:
-            LOGGER.err(f'{e=}, {e.__class__=}', exc_info=True)
-            return ORJSONResponse(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, content='Internal Server Error')
+            LOGGER.err(f"{e=}, {e.__class__=}", exc_info=True)
+            return ORJSONResponse(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                content="Internal Server Error",
+            )
 
     return wrapper
 
@@ -39,7 +42,7 @@ class TokenGenerator:
     def generate_new_token(cls, token_len: int = app_settings.TOKEN_LENGTH) -> str:
         token = [random.choice(cls.alphabet) for _ in range(token_len)]
 
-        return ''.join(token)
+        return "".join(token)
 
 
 def convert_schema_to_dict(schema: BaseModel) -> dict:

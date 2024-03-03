@@ -7,17 +7,15 @@ from services.database.view import View
 from services.database.connector import BaseTable
 
 vus = (
-    select(Platoon.vus)
-    .where(
-        User.platoon_number == Platoon.platoon_number
-    )
-).scalar_subquery().label('vus')
+    (select(Platoon.vus).where(User.platoon_id == Platoon.platoon_number))
+    .scalar_subquery()
+    .label("vus")
+)
 course_number = (
-    select(Platoon.semester)
-    .where(
-        User.platoon_number == Platoon.platoon_number
-    )
-).scalar_subquery().label('course_number')
+    (select(Platoon.semester).where(User.platoon_id == Platoon.platoon_number))
+    .scalar_subquery()
+    .label("course_number")
+)
 
 
 class Users(BaseTable, View):
@@ -31,17 +29,13 @@ class Users(BaseTable, View):
         User.institute,
         User.direction_of_study,
         User.group_study,
-        User.platoon_number,
+        User.platoon_id,
         vus,
         course_number,
         User.squad_number,
         User.telegram_id,
         User.token,
-        User.role
+        User.role,
     )
 
-    __table__ = create_view(
-        "users",
-        selectable,
-        BaseTable.metadata
-    )
+    __table__ = create_view("users", selectable, BaseTable.metadata)

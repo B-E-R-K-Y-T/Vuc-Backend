@@ -27,6 +27,10 @@ class ProfessorID(BaseModel):
     id: int
 
 
+class Professor(ProfessorID):
+    name: str
+
+
 class Semesters(BaseModel):
     semesters: list
 

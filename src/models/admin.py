@@ -5,7 +5,7 @@ from services.database.db_types import intpk
 
 
 class Admin(BaseTable):
-    __tablename__ = 'admins'
+    __tablename__ = "admins"
 
     id: Mapped[intpk]
     name: Mapped[str]

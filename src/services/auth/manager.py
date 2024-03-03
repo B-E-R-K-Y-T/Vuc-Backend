@@ -21,7 +21,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = USER_SECRET_TOKEN
     verification_token_secret = USER_SECRET_TOKEN
 
-    def __init__(self, *args, session: AsyncSession = Depends(get_async_session), **kwargs):
+    def __init__(
+        self, *args, session: AsyncSession = Depends(get_async_session), **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self.session = session
 
@@ -29,10 +31,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         LOGGER.info(f"User {user.id} has registered.")
 
     async def create(
-            self,
-            user_create: schemas.UC,
-            safe: bool = False,
-            request: Optional[Request] = None
+        self,
+        user_create: schemas.UC,
+        safe: bool = False,
+        request: Optional[Request] = None,
     ) -> models.UP:
         await self.validate_password(user_create.password, user_create)
 
@@ -42,10 +44,12 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             raise UserAlreadyExists()
 
         if user_create.role.value == Roles.platoon_commander:
-            if await DatabaseWorker(self.session).platoon_commander_is_exist(user_create.platoon_number):
+            if await DatabaseWorker(self.session).platoon_commander_is_exist(
+                user_create.platoon_number
+            ):
                 raise PlatoonError(
                     f"Взвод {user_create.platoon_number} уже имеет командира!",
-                    status_code=HTTPStatus.BAD_REQUEST
+                    status_code=HTTPStatus.BAD_REQUEST,
                 )
 
         user_dict = convert_schema_to_dict(user_create)
@@ -61,5 +65,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         return created_user
 
 
-async def get_user_manager(user_db=Depends(get_user_db), session: AsyncSession = Depends(get_async_session)):
+async def get_user_manager(
+    user_db=Depends(get_user_db), session: AsyncSession = Depends(get_async_session)
+):
     yield UserManager(user_db, session=session)

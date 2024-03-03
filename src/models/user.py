@@ -2,14 +2,14 @@ import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import ForeignKey, String, CheckConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from services.database.connector import BaseTable
 from services.database.db_types import intpk
 
 
 class User(SQLAlchemyBaseUserTable[int], BaseTable):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     id: Mapped[intpk]
     name: Mapped[str] = mapped_column(nullable=False)
@@ -18,23 +18,23 @@ class User(SQLAlchemyBaseUserTable[int], BaseTable):
     address: Mapped[str]
     institute: Mapped[str]
     direction_of_study: Mapped[str]
-    platoon_number: Mapped[int] = mapped_column(ForeignKey('platoon.platoon_number'))
+    platoon_id: Mapped[int] = mapped_column(ForeignKey("platoon.id"))
     squad_number: Mapped[int]
-    role: Mapped[str] = mapped_column(default='Студент')
+    role: Mapped[str] = mapped_column(default="Студент")
     telegram_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     token: Mapped[str]
     group_study: Mapped[str]
     email: Mapped[str] = mapped_column(
         String(length=320), unique=True, index=True, nullable=False
     )
-    registered_at: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.utcnow())
+    registered_at: Mapped[datetime.datetime] = mapped_column(
+        default=datetime.datetime.utcnow()
+    )
     hashed_password: Mapped[str] = mapped_column(nullable=True)
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     is_superuser: Mapped[bool] = mapped_column(default=False, nullable=False)
     is_verified: Mapped[bool] = mapped_column(default=False, nullable=False)
 
-    # alembic не видит изменений в этом поле. Так что надо будет провести миграции, а изменения из __table_args__
-    # добавлять вручную.
     __table_args__ = (
-        CheckConstraint('squad_number IN (1, 2, 3)', name='squad_number_check_c'),
+        CheckConstraint("squad_number IN (1, 2, 3)", name="squad_number_check_c"),
     )

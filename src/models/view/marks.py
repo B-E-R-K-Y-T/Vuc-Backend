@@ -1,4 +1,4 @@
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.orm import aliased
 from sqlalchemy_utils import create_view
 
@@ -10,18 +10,20 @@ from services.database.connector import BaseTable
 gr = aliased(Grading)
 
 subject = (
-    select(Subject.name).
-    select_from(Subject).
-    where(Subject.id == gr.subj_id)
-).scalar_subquery().label('subject')
+    (select(Subject.name).select_from(Subject).where(Subject.id == gr.subj_id)).
+    scalar_subquery().
+    label("subject")
+)
 semester = (
-    select(Subject.semester).
-    where(Subject.id == gr.subj_id)
-).scalar_subquery().label('semester')
+    (select(Subject.semester).where(Subject.id == gr.subj_id)).
+    scalar_subquery().
+    label("semester")
+)
 platoon_number = (
-    select(Subject.platoon_id).
-    where(Subject.id == gr.subj_id)
-).scalar_subquery().label('platoon_number')
+    (select(Subject.platoon_id).where(Subject.id == gr.subj_id)).
+    scalar_subquery().
+    label("platoon_number")
+)
 
 
 class Marks(BaseTable, View):
@@ -33,11 +35,7 @@ class Marks(BaseTable, View):
         platoon_number,
         gr.user_id,
         gr.theme,
-        gr.mark
+        gr.mark,
     )
 
-    __table__ = create_view(
-        "marks",
-        selectable,
-        BaseTable.metadata
-    )
+    __table__ = create_view("marks", selectable, BaseTable.metadata)

@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Extra
+from pydantic import BaseModel, EmailStr
 from fastapi_users import schemas as fastapi_users_schemas
 
 from services.auth.auth import Roles

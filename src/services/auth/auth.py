@@ -31,11 +31,11 @@ class AuthUser(FastAPIUsers):
     def __init__(self, user_manager, auth_backends):
         super().__init__(user_manager, auth_backends)
         self._role_hierarchy = {
-            Roles.admin:             4,
-            Roles.professor:         3,
+            Roles.admin: 4,
+            Roles.professor: 3,
             Roles.platoon_commander: 2,
-            Roles.squad_commander:   1,
-            Roles.student:           0,
+            Roles.squad_commander: 1,
+            Roles.student: 0,
         }
 
     def access_from_admin(self, func: Callable) -> Callable:
@@ -91,7 +91,4 @@ auth_user = AuthUser(
 )
 
 
-__all__ = (
-    'auth_user',
-    Roles.__name__
-)
+__all__ = ("auth_user", Roles.__name__)

@@ -1,13 +1,16 @@
 import datetime
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, relationship
 
 from services.database.connector import BaseTable
+from services.database.db_types import intpk
 
 
 class Day(BaseTable):
-    __tablename__ = 'day'
+    __tablename__ = "day"
 
-    date: Mapped[datetime.date] = mapped_column(primary_key=True)
+    id: Mapped[intpk]
+    date: Mapped[datetime.date]
     weekday: Mapped[int]
     semester: Mapped[int]
+    holiday: Mapped[bool]

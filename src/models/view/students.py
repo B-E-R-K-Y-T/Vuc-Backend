@@ -8,9 +8,10 @@ from services.database.connector import BaseTable
 from config import Roles
 
 vus = (
-    select(Platoon.vus).
-    where(User.platoon_number == Platoon.platoon_number)
-).scalar_subquery().label('vus')
+    (select(Platoon.vus).where(User.platoon_id == Platoon.platoon_number))
+    .scalar_subquery()
+    .label("vus")
+)
 
 
 class Students(BaseTable, View):
@@ -24,16 +25,12 @@ class Students(BaseTable, View):
         User.institute,
         User.direction_of_study,
         User.group_study,
-        User.platoon_number,
+        User.platoon_id,
         vus,
         User.squad_number,
         User.telegram_id,
         User.token,
-        User.role
+        User.role,
     ).where(User.role != Roles.admin)
 
-    __table__ = create_view(
-        "students",
-        selectable,
-        BaseTable.metadata
-    )
+    __table__ = create_view("students", selectable, BaseTable.metadata)

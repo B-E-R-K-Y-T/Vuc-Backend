@@ -9,6 +9,7 @@ from config import app_settings
 
 
 class _Base(DeclarativeBase):
+    schema = 'vuc'
     type_annotation_map = {
         str: String().with_variant(String(255), "postgresql")
     }

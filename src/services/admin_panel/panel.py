@@ -9,6 +9,11 @@ _model_collector = ModelCollector()
 @_model_collector.target_model
 class _UserTable(ModelView, model=User):
     column_list = [User.id, User.name]
+    form_ajax_refs = {
+        "platoon": {
+            "fields": (Platoon.platoon_number,),
+        }
+    }
 
 
 @_model_collector.target_model
@@ -29,6 +34,11 @@ class _AttendTable(ModelView, model=Attend):
 @_model_collector.target_model
 class _GradingTable(ModelView, model=Grading):
     column_list = [Grading.id, Grading.subj_id, Grading.mark, Grading.theme]
+    form_ajax_refs = {
+        "subject": {
+            "fields": (Subject.id,),
+        }
+    }
 
 
 @_model_collector.target_model
@@ -59,7 +69,9 @@ def init_admin_panel(app, engine):
     from .auth import AdminPanelAuth
 
     authentication_backend = AdminPanelAuth()
-    administrator = Admin(app=app, engine=engine, authentication_backend=authentication_backend)
+    administrator = Admin(
+        app=app, engine=engine, authentication_backend=authentication_backend
+    )
 
     for model in MODELS:
         administrator.add_view(model)
@@ -67,7 +79,4 @@ def init_admin_panel(app, engine):
     return administrator
 
 
-__all__ = (
-    init_admin_panel.__name__,
-    'MODELS'
-)
+__all__ = (init_admin_panel.__name__, "MODELS")
