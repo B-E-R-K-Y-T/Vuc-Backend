@@ -14,3 +14,5 @@ class Day(BaseTable):
     weekday: Mapped[int]
     semester: Mapped[int]
     holiday: Mapped[bool]
+
+    schedule = relationship("Schedule", back_populates="day")

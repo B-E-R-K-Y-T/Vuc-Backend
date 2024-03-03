@@ -35,6 +35,11 @@ class User(SQLAlchemyBaseUserTable[int], BaseTable):
     is_superuser: Mapped[bool] = mapped_column(default=False, nullable=False)
     is_verified: Mapped[bool] = mapped_column(default=False, nullable=False)
 
+    attend = relationship('Attend', back_populates='user', uselist=False)
+    grading = relationship('Grading', back_populates='user')
+    message_queue = relationship('MessageQueue', back_populates='user')
+    platoon = relationship('Platoon', back_populates='user', uselist=False)
+
     __table_args__ = (
         CheckConstraint("squad_number IN (1, 2, 3)", name="squad_number_check_c"),
     )

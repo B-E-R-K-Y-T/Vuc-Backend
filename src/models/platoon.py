@@ -11,3 +11,8 @@ class Platoon(BaseTable):
     platoon_number: Mapped[int] = mapped_column(unique=True)
     vus: Mapped[int]
     semester: Mapped[int] = mapped_column(default=1)
+
+    schedule = relationship('Schedule', back_populates='platoon')
+    subject = relationship('Subject', back_populates='platoon')
+    user = relationship('User', back_populates='platoon')
+    

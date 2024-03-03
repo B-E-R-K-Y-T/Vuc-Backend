@@ -11,3 +11,5 @@ class MessageQueue(BaseTable):
     id: Mapped[intpk]
     telegram_id: Mapped[int] = mapped_column(ForeignKey("user.telegram_id"))
     message: Mapped[str]
+
+    user = relationship("User", back_populates='message_queue', uselist=False)

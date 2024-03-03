@@ -13,3 +13,6 @@ class Subject(BaseTable):
     semester: Mapped[int]
     admin_id: Mapped[int]
     name: Mapped[str]
+
+    grading = relationship('Grading', back_populates='subject')
+    platoon = relationship('Platoon', back_populates='subject')

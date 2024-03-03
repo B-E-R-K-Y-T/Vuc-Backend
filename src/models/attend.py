@@ -15,3 +15,5 @@ class Attend(BaseTable):
     date_v: Mapped[datetime.date]
     visiting: Mapped[int]
     semester: Mapped[int]
+
+    user = relationship('User', back_populates='attend')

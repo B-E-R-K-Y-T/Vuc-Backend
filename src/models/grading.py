@@ -16,3 +16,6 @@ class Grading(BaseTable):
     mark: Mapped[int]
     mark_date: Mapped[datetime.date]
     theme: Mapped[str]
+
+    subject = relationship("Subject", back_populates="grading")
+    user = relationship("User", back_populates="grading")
