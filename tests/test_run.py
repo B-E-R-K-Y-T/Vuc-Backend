@@ -523,7 +523,7 @@ async def test_get_subjects(ac: AsyncClient, tst_async_session: AsyncSession):
         await tst_async_session.commit()
 
     response = await ac.get(
-        url="/professor/get_subject_by_semester",
+        url="/subject/get_subject_by_semester",
         params={"platoon_number": 0, "semester": 1},
         cookies={'bonds': jwt_token}
     )
@@ -539,7 +539,7 @@ async def test_get_subjects(ac: AsyncClient, tst_async_session: AsyncSession):
 
 async def test_get_subjects_error(ac: AsyncClient):
     response = await ac.get(
-        url="/professor/get_subjects",
+        url="/subject/get_subjects",
         params={"platoon_number": 352, "semester": 1},
         cookies={'bonds': jwt_token}
     )
@@ -669,7 +669,7 @@ async def test_get_students_list(ac: AsyncClient):
 
 async def test_get_gradings_by_student_error(ac: AsyncClient):
     response = await ac.get(
-        url="/professor/get_gradings_by_student",
+        url="/subject/get_gradings_by_student",
         params={'user_id': 1, 'subject_id': 9129},
         cookies={'bonds': jwt_token}
     )
@@ -677,7 +677,7 @@ async def test_get_gradings_by_student_error(ac: AsyncClient):
     assert response.status_code == 404
 
     response = await ac.get(
-        url="/professor/get_gradings_by_student",
+        url="/subject/get_gradings_by_student",
         params={'user_id': 2356, 'subject_id': 1},
         cookies={'bonds': jwt_token}
     )
@@ -687,7 +687,7 @@ async def test_get_gradings_by_student_error(ac: AsyncClient):
 
 async def test_get_gradings_by_student(ac: AsyncClient):
     response = await ac.get(
-        url="/professor/get_gradings_by_student",
+        url="/subject/get_gradings_by_student",
         params={'user_id': 1, 'subject_id': 1},
         cookies={'bonds': jwt_token}
     )
@@ -711,7 +711,7 @@ async def test_get_subject_by_now_semester(ac: AsyncClient, tst_async_session: A
     await tst_async_session.commit()
 
     response = await ac.get(
-        url="/professor/get_subject_by_now_semester",
+        url="/subject/get_subject_by_now_semester",
         params={'platoon_number': 818},
         cookies={'bonds': jwt_token}
     )
@@ -736,7 +736,7 @@ async def test_get_subject_by_semester(ac: AsyncClient, tst_async_session: Async
     await tst_async_session.commit()
 
     response = await ac.get(
-        url="/professor/get_subject_by_semester",
+        url="/subject/get_subject_by_semester",
         params={'platoon_number': 818, 'semester': 1},
         cookies={'bonds': jwt_token}
     )
