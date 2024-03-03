@@ -42,10 +42,10 @@ class _GradingTable(ModelView, model=Grading):
     column_list = [Grading.id, Grading.subj_id, Grading.mark, Grading.theme]
     form_ajax_refs = {
         'subject': {
-            'fields': (Subject.id,)
+            'fields': (Subject.id, Subject.name)
         },
         'user': {
-            'fields': (User.id,)
+            'fields': (User.id, User.name)
         }
     }
 

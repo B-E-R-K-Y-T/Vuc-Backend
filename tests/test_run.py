@@ -667,6 +667,69 @@ async def test_get_students_list(ac: AsyncClient):
     ]
 
 
+async def test_get_gradings_by_student_error(ac: AsyncClient):
+    response = await ac.get(
+        url="/professor/get_gradings_by_student",
+        params={'user_id': 1, 'subject_id': 9129},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 404
+
+    response = await ac.get(
+        url="/professor/get_gradings_by_student",
+        params={'user_id': 2356, 'subject_id': 1},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 404
+
+
+async def test_get_gradings_by_student(ac: AsyncClient):
+    response = await ac.get(
+        url="/professor/get_gradings_by_student",
+        params={'user_id': 1, 'subject_id': 1},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [{'id': 1, 'mark': 1, 'mark_date': '2023-12-22', 'theme': 'theme'}]
+
+
+async def test_get_subject_by_now_semester(ac: AsyncClient, tst_async_session: AsyncSession):
+    stmt = (
+        insert(
+            Subject
+        ).values(
+            name=f"Test Subject_818",
+            admin_id=0,
+            platoon_id=818,
+            semester=2,
+        )
+    )
+    await tst_async_session.execute(stmt)
+    await tst_async_session.commit()
+
+    response = await ac.get(
+        url="/professor/get_subject_by_now_semester",
+        params={'platoon_number': 818},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [{'id': 5, 'platoon_id': 818, 'semester': 2, 'admin_id': 0, 'name': 'Test Subject_818'}]
+
+
+async def test_get_subject_by_now_semester_error(ac: AsyncClient):
+    response = await ac.get(
+        url="/professor/get_subject_by_now_semester",
+        params={'platoon_number': -1},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 404
+
+
 async def test_logout_user(ac: AsyncClient):
     response = await ac.post(
         url="/auth/jwt/logout",

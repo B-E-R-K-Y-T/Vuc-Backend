@@ -35,6 +35,13 @@ class Semesters(BaseModel):
     semesters: list
 
 
+class Gradings(BaseModel):
+    id: int
+    mark: int
+    mark_date: date
+    theme: str
+
+
 class Visit(Enum):
     one = 1
     two = 2

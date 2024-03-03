@@ -4,10 +4,11 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from exceptions import SemesterError
 from services.auth.auth import auth_user
 from services.database.connector import get_async_session
 from services.util import exception_handler, convert_schema_to_dict
-from schemas.professor import SubjectDTO, Semesters, AttendanceDTO, Professor
+from schemas.professor import SubjectDTO, Semesters, AttendanceDTO, Professor, Gradings
 from services.database.worker import DatabaseWorker
 
 current_user = auth_user.current_user()
@@ -22,9 +23,9 @@ router = APIRouter(prefix="/professor")
 )
 @exception_handler
 async def get_subject_by_semester(
-    platoon_number: int,
-    semester: int,
-    session: AsyncSession = Depends(get_async_session),
+        platoon_number: int,
+        semester: int,
+        session: AsyncSession = Depends(get_async_session),
 ):
     subjects = await DatabaseWorker(session).get_subjects(platoon_number, semester)
 
@@ -32,13 +33,7 @@ async def get_subject_by_semester(
         SubjectDTO.model_validate(subject, from_attributes=True) for subject in subjects
     ]
 
-"""
-из ручек надо:
-- получить список предметов за текущий семестр
-- получить список предметов за любой семестр
-- получить список оценок за конкретный предмет у конкретного студента
-- получить текущую посещаемость (подтверждённый/не подтвеждённый добавить атрибут в attendance) студента за семестр
-"""
+
 @router.get(
     "/get_subject_by_now_semester",
     description="Получить список дисциплин взвода за текущий семестр",
@@ -46,17 +41,44 @@ async def get_subject_by_semester(
     status_code=HTTPStatus.OK,
 )
 @exception_handler
-async def get_subject_by_semester(
-    platoon_number: int,
-    semester: int,
-    session: AsyncSession = Depends(get_async_session),
+async def get_subject_by_now_semester(
+        platoon_number: int,
+        session: AsyncSession = Depends(get_async_session),
 ):
-    print(datetime.date.year)
-    # semester =
+    if 9 <= datetime.date.today().month <= 12:
+        semester = 1
+    elif 1 <= datetime.date.today().month <= 6:
+        semester = 2
+    else:
+        raise SemesterError(
+            message='Сейчас не идет учеба',
+            status_code=HTTPStatus.BAD_REQUEST
+        )
+
     subjects = await DatabaseWorker(session).get_subjects(platoon_number, semester)
 
     return [
         SubjectDTO.model_validate(subject, from_attributes=True) for subject in subjects
+    ]
+
+
+@router.get(
+    "/get_gradings_by_student",
+    description="Получить список оценок за конкретный предмет у конкретного студента",
+    response_model=list[Gradings],
+    status_code=HTTPStatus.OK,
+    dependencies=[Depends(auth_user.access_from_student(current_user))],
+)
+@exception_handler
+async def get_gradings_by_student(
+        user_id: int,
+        subject_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    gradings = await DatabaseWorker(session).get_gradings_by_student(user_id, subject_id)
+
+    return [
+        Gradings.model_validate(grading, from_attributes=True) for grading in gradings
     ]
 
 
@@ -69,7 +91,7 @@ async def get_subject_by_semester(
 )
 @exception_handler
 async def get_semesters(
-    user_id: int, session: AsyncSession = Depends(get_async_session)
+        user_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     semesters = await DatabaseWorker(session).get_semesters(user_id)
 
@@ -83,7 +105,7 @@ async def get_semesters(
 )
 @exception_handler
 async def set_visit_user(
-    attendance: AttendanceDTO, session: AsyncSession = Depends(get_async_session)
+        attendance: AttendanceDTO, session: AsyncSession = Depends(get_async_session)
 ):
     await DatabaseWorker(session).set_visit_user(**convert_schema_to_dict(attendance))
 

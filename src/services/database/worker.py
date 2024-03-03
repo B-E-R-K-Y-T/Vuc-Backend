@@ -5,8 +5,8 @@ from sqlalchemy import insert, select, func, and_, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
-from exceptions import PlatoonError, UserNotFound
-from models import User, Platoon, Subject, Attend
+from exceptions import PlatoonError, UserNotFound, UserError, SubjectError
+from models import User, Platoon, Subject, Attend, Grading
 from models.view.users import Users
 from schemas.platoon import PlatoonDTO
 from services.database.connector import BaseTable
@@ -35,9 +35,34 @@ class DatabaseWorker:
         query = select(Platoon)
 
         platoons = await self.session.scalars(query)
-        # await self.session.commit()
 
         return platoons
+
+    async def get_gradings_by_student(self, user_id: int, subject_id: int):
+        if not await self.user_is_exist(user_id):
+            raise UserError(
+                message="Пользователя не существует",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+        if not await self.subject_is_exist(subject_id):
+            raise SubjectError(
+                message="Данного предмета не существует",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = (
+            select(Grading).
+            where(
+                and_(
+                    Grading.user_id == user_id,
+                    Grading.subj_id == subject_id
+                )
+            )
+        )
+
+        gradings = await self.session.scalars(query)
+
+        return gradings
 
     async def get_students_list(self):
         query = select(User).where(User.role.not_in([Roles.admin, Roles.professor]))
@@ -231,6 +256,13 @@ class DatabaseWorker:
 
         return is_exist
 
+    async def subject_is_exist(self, subject_id: int) -> bool:
+        query = exists(Subject).where(Subject.id == subject_id).select()
+
+        is_exist = await self.session.scalar(query)
+
+        return is_exist
+
     async def platoon_commander_is_exist(self, platoon_number: int) -> bool:
         query = (
             exists(User)
@@ -254,7 +286,7 @@ class DatabaseWorker:
         return False
 
     async def _check_exist_entity_column(
-        self, entity: BaseTable, columns: dict
+            self, entity: BaseTable, columns: dict
     ) -> bool:
         query = select(entity).filter_by(**columns)
         res = await self.session.scalar(query)
