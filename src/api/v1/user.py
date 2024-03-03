@@ -38,6 +38,18 @@ async def get_user_role(
 
     return {"role": role}
 
+#
+# @router.get(
+#     "/get_marks",
+#     description="Получить список оценок взвода",
+#     response_model=list[SubjectDTO],
+#     status_code=HTTPStatus.OK,
+# )
+# @exception_handler
+# async def get_marks(session: AsyncSession = Depends(get_async_session)):
+#     pass
+
+
 
 @router.get(
     "/get_user",

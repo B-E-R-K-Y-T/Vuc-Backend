@@ -1,4 +1,5 @@
 from sqladmin import ModelView
+from sqlalchemy.orm import Mapper
 
 from models import *
 from .model_worker import ModelCollector
@@ -59,7 +60,7 @@ class _SubjectTable(ModelView, model=Subject):
     column_list = [Subject.id, Subject.name]
     form_ajax_refs = {
         'platoon': {
-            'fields': (Platoon.id, Platoon.platoon_number)
+            'fields': (Platoon.platoon_number,)
         }
     }
 
@@ -67,6 +68,7 @@ class _SubjectTable(ModelView, model=Subject):
 @_model_collector.target_model
 class _PlatoonTable(ModelView, model=Platoon):
     column_list = [Platoon.platoon_number]
+    form_include_pk = True
 
 
 @_model_collector.target_model
@@ -79,7 +81,7 @@ class _ScheduleTable(ModelView, model=Schedule):
     column_list = [Schedule.id, Schedule.day, Schedule.platoon_number]
     form_ajax_refs = {
         'platoon': {
-            'fields': (Platoon.id,)
+            'fields': (Platoon.platoon_number,)
         },
         'day': {
             'fields': (Day.id,)

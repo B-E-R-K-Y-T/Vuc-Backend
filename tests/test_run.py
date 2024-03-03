@@ -523,7 +523,7 @@ async def test_get_subjects(ac: AsyncClient, tst_async_session: AsyncSession):
         await tst_async_session.commit()
 
     response = await ac.get(
-        url="/professor/get_subjects",
+        url="/professor/get_subject_by_semester",
         params={"platoon_number": 0, "semester": 1},
         cookies={'bonds': jwt_token}
     )

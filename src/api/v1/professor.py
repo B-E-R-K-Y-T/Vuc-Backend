@@ -15,13 +15,13 @@ router = APIRouter(prefix="/professor")
 
 
 @router.get(
-    "/get_subjects",
+    "/get_subject_by_semester",
     description="Получить список дисциплин взвода",
     response_model=list[SubjectDTO],
     status_code=HTTPStatus.OK,
 )
 @exception_handler
-async def get_subjects(
+async def get_subject_by_semester(
     platoon_number: int,
     semester: int,
     session: AsyncSession = Depends(get_async_session),
@@ -32,16 +32,32 @@ async def get_subjects(
         SubjectDTO.model_validate(subject, from_attributes=True) for subject in subjects
     ]
 
-
+"""
+из ручек надо:
+- получить список предметов за текущий семестр
+- получить список предметов за любой семестр
+- получить список оценок за конкретный предмет у конкретного студента
+- получить текущую посещаемость (подтверждённый/не подтвеждённый добавить атрибут в attendance) студента за семестр
+"""
 @router.get(
-    "/get_marks",
-    description="Получить список дисциплин взвода",
+    "/get_subject_by_now_semester",
+    description="Получить список дисциплин взвода за текущий семестр",
     response_model=list[SubjectDTO],
     status_code=HTTPStatus.OK,
 )
 @exception_handler
-async def get_marks(session: AsyncSession = Depends(get_async_session)):
-    pass
+async def get_subject_by_semester(
+    platoon_number: int,
+    semester: int,
+    session: AsyncSession = Depends(get_async_session),
+):
+    print(datetime.date.year)
+    # semester =
+    subjects = await DatabaseWorker(session).get_subjects(platoon_number, semester)
+
+    return [
+        SubjectDTO.model_validate(subject, from_attributes=True) for subject in subjects
+    ]
 
 
 @router.get(

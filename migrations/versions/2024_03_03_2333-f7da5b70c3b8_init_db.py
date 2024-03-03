@@ -1,8 +1,8 @@
 """init db
 
-Revision ID: 3bfb80e2a3af
+Revision ID: f7da5b70c3b8
 Revises: 
-Create Date: 2024-03-03 22:34:58.416284
+Create Date: 2024-03-03 23:33:49.131068
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "3bfb80e2a3af"
+revision: str = "f7da5b70c3b8"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -51,12 +51,10 @@ def upgrade() -> None:
     )
     op.create_table(
         "platoon",
-        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("platoon_number", sa.Integer(), nullable=False),
         sa.Column("vus", sa.Integer(), nullable=False),
         sa.Column("semester", sa.Integer(), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("platoon_number"),
+        sa.PrimaryKeyConstraint("platoon_number"),
     )
     op.create_table(
         "student",
@@ -97,7 +95,7 @@ def upgrade() -> None:
             sa.String().with_variant(sa.String(length=255), "postgresql"),
             nullable=False,
         ),
-        sa.Column("platoon_id", sa.Integer(), nullable=False),
+        sa.Column("platoon_number", sa.Integer(), nullable=False),
         sa.Column("vus", sa.Integer(), nullable=False),
         sa.Column("squad_number", sa.Integer(), nullable=False),
         sa.Column("telegram_id", sa.Integer(), nullable=False),
