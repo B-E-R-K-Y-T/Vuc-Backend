@@ -91,4 +91,7 @@ auth_user = AuthUser(
 )
 
 
-__all__ = ("auth_user", Roles.__name__)
+__all__ = (
+    "auth_user",
+    Roles.__name__
+)

@@ -30,8 +30,8 @@ class _DayTable(ModelView, model=Day):
 class _AttendTable(ModelView, model=Attend):
     column_list = [Attend.id, Attend.user_id, Attend.date_v]
     form_ajax_refs = {
-        "user": {
-            "fields": (User.id, User.name, User.platoon_id)
+        'user': {
+            'fields': (User.id, User.name, User.platoon_id)
         }
     }
 
@@ -40,8 +40,8 @@ class _AttendTable(ModelView, model=Attend):
 class _GradingTable(ModelView, model=Grading):
     column_list = [Grading.id, Grading.subj_id, Grading.mark, Grading.theme]
     form_ajax_refs = {
-        "subject": {
-            "fields": (Subject.id,)
+        'subject': {
+            'fields': (Subject.id,)
         },
         'user': {
             'fields': (User.id,)
@@ -58,25 +58,15 @@ class _MessageQueueTable(ModelView, model=MessageQueue):
 class _SubjectTable(ModelView, model=Subject):
     column_list = [Subject.id, Subject.name]
     form_ajax_refs = {
-        "platoon": {
-            "fields": (Platoon.id, Platoon.platoon_number)
+        'platoon': {
+            'fields': (Platoon.id, Platoon.platoon_number)
         }
     }
+
 
 @_model_collector.target_model
 class _PlatoonTable(ModelView, model=Platoon):
     column_list = [Platoon.platoon_number]
-    # form_ajax_refs = {
-    #     "subject": {
-    #         "fields": (Subject.id,)
-    #     },
-    #     'schedule': {
-    #         'fields': (Schedule.id,)
-    #     },
-    #     'user': {
-    #         'fields': (User.id,)
-    #     }
-    # }
 
 
 @_model_collector.target_model
@@ -88,8 +78,8 @@ class _AdminTable(ModelView, model=Admin):
 class _ScheduleTable(ModelView, model=Schedule):
     column_list = [Schedule.id, Schedule.day, Schedule.platoon_number]
     form_ajax_refs = {
-        "platoon": {
-            "fields": (Platoon.id,)
+        'platoon': {
+            'fields': (Platoon.id,)
         },
         'day': {
             'fields': (Day.id,)
@@ -115,4 +105,7 @@ def init_admin_panel(app, engine):
     return administrator
 
 
-__all__ = (init_admin_panel.__name__, 'MODELS')
+__all__ = (
+    init_admin_panel.__name__,
+    'MODELS'
+)

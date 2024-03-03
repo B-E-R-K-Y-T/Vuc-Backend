@@ -20,7 +20,7 @@ from services.database.worker import DatabaseWorker
 
 current_user = auth_user.current_user()
 router = APIRouter(
-    prefix="/users", dependencies=[Depends(auth_user.access_from_student(current_user))]
+    prefix='/users', dependencies=[Depends(auth_user.access_from_student(current_user))]
 )
 
 
