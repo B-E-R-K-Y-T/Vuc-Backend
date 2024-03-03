@@ -22,7 +22,7 @@ class DatabaseWorker:
                 message="Platoon not found", status_code=HTTPStatus.NOT_FOUND
             )
 
-        query = select(User).where(platoon_number == User.platoon_id)
+        query = select(User).where(platoon_number == User.platoon_number)
 
         users = await self.session.scalars(query)
         await self.session.commit()
@@ -91,7 +91,7 @@ class DatabaseWorker:
 
     async def get_semesters(self, user_id: int) -> dict[str, Sequence]:
         sub_query = (
-            select(User.platoon_id).where(User.id == user_id)
+            select(User.platoon_number).where(User.id == user_id)
         ).scalar_subquery()
 
         query = (
@@ -163,7 +163,7 @@ class DatabaseWorker:
         query = select(User).where(
             and_(
                 User.role == Roles.platoon_commander,
-                User.platoon_id == platoon_number,
+                User.platoon_number == platoon_number,
             )
         )
 
@@ -200,7 +200,7 @@ class DatabaseWorker:
             select(User.squad_number)
             .where(
                 and_(
-                    User.platoon_id == platoon_number,
+                    User.platoon_number == platoon_number,
                     User.squad_number.in_([1, 2, 3]),
                 )
             )
@@ -236,7 +236,7 @@ class DatabaseWorker:
             exists(User)
             .where(
                 and_(
-                    User.platoon_id == platoon_number,
+                    User.platoon_number == platoon_number,
                     User.role == Roles.platoon_commander,
                 )
             )

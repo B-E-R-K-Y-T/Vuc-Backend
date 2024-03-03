@@ -8,7 +8,7 @@ from services.database.connector import BaseTable
 from config import Roles
 
 vus = (
-    (select(Platoon.vus).where(User.platoon_id == Platoon.platoon_number))
+    (select(Platoon.vus).where(User.platoon_number == Platoon.platoon_number))
     .scalar_subquery()
     .label("vus")
 )
@@ -25,7 +25,7 @@ class Students(BaseTable, View):
         User.institute,
         User.direction_of_study,
         User.group_study,
-        User.platoon_id,
+        User.platoon_number,
         vus,
         User.squad_number,
         User.telegram_id,

@@ -1,8 +1,8 @@
 """init db
 
-Revision ID: c808b6285c17
+Revision ID: 3bfb80e2a3af
 Revises: 
-Create Date: 2024-03-03 17:35:21.915182
+Create Date: 2024-03-03 22:34:58.416284
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "c808b6285c17"
+revision: str = "3bfb80e2a3af"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -97,7 +97,7 @@ def upgrade() -> None:
             sa.String().with_variant(sa.String(length=255), "postgresql"),
             nullable=False,
         ),
-        sa.Column("platoon_number", sa.Integer(), nullable=False),
+        sa.Column("platoon_id", sa.Integer(), nullable=False),
         sa.Column("vus", sa.Integer(), nullable=False),
         sa.Column("squad_number", sa.Integer(), nullable=False),
         sa.Column("telegram_id", sa.Integer(), nullable=False),
@@ -179,7 +179,7 @@ def upgrade() -> None:
             sa.String().with_variant(sa.String(length=255), "postgresql"),
             nullable=False,
         ),
-        sa.Column("platoon_id", sa.Integer(), nullable=False),
+        sa.Column("platoon_number", sa.Integer(), nullable=False),
         sa.Column("squad_number", sa.Integer(), nullable=False),
         sa.Column(
             "role",
@@ -211,8 +211,8 @@ def upgrade() -> None:
             "squad_number IN (1, 2, 3)", name="squad_number_check_c"
         ),
         sa.ForeignKeyConstraint(
-            ["platoon_id"],
-            ["platoon.id"],
+            ["platoon_number"],
+            ["platoon.platoon_number"],
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("telegram_id"),

@@ -52,7 +52,7 @@ async def prepare_database():
                  "'email', '2024-02-29T15:07:16.345'::date, 't', 'f', 'f', 'hashed_password');")
         )
         await conn.execute(text("INSERT INTO admins (name, email, password)VALUES('Tim','mail@mail.ru','123');"))
-        await conn.execute(text("INSERT INTO day (date, weekday, semester)VALUES('12-22-2023'::date, 0, 0);"))
+        await conn.execute(text("INSERT INTO day (date, weekday, semester, holiday)VALUES('12-22-2023'::date, 0, 0, 'f');"))
         await conn.execute(text("INSERT INTO attend (user_id, date_v, visiting, semester)"
                                 "VALUES(1,'12-22-2023'::date, 1, 1);"))
         await conn.execute(text("INSERT INTO subject (platoon_id, semester, admin_id, name)"

@@ -10,7 +10,7 @@ name = (
     (select(User.name).where(User.id == Attend.user_id)).scalar_subquery().label("name")
 )
 platoon_number = (
-    (select(User.platoon_id).where(User.id == Attend.user_id))
+    (select(User.platoon_number).where(User.id == Attend.user_id))
     .scalar_subquery()
     .label("platoon_number")
 )

@@ -31,7 +31,7 @@ class _AttendTable(ModelView, model=Attend):
     column_list = [Attend.id, Attend.user_id, Attend.date_v]
     form_ajax_refs = {
         'user': {
-            'fields': (User.id, User.name, User.platoon_id)
+            'fields': (User.id, User.name, User.platoon_number)
         }
     }
 

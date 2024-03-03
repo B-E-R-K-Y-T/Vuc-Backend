@@ -12,7 +12,7 @@ commander = (
     (
         select(User.name).where(
             and_(
-                User.platoon_id == Platoon.platoon_number,
+                User.platoon_number == Platoon.platoon_number,
                 User.role == Roles.platoon_commander,
             )
         )
@@ -28,7 +28,7 @@ squads = (
             select(1)
             .where(
                 and_(
-                    User.platoon_id == Platoon.platoon_number,
+                    User.platoon_number == Platoon.platoon_number,
                     User.squad_number.in_([1, 2, 3]),
                 )
             )
