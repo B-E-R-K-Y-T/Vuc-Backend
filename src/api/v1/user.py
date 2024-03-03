@@ -50,7 +50,6 @@ async def get_user_role(
 #     pass
 
 
-
 @router.get(
     "/get_user",
     description="Получить пользователя",
