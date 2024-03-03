@@ -15,7 +15,7 @@ Python 3.12
 5. *Configure the .env file*
 6. ```alembic upgrade head```
 7. ```cd .\src\```
-8. ```uvicorn main:app --reload``` OR ```py .\main.py```
+8. ```uvicorn main:app --host 127.0.0.1 --port 8080 --reload``` OR ```py .\main.py```
 
 
 ### Up database in docker 
