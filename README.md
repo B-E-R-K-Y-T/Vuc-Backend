@@ -19,6 +19,7 @@ Python 3.12
 
 --- OR ---
 
+1. *Configure the .env file*
 ```bash
 docker-compose up
 ```
