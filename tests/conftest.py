@@ -40,7 +40,11 @@ async def tst_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 @pytest.fixture(autouse=True, scope='session')
 async def init_fastapi_cache():
-    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+    redis = aioredis.from_url(
+        f"redis://{app_settings.REDIS_HOST}:{app_settings.REDIS_PORT}",
+        encoding="utf8",
+        decode_responses=True
+    )
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 

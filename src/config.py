@@ -27,6 +27,8 @@ class AppSettings(BaseSettings):
     DOCS_URL: str
     PASSWORD_ADMIN_PANEL: str
     LOGIN_ADMIN_PANEL: str
+    REDIS_HOST: str
+    REDIS_PORT: int
 
     model_config = SettingsConfigDict(env_file=f"{BASE_DIR}/.env")
 
