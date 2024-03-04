@@ -2,7 +2,10 @@ import asyncio
 from typing import AsyncGenerator
 
 import pytest
+from redis import asyncio as aioredis
 from fastapi.testclient import TestClient
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 from httpx import AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -33,6 +36,12 @@ async def override_get_async_session() -> AsyncGenerator[AsyncSession, None]:
 async def tst_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
+
+
+@pytest.fixture(autouse=True, scope='session')
+async def init_fastapi_cache():
+    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
 app.dependency_overrides[get_async_session] = override_get_async_session
