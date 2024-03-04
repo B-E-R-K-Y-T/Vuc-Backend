@@ -53,7 +53,7 @@ async def get_platoon(
     status_code=HTTPStatus.OK,
 )
 @exception_handler
-@cache(expire=3600)
+@cache(expire=300)
 async def get_platoons(db_worker: DatabaseWorker = Depends(get_database_worker)):
     platoons = await db_worker.get_platoons()
 
@@ -78,7 +78,7 @@ async def get_platoons(db_worker: DatabaseWorker = Depends(get_database_worker))
     status_code=HTTPStatus.OK,
 )
 @exception_handler
-async def get_platoons(
+async def get_platoon_commander(
     platoon_number: int, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
     commander = await db_worker.get_platoon_commander(platoon_number)

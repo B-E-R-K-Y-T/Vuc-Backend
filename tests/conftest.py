@@ -1,3 +1,7 @@
+"""
+Сначала надо поднять тестовую базу данных.
+"""
+
 import asyncio
 from typing import AsyncGenerator
 

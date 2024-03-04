@@ -100,7 +100,7 @@ async def get_id_from_tg(
     status_code=HTTPStatus.OK,
 )
 @exception_handler
-@cache(expire=3600)
+@cache(expire=300)
 async def get_students_list(db_worker: DatabaseWorker = Depends(get_database_worker)):
     students = await db_worker.get_students_list()
 
