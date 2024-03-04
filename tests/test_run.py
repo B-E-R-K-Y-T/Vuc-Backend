@@ -394,7 +394,7 @@ async def test_set_attrs_to_user(ac: AsyncClient):
             "direction_of_study": "Test Direction Of Study",
         }
     }
-    response = await ac.post(
+    response = await ac.patch(
         url="/users/set_user_attr",
         json=new_attrs,
         cookies={'bonds': jwt_token}
@@ -420,7 +420,7 @@ async def test_set_attrs_to_user_error(ac: AsyncClient):
             "direction_of_study": [],
         }
     }
-    response = await ac.post(
+    response = await ac.patch(
         url="/users/set_user_attr",
         json=new_attrs,
         cookies={'bonds': jwt_token}
@@ -430,7 +430,7 @@ async def test_set_attrs_to_user_error(ac: AsyncClient):
 
 
 async def test_set_user_mail(ac: AsyncClient):
-    response = await ac.post(
+    response = await ac.patch(
         url="/users/set_user_mail",
         json={
             "id": 1,
@@ -443,7 +443,7 @@ async def test_set_user_mail(ac: AsyncClient):
 
 
 async def test_set_user_mail_error(ac: AsyncClient):
-    response = await ac.post(
+    response = await ac.patch(
         url="/users/set_user_mail",
         json={
             "id": 1,
@@ -454,7 +454,7 @@ async def test_set_user_mail_error(ac: AsyncClient):
 
     assert response.status_code == 422
 
-    response = await ac.post(
+    response = await ac.patch(
         url="/users/set_user_mail",
         json={
             "id": 1,

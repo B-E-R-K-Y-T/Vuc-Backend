@@ -129,7 +129,7 @@ async def get_attendance_status_user(
     ]
 
 
-@router.post(
+@router.patch(
     "/set_user_attr",
     description="Установить атрибут(ы) пользователя в некоторое значение",
     status_code=HTTPStatus.NO_CONTENT,
@@ -146,7 +146,7 @@ async def set_user_attr(
     await DatabaseWorker(session).set_user_attr(attrs.id, **data)
 
 
-@router.post(
+@router.patch(
     "/set_user_mail",
     description="Установить почту пользователя в некоторое значение",
     status_code=HTTPStatus.NO_CONTENT,
