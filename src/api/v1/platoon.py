@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO, PlatoonsDTO
@@ -54,6 +55,7 @@ async def get_platoon(
     status_code=HTTPStatus.OK,
 )
 @exception_handler
+@cache(expire=3600)
 async def get_platoons(session: AsyncSession = Depends(get_async_session)):
     platoons = await DatabaseWorker(session).get_platoons()
 
