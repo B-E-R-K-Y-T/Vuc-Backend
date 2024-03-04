@@ -17,6 +17,12 @@ Python 3.12
 7. ```cd .\src\```
 8. ```uvicorn main:app --host 127.0.0.1 --port 8080 --reload``` OR ```py .\main.py```
 
+--- OR ---
+
+```bash
+docker-compose up
+```
+
 
 ### Up database in docker 
 ```bash
