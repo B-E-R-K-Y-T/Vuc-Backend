@@ -2,6 +2,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.responses import ORJSONResponse
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis import asyncio as aioredis
 
 from config import app_settings
 from schemas.user import UserRead, UserCreate
@@ -13,7 +16,6 @@ from api.v1.user import router as user_router
 from api.v1.professor import router as professor_router
 from api.v1.platoon import router as platoon_router
 from api.v1.subject import router as subject_router
-
 
 app = FastAPI(
     title=app_settings.APP_TITLE,
@@ -51,7 +53,12 @@ app.include_router(
     tags=["Auth"],
 )
 
-init_admin_panel(app, engine)
+
+@app.on_event("startup")
+async def startup_event():
+    init_admin_panel(app, engine)
+    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
 @app.exception_handler(MainVucException)

@@ -1,6 +1,7 @@
 import datetime
 from http import HTTPStatus
 
+from fastapi_cache.decorator import cache
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,11 +26,15 @@ router = APIRouter(
     status_code=HTTPStatus.OK,
 )
 @exception_handler
+@cache(expire=30)
 async def get_subject_by_semester(
         platoon_number: int,
         semester: int,
         session: AsyncSession = Depends(get_async_session),
 ):
+    import time
+
+    time.sleep(10)
     subjects = await DatabaseWorker(session).get_subjects(platoon_number, semester)
 
     return [
