@@ -2,6 +2,7 @@ from http import HTTPStatus
 from typing import Optional
 
 from fastapi import Depends, Request
+from fastapi.openapi.models import Response
 from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,6 +30,14 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
         LOGGER.info(f"User {user.id} has registered.")
+
+    async def on_after_login(
+        self,
+        user: models.UP,
+        request: Optional[Request] = None,
+        response: Optional[Response] = None,
+    ) -> None:
+        LOGGER.info(f"User {user.id} has login.")
 
     async def create(
         self,
