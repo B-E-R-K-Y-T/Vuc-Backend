@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+from fastapi_cache.decorator import cache
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -100,6 +101,7 @@ async def get_id_from_tg(
     status_code=HTTPStatus.OK,
 )
 @exception_handler
+@cache(expire=3600)
 async def get_students_list(session: AsyncSession = Depends(get_async_session)):
     students = await DatabaseWorker(session).get_students_list()
 
