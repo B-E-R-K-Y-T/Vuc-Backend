@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from typing import Sequence
 
+from fastapi import Depends
 from sqlalchemy import insert, select, func, and_, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +10,7 @@ from exceptions import PlatoonError, UserNotFound, UserError, SubjectError
 from models import User, Platoon, Subject, Attend, Grading
 from models.view.users import Users
 from schemas.platoon import PlatoonDTO
-from services.database.connector import BaseTable
+from services.database.connector import BaseTable, get_async_session
 
 
 class DatabaseWorker:
@@ -311,3 +312,7 @@ class DatabaseWorker:
             return True
 
         return False
+
+
+async def get_database_worker(session: AsyncSession = Depends(get_async_session)):
+    yield DatabaseWorker(session)

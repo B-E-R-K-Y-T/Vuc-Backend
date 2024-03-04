@@ -2,14 +2,12 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO, PlatoonsDTO
 from schemas.user import UserDTO, UserCreate, UserRead
 from services.auth.auth import auth_user
 from services.util import exception_handler
-from services.database.worker import DatabaseWorker
-from services.database.connector import get_async_session
+from services.database.worker import DatabaseWorker, get_database_worker
 
 current_user = auth_user.current_user()
 router = APIRouter(
@@ -26,9 +24,9 @@ router = APIRouter(
 )
 @exception_handler
 async def register(
-    platoon: PlatoonDTO, session: AsyncSession = Depends(get_async_session)
+    platoon: PlatoonDTO, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
-    await DatabaseWorker(session).create_platoon(platoon)
+    await db_worker.create_platoon(platoon)
 
     return {"platoon_number": platoon.platoon_number}
 
@@ -41,9 +39,9 @@ async def register(
 )
 @exception_handler
 async def get_platoon(
-    platoon_number: int, session: AsyncSession = Depends(get_async_session)
+    platoon_number: int, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
-    platoon = await DatabaseWorker(session).get_platoon(platoon_number)
+    platoon = await db_worker.get_platoon(platoon_number)
 
     return [UserDTO.model_validate(user, from_attributes=True) for user in platoon]
 
@@ -56,8 +54,8 @@ async def get_platoon(
 )
 @exception_handler
 @cache(expire=3600)
-async def get_platoons(session: AsyncSession = Depends(get_async_session)):
-    platoons = await DatabaseWorker(session).get_platoons()
+async def get_platoons(db_worker: DatabaseWorker = Depends(get_database_worker)):
+    platoons = await db_worker.get_platoons()
 
     data = platoons.all()
     transformed_data = {}
@@ -81,9 +79,9 @@ async def get_platoons(session: AsyncSession = Depends(get_async_session)):
 )
 @exception_handler
 async def get_platoons(
-    platoon_number: int, session: AsyncSession = Depends(get_async_session)
+    platoon_number: int, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
-    commander = await DatabaseWorker(session).get_platoon_commander(platoon_number)
+    commander = await db_worker.get_platoon_commander(platoon_number)
 
     return UserRead.model_validate(commander, from_attributes=True)
 
@@ -96,9 +94,9 @@ async def get_platoons(
 )
 @exception_handler
 async def get_count_squad_in_platoon(
-    platoon_number: int, session: AsyncSession = Depends(get_async_session)
+    platoon_number: int, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
-    count_squad = await DatabaseWorker(session).get_count_squad_in_platoon(
+    count_squad = await db_worker.get_count_squad_in_platoon(
         platoon_number
     )
 
