@@ -1,5 +1,4 @@
 from sqladmin import ModelView
-from sqlalchemy.orm import Mapper
 
 from models import *
 from .model_worker import ModelCollector
