@@ -66,8 +66,8 @@ async def prepare_database():
         )
         await conn.execute(text("INSERT INTO admins (name, email, password)VALUES('Tim','mail@mail.ru','123');"))
         await conn.execute(text("INSERT INTO day (date, weekday, semester, holiday)VALUES('12-22-2023'::date, 0, 0, 'f');"))
-        await conn.execute(text("INSERT INTO attend (user_id, date_v, visiting, semester)"
-                                "VALUES(1,'12-22-2023'::date, 1, 1);"))
+        await conn.execute(text("INSERT INTO attend (user_id, date_v, visiting, semester, confirmed)"
+                                "VALUES(1,'12-22-2023'::date, 1, 1, 't');"))
         await conn.execute(text("INSERT INTO subject (platoon_id, semester, admin_id, name)"
                                 "VALUES(0, 1, 1, 'subject');"))
         await conn.execute(text("INSERT INTO grading (subj_id, user_id, mark, mark_date, theme)"

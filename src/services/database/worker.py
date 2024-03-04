@@ -38,6 +38,22 @@ class DatabaseWorker:
 
         return platoons
 
+    async def get_attendance_status_user(self, user_id):
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(
+                message="Данного пользователя не существует",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = (
+            select(Attend).
+            where(Attend.user_id == user_id)
+        )
+
+        attendances = await self.session.scalars(query)
+
+        return attendances
+
     async def get_gradings_by_student(self, user_id: int, subject_id: int):
         if not await self.user_is_exist(user_id):
             raise UserError(

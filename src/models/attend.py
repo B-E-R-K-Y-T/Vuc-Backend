@@ -15,5 +15,6 @@ class Attend(BaseTable):
     date_v: Mapped[datetime.date]
     visiting: Mapped[int]
     semester: Mapped[int]
+    confirmed: Mapped[bool] = mapped_column(default=False)
 
     user = relationship('User', back_populates='attend')

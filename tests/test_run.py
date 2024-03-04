@@ -2,11 +2,13 @@
 Хоть какие-то тесты лучше, чем никакие
 """
 
+from datetime import datetime
+
 from httpx import AsyncClient
 from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import User, Subject
+from models import User, Subject, Attend
 
 # Чтобы можно было просто скопировать тело ответа и запроса из Swagger и ничо не менять
 true = True
@@ -749,6 +751,47 @@ async def test_get_subject_by_now_semester_error(ac: AsyncClient):
     response = await ac.get(
         url="/professor/get_subject_by_now_semester",
         params={'platoon_number': -1},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 404
+
+
+async def test_get_attendance_status_user(ac: AsyncClient, tst_async_session: AsyncSession):
+    stmt = (
+        insert(
+            Attend
+        ).values(
+            user_id=1,
+            semester=1,
+            date_v=datetime.strptime('2024-12-12', '%Y-%m-%d'),
+            confirmed=True,
+            visiting=1
+        )
+    )
+
+    await tst_async_session.execute(stmt)
+    await tst_async_session.commit()
+
+    response = await ac.get(
+        url="/users/get_attendance_status_user",
+        params={'user_id': 1},
+        cookies={'bonds': jwt_token}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {'id': 1, 'user_id': 1, 'date_v': '2023-12-22', 'visiting': 1, 'semester': 1, 'confirmed': True},
+        {'id': 2, 'user_id': 1, 'date_v': '2024-02-29', 'visiting': 1, 'semester': 0, 'confirmed': False},
+        {'id': 3, 'user_id': 1, 'date_v': '2024-12-12', 'visiting': 1, 'semester': 1, 'confirmed': True}
+    ]
+
+
+
+async def test_get_attendance_status_user_error(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_attendance_status_user",
+        params={'user_id': -1},
         cookies={'bonds': jwt_token}
     )
 

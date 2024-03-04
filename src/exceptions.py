@@ -30,6 +30,10 @@ class TelegramIDError(MainVucException):
     pass
 
 
+class EmailError(MainVucException):
+    pass
+
+
 class PlatoonError(MainVucException):
     pass
 

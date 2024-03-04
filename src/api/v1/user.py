@@ -4,7 +4,8 @@ from fastapi_cache.decorator import cache
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from exceptions import TelegramIDError
+from exceptions import TelegramIDError, EmailError, UserNotFound
+from schemas.attend import AttendDTO
 from schemas.user import (
     UserRole,
     UserRead,
@@ -33,11 +34,12 @@ router = APIRouter(
 )
 @exception_handler
 async def get_user_role(
-    user_id: int, session: AsyncSession = Depends(get_async_session)
+        user_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     role = await DatabaseWorker(session).get_user_role(user_id)
 
     return {"role": role}
+
 
 #
 # @router.get(
@@ -72,7 +74,7 @@ async def get_user(user_id: int, session: AsyncSession = Depends(get_async_sessi
 )
 @exception_handler
 async def get_user_by_tg(
-    telegram_id: int, session: AsyncSession = Depends(get_async_session)
+        telegram_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     user = await DatabaseWorker(session).get_user_by_tg(telegram_id)
 
@@ -87,7 +89,7 @@ async def get_user_by_tg(
 )
 @exception_handler
 async def get_id_from_tg(
-    telegram_id: int, session: AsyncSession = Depends(get_async_session)
+        telegram_id: int, session: AsyncSession = Depends(get_async_session)
 ):
     user_id = await DatabaseWorker(session).get_tg_from_id(telegram_id)
 
@@ -110,6 +112,23 @@ async def get_students_list(session: AsyncSession = Depends(get_async_session)):
     ]
 
 
+@router.get(
+    "/get_attendance_status_user",
+    description="Получить посещаемость по студенту",
+    status_code=HTTPStatus.OK,
+    response_model=list[AttendDTO]
+)
+@exception_handler
+async def get_attendance_status_user(
+        user_id: int, session: AsyncSession = Depends(get_async_session)
+):
+    attendances = await DatabaseWorker(session).get_attendance_status_user(user_id)
+
+    return [
+        AttendDTO.model_validate(attendance, from_attributes=True) for attendance in attendances
+    ]
+
+
 @router.post(
     "/set_user_attr",
     description="Установить атрибут(ы) пользователя в некоторое значение",
@@ -117,7 +136,7 @@ async def get_students_list(session: AsyncSession = Depends(get_async_session)):
 )
 @exception_handler
 async def set_user_attr(
-    attrs: UserSetAttr, session: AsyncSession = Depends(get_async_session)
+        attrs: UserSetAttr, session: AsyncSession = Depends(get_async_session)
 ):
     data = {
         attr: value
@@ -134,10 +153,10 @@ async def set_user_attr(
 )
 @exception_handler
 async def set_user_email(
-    u_email: UserSetMail, session: AsyncSession = Depends(get_async_session)
+        u_email: UserSetMail, session: AsyncSession = Depends(get_async_session)
 ):
     if await DatabaseWorker(session).email_is_exist(u_email.email):
-        raise TelegramIDError(
+        raise EmailError(
             message=f"Email {u_email.email} already exists.",
             status_code=HTTPStatus.BAD_REQUEST,
         )
@@ -150,7 +169,7 @@ async def set_user_email(
 #              status_code=HTTPStatus.NO_CONTENT)
 @exception_handler
 async def set_user_telegram_id(
-    u_telegram_id: UserSetTelegramID, session: AsyncSession = Depends(get_async_session)
+        u_telegram_id: UserSetTelegramID, session: AsyncSession = Depends(get_async_session)
 ):
     """
     Временно вырезано
