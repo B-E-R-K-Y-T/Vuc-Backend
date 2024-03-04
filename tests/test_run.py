@@ -787,8 +787,7 @@ async def test_get_attendance_status_user(ac: AsyncClient, tst_async_session: As
     ]
 
 
-
-async def test_get_attendance_status_user_error(ac: AsyncClient, tst_async_session: AsyncSession):
+async def test_get_attendance_status_user_error(ac: AsyncClient):
     response = await ac.get(
         url="/users/get_attendance_status_user",
         params={'user_id': -1},
