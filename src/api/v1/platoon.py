@@ -1,9 +1,10 @@
 from http import HTTPStatus
+from typing import Dict
 
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
-from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO, PlatoonsDTO
+from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO, PlatoonsDTO, PlatoonDataDTO
 from schemas.user import UserDTO, UserCreate, UserRead
 from services.auth.auth import auth_user
 from services.util import exception_handler
@@ -49,26 +50,26 @@ async def get_platoon(
 @router.get(
     "/get_platoons",
     description="Получить список взводов",
-    response_model=PlatoonsDTO,
+    response_model=Dict[int, PlatoonDataDTO],
     status_code=HTTPStatus.OK,
 )
 @exception_handler
-@cache(expire=300)
+# @cache(expire=300)
 async def get_platoons(db_worker: DatabaseWorker = Depends(get_database_worker)):
     platoons = await db_worker.get_platoons()
 
     data = platoons.all()
-    transformed_data = {}
+    transformed_platoons = {}
 
     for model in data:
         item = model.convert_to_dict()
         platoon_number = item["platoon_number"]
-        transformed_data[platoon_number] = {
+        transformed_platoons[platoon_number] = PlatoonDataDTO.model_validate({
             "vus": item["vus"],
             "semester": item["semester"],
-        }
+        }, from_attributes=True)
 
-    return PlatoonsDTO(data=transformed_data)
+    return transformed_platoons
 
 
 @router.get(
