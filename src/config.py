@@ -43,6 +43,8 @@ class AppSettings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
 
+    CORS_ORIGINS: list[str]
+
     @property
     def DATABASE_DSN(self):
         return PostgresDsn(
