@@ -18,7 +18,6 @@ class Roles:
 class AppSettings(BaseSettings):
     APP_TITLE: str = "DefaultApp"
 
-    # DATABASE_DSN: PostgresDsn
     TEST_DATABASE_DSN: PostgresDsn
 
     PROJECT_HOST: str = Field("127.0.0.1", env="PROJECT_HOST")
