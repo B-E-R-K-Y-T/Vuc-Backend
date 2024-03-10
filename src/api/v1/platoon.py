@@ -70,8 +70,6 @@ async def get_platoons(db_worker: DatabaseWorker = Depends(get_database_worker))
             "semester": item["semester"],
         }, from_attributes=True)
 
-    print(transformed_platoons)
-
     return transformed_platoons
 
 
