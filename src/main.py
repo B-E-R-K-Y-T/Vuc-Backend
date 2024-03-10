@@ -82,7 +82,7 @@ async def startup_event():
 async def exception_handler(request: Request, exc: MainVucException):
     return ORJSONResponse(
         status_code=exc.status_code,
-        content=f"Detail: {str(exc)}, JSON: {request.json()}",
+        content=f"Detail: {str(exc)}, JSON: {await request.json()}",
     )
 
 
