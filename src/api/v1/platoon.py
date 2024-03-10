@@ -4,7 +4,7 @@ from typing import Dict
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
-from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO, PlatoonsDTO, PlatoonDataDTO
+from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO, PlatoonDataDTO
 from schemas.user import UserDTO, UserCreate, UserRead
 from services.auth.auth import auth_user
 from services.util import exception_handler
