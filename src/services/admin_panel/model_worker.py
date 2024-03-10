@@ -5,7 +5,7 @@ class ModelCollector:
     def __init__(self):
         self.admin_models = []
 
-    def target_model(self, model: Callable):
+    def bind_model(self, model: Callable):
         self.admin_models.append(model)
 
         return model

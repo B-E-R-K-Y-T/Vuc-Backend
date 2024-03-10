@@ -6,7 +6,7 @@ from .model_worker import ModelCollector
 _model_collector = ModelCollector()
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _UserTable(ModelView, model=User):
     column_list = [User.id, User.name]
     form_ajax_refs = {
@@ -16,17 +16,17 @@ class _UserTable(ModelView, model=User):
     }
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _StudentTable(ModelView, model=Student):
     column_list = [Student.id, Student.name]
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _DayTable(ModelView, model=Day):
     column_list = [Day.date]
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _AttendTable(ModelView, model=Attend):
     column_list = [Attend.id, Attend.user_id, Attend.date_v]
     form_ajax_refs = {
@@ -36,7 +36,7 @@ class _AttendTable(ModelView, model=Attend):
     }
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _GradingTable(ModelView, model=Grading):
     column_list = [Grading.id, Grading.subj_id, Grading.mark, Grading.theme]
     form_ajax_refs = {
@@ -49,12 +49,12 @@ class _GradingTable(ModelView, model=Grading):
     }
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _MessageQueueTable(ModelView, model=MessageQueue):
     column_list = [MessageQueue.id, MessageQueue.message]
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _SubjectTable(ModelView, model=Subject):
     column_list = [Subject.id, Subject.name]
     form_ajax_refs = {
@@ -64,18 +64,18 @@ class _SubjectTable(ModelView, model=Subject):
     }
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _PlatoonTable(ModelView, model=Platoon):
     column_list = [Platoon.platoon_number]
     form_include_pk = True
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _AdminTable(ModelView, model=Admin):
     column_list = [Admin.name]
 
 
-@_model_collector.target_model
+@_model_collector.bind_model
 class _ScheduleTable(ModelView, model=Schedule):
     column_list = [Schedule.id, Schedule.day, Schedule.platoon_number]
     form_ajax_refs = {
