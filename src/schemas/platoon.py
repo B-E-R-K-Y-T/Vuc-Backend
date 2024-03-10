@@ -13,6 +13,7 @@ class PlatoonDTO(PlatoonNumberDTO):
 
 
 class PlatoonDataDTO(BaseModel):
+    commander: str | None
     vus: int
     semester: int
 

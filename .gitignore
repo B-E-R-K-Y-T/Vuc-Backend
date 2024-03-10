@@ -161,4 +161,4 @@ cython_debug/
 
 ignore_git/
 
-.log.*
+*.log.*

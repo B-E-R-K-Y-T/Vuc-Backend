@@ -33,11 +33,30 @@ class DatabaseWorker:
         return result
 
     async def get_platoons(self):
-        query = select(Platoon)
+        query = (
+            select(Platoon, User.name).
+            outerjoin(
+                User,
+                and_(
+                    User.role == Roles.platoon_commander,
+                    User.platoon_number == Platoon.platoon_number
+                )
+            )
+        )
 
-        platoons = await self.session.scalars(query)
+        platoons = await self.session.execute(query)
 
         return platoons
+
+    async def get_commanders_platoons(self):
+        query = (
+            select(User).
+            where(User.role == Roles.platoon_commander)
+        )
+
+        commanders = await self.session.scalars(query)
+
+        return commanders
 
     async def get_attendance_status_user(self, user_id):
         if not await self.user_is_exist(user_id):

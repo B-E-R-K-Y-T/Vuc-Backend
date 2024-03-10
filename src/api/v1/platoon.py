@@ -50,7 +50,7 @@ async def get_platoon(
 @router.get(
     "/get_platoons",
     description="Получить список взводов",
-    response_model=Dict[int, PlatoonDataDTO],
+    response_model=Dict[int | str, PlatoonDataDTO | int],
     status_code=HTTPStatus.OK,
 )
 @exception_handler
@@ -59,15 +59,18 @@ async def get_platoons(db_worker: DatabaseWorker = Depends(get_database_worker))
     platoons = await db_worker.get_platoons()
 
     data = platoons.all()
-    transformed_platoons = {}
+    transformed_platoons = {'count': len(data)}
 
     for model in data:
-        item = model.convert_to_dict()
+        item = model[0].convert_to_dict()
         platoon_number = item["platoon_number"]
         transformed_platoons[platoon_number] = PlatoonDataDTO.model_validate({
+            "commander": model[1],
             "vus": item["vus"],
             "semester": item["semester"],
         }, from_attributes=True)
+
+    print(transformed_platoons)
 
     return transformed_platoons
 

@@ -209,9 +209,11 @@ async def test_get_platoons(ac: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == {
-        "0": {"vus": 0, "semester": 0},
-        "818": {"vus": 818, "semester": 818},
+        'count': 2,
+        '0': {'commander': 'string', 'vus': 0, 'semester': 0},
+        '818': {'commander': None, 'vus': 818, 'semester': 818}
     }
+
 
 
 async def test_get_platoon(ac: AsyncClient):
@@ -250,7 +252,7 @@ async def test_get_platoon_commander(ac: AsyncClient, tst_async_session: AsyncSe
 
 
 async def test_get_platoon_commander_error(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     response = await ac.get(
         "/platoons/get_platoon_commander",
@@ -673,7 +675,7 @@ async def test_get_gradings_by_student(ac: AsyncClient):
 
 
 async def test_get_subject_by_now_semester(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -703,7 +705,7 @@ async def test_get_subject_by_now_semester(
 
 
 async def test_get_subject_by_semester(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -744,7 +746,7 @@ async def test_get_subject_by_now_semester_error(ac: AsyncClient):
 
 
 async def test_get_attendance_status_user(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Attend).values(
         user_id=1,
@@ -800,6 +802,20 @@ async def test_get_attendance_status_user_error(ac: AsyncClient):
     )
 
     assert response.status_code == 404
+
+
+async def test_get_self(ac: AsyncClient):
+    response = await ac.get(
+        url="/users/get_self",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        'id': 1, 'email': 'user@example.com', 'is_active': True, 'is_superuser': False, 'is_verified': False,
+        'name': 'Nik', 'token': 'token', 'role': 'Студент', 'telegram_id': 98765, 'platoon_number': 0, 'squad_number': 1
+    }
 
 
 async def test_logout_user(ac: AsyncClient):

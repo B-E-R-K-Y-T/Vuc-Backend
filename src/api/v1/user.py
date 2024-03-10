@@ -11,7 +11,7 @@ from schemas.user import (
     UserSetAttr,
     UserSetMail,
     UserID,
-    Student,
+    Student, UserSelf,
 )
 from services.auth.auth import auth_user
 from services.util import exception_handler, convert_schema_to_dict
@@ -100,7 +100,7 @@ async def get_id_from_tg(
     status_code=HTTPStatus.OK,
 )
 @exception_handler
-@cache(expire=300)
+# @cache(expire=300)
 async def get_students_list(db_worker: DatabaseWorker = Depends(get_database_worker)):
     students = await db_worker.get_students_list()
 
@@ -124,6 +124,23 @@ async def get_attendance_status_user(
     return [
         AttendDTO.model_validate(attendance, from_attributes=True) for attendance in attendances
     ]
+
+
+@router.get(
+    "/get_self",
+    description="Получить информацию по студенту",
+    status_code=HTTPStatus.OK,
+    response_model=UserSelf
+)
+@exception_handler
+async def get_self(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    user_self = await db_worker.get_user(user_id)
+
+    print(user_self)
+
+    return UserSelf.model_validate(user_self, from_attributes=True)
 
 
 @router.patch(
