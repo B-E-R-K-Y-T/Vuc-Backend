@@ -18,7 +18,7 @@ class _Base(DeclarativeBase):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return (f'ORM Table: \n{self.__class__.__name__}(\n'
+        return (f'{self.__class__.__name__}(\n'
                 f'{''.join(f'\t{k}={v};\n' for k, v in self.convert_to_dict().items())})')
 
 
