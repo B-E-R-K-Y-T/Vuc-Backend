@@ -557,6 +557,17 @@ async def test_get_id_from_tg(ac: AsyncClient):
     assert response.json() == {"id": 2}
 
 
+async def test_get_id_from_email(ac: AsyncClient):
+    response = await ac.get(
+        url="/users/get_id_from_email",
+        params={"email": "user818@example.com"},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"id": 2}
+
+
 async def test_set_visit_user(ac: AsyncClient):
     response = await ac.post(
         url="/professor/set_visit_user",
@@ -813,8 +824,9 @@ async def test_get_self(ac: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == {
-        'id': 1, 'email': 'user@example.com', 'is_active': True, 'is_superuser': False, 'is_verified': False,
-        'name': 'Nik', 'token': 'token', 'role': 'Студент', 'telegram_id': 98765, 'platoon_number': 0, 'squad_number': 1
+        'name': 'Nik', 'date_of_birth': '2024-02-29T00:00:00', 'phone': '89012345678', 'email': 'user@example.com',
+        'address': 'улица 20', 'institute': 'IKB', 'direction_of_study': 'direction_of_study',
+        'group_study': 'group_study', 'platoon_number': 0, 'squad_number': 1, 'role': 'Студент', 'telegram_id': 98765
     }
 
 
