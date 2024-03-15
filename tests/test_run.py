@@ -215,7 +215,6 @@ async def test_get_platoons(ac: AsyncClient):
     }
 
 
-
 async def test_get_platoon(ac: AsyncClient):
     response = await ac.get(
         "/platoons/get_platoon",
@@ -295,7 +294,7 @@ async def test_get_user_role(ac: AsyncClient, tst_async_session: AsyncSession):
     )
 
     assert response.status_code == 200
-    assert response.json() == {"role": "Admin"}
+    assert response.json() == "Admin"
 
 
 async def test_get_user_role_error(ac: AsyncClient):
@@ -554,7 +553,7 @@ async def test_get_id_from_tg(ac: AsyncClient):
     )
 
     assert response.status_code == 200
-    assert response.json() == {"id": 2}
+    assert response.json() == 2
 
 
 async def test_get_id_from_email(ac: AsyncClient):
@@ -565,7 +564,7 @@ async def test_get_id_from_email(ac: AsyncClient):
     )
 
     assert response.status_code == 200
-    assert response.json() == {"id": 2}
+    assert response.json() == 2
 
 
 async def test_set_visit_user(ac: AsyncClient):
@@ -828,6 +827,223 @@ async def test_get_self(ac: AsyncClient):
         'address': 'улица 20', 'institute': 'IKB', 'direction_of_study': 'direction_of_study',
         'group_study': 'group_study', 'platoon_number': 0, 'squad_number': 1, 'role': 'Студент', 'telegram_id': 98765
     }
+
+
+async def test_get_self_error(ac: AsyncClient):
+    response = await ac.get(
+        url="/users/get_self",
+        params={"user_id": -1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
+
+
+async def test_get_marks(ac: AsyncClient):
+    response = await ac.get(
+        url="/users/get_marks",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {'user_id': 1, 'id': 1, 'mark': 1, 'mark_date': '2023-12-22', 'subj_id': 1, 'theme': 'theme'}
+    ]
+
+
+async def test_get_marks_error(ac: AsyncClient):
+    response = await ac.get(
+        url="/users/get_marks",
+        params={"user_id": -1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
+
+
+async def test_get_marks_by_semester(ac: AsyncClient):
+    response = await ac.get(
+        url="/users/get_marks_by_semester",
+        params={"user_id": 1, "semester": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {'user_id': 1, 'id': 1, 'mark': 1, 'mark_date': '2023-12-22', 'subj_id': 1, 'theme': 'theme'}
+    ]
+
+    response = await ac.get(
+        url="/users/get_marks_by_semester",
+        params={"user_id": 1, "semester": 0},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+async def test_get_marks_by_semester_error(ac: AsyncClient):
+    response = await ac.get(
+        url="/users/get_marks_by_semester",
+        params={"user_id": -1, "semester": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
+
+
+async def test_get_students_by_squad(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/squad/get_students_by_squad",
+        params={"platoon_number": 0, "squad_number": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    query = (
+        select(User.id, User.token).
+        where(
+            User.id.in_([1, 2, 3, 4])
+        )
+    )
+
+    tokens = await tst_async_session.execute(query)
+    (_, t1), (_, t2), (_, t3), (_, t4) = sorted(tokens.all())
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {'id': 2, 'email': 'user818@example.com', 'is_active': True, 'is_superuser': False,
+         'is_verified': False, 'name': 'string', 'token': t2,
+         'role': 'Admin', 'telegram_id': 818, 'platoon_number': 0, 'squad_number': 1},
+        {'id': 3, 'email': 'user817@example.com', 'is_active': True, 'is_superuser': False,
+         'is_verified': False, 'name': 'string', 'token': t3,
+         'role': 'Командир взвода', 'telegram_id': 817, 'platoon_number': 0, 'squad_number': 1},
+        {'id': 4, 'email': 'user816@example.com', 'is_active': True, 'is_superuser': False,
+         'is_verified': False, 'name': 'string', 'token': t4,
+         'role': 'Командир отделения', 'telegram_id': 816, 'platoon_number': 0, 'squad_number': 1},
+        {'id': 1, 'email': 'user@example.com', 'is_active': True, 'is_superuser': False,
+         'is_verified': False, 'name': 'Nik', 'token': t1, 'role': 'Студент', 'telegram_id': 98765,
+         'platoon_number': 0, 'squad_number': 1}
+    ]
+
+
+    response = await ac.get(
+        url="/squad/get_students_by_squad",
+        params={"platoon_number": 0, "squad_number": 100},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+async def test_get_squad_user(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_squad_user",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == 1
+
+
+async def test_get_squad_user_error(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_squad_user",
+        params={"user_id": -1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
+
+
+async def test_get_platoon_user(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_platoon_user",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == 0
+
+
+async def test_get_platoon_user_error(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_platoon_user",
+        params={"user_id": -1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
+
+
+async def test_get_user_group_study(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_user_group_study",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == "group_study"
+
+
+async def test_get_user_direction_of_study(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_user_direction_of_study",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == "direction_of_study"
+
+
+async def test_get_user_address(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_user_address",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == "улица 20"
+
+
+async def test_get_user_institute(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_user_institute",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == "IKB"
+
+
+async def test_get_user_date_of_birth(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_user_date_of_birth",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == "2024-02-29"
+
+
+async def test_get_user_phone(ac: AsyncClient, tst_async_session: AsyncSession):
+    response = await ac.get(
+        url="/users/get_user_phone",
+        params={"user_id": 1},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == "89012345678"
 
 
 async def test_logout_user(ac: AsyncClient):

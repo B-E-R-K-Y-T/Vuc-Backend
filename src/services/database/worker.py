@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Sequence
+from typing import Sequence, Any
 
 from fastapi import Depends
 from sqlalchemy import insert, select, func, and_, update, exists
@@ -162,7 +162,12 @@ class DatabaseWorker:
 
         is_exist_query = (
             exists(Attend.id)
-            .where(and_(Attend.user_id == user_id, Attend.date_v == date_v))
+            .where(
+                and_(
+                    Attend.user_id == user_id,
+                    Attend.date_v == date_v
+                )
+            )
             .select()
         )
 
@@ -196,6 +201,22 @@ class DatabaseWorker:
 
         return user_id
 
+    async def get_users_by_squad(self, platoon_number: int, squad_number: int):
+        query = (
+            select(User).
+            where(
+                and_(
+                    User.platoon_number == platoon_number,
+                    User.squad_number == squad_number
+                )
+            )
+        )
+
+        users = await self.session.scalars(query)
+        await self.session.commit()
+
+        return users.all()
+
     async def get_semesters(self, user_id: int) -> dict[str, Sequence]:
         sub_query = (
             select(User.platoon_number).where(User.id == user_id)
@@ -224,6 +245,38 @@ class DatabaseWorker:
 
         return subjects
 
+    async def get_user_date_of_birth(self, user_id: int) -> str:
+        return await self.get_user_attr(user_id, User.date_of_birth)
+
+    async def get_user_address(self, user_id: int) -> str:
+        return await self.get_user_attr(user_id, User.address)
+
+    async def get_user_direction_of_study(self, user_id: int) -> str:
+        return await self.get_user_attr(user_id, User.direction_of_study)
+
+    async def get_user_group_study(self, user_id: int) -> str:
+        return await self.get_user_attr(user_id, User.group_study)
+
+    async def get_user_institute(self, user_id: int) -> str:
+        return await self.get_user_attr(user_id, User.institute)
+
+    async def get_user_phone(self, user_id: int) -> str:
+        return await self.get_user_attr(user_id, User.phone)
+
+    async def get_user_attr(self, user_id: int, name_attr: User) -> Any:
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(
+                message=f"Пользователя c id \"{user_id}\" не существует",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = (
+            select(name_attr).
+            where(User.id == user_id)
+        )
+
+        return await self.session.scalar(query)
+
     async def get_user_role(self, user_id: int) -> str:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
@@ -234,6 +287,28 @@ class DatabaseWorker:
         user = await self.session.scalar(query)
 
         return user.convert_to_dict()["role"]
+
+    async def get_squad_user(self, user_id: int) -> str:
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(
+                message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = select(User.squad_number).where(User.id == user_id)
+        squad_number = await self.session.scalar(query)
+
+        return squad_number
+
+    async def get_platoon_user(self, user_id: int) -> str:
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(
+                message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = select(User.platoon_number).where(User.id == user_id)
+        platoon_number = await self.session.scalar(query)
+
+        return platoon_number
 
     async def get_user(self, user_id: int) -> User:
         if not await self.user_is_exist(user_id):

@@ -1,3 +1,4 @@
+from datetime import date
 from http import HTTPStatus
 
 from fastapi_cache.decorator import cache
@@ -13,7 +14,7 @@ from schemas.user import (
     UserSetMail,
     UserID,
     Student,
-    UserDTO,
+    UserDTO, RoleRange,
 )
 from services.auth.auth import auth_user
 from services.util import exception_handler, convert_schema_to_dict
@@ -26,9 +27,87 @@ router = APIRouter(
 
 
 @router.get(
+    "/get_user_direction_of_study",
+    description="Получить Направление обучения пользователя",
+    response_model=str,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_user_direction_of_study(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    return await db_worker.get_user_direction_of_study(user_id)
+
+
+@router.get(
+    "/get_user_group_study",
+    description="Получить группу пользователя",
+    response_model=str,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_user_group_study(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    return await db_worker.get_user_group_study(user_id)
+
+
+@router.get(
+    "/get_user_address",
+    description="Получить адрес пользователя",
+    response_model=str,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_user_address(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    return await db_worker.get_user_address(user_id)
+
+
+@router.get(
+    "/get_user_institute",
+    description="Получить институт пользователя",
+    response_model=str,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_user_institute(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    return await db_worker.get_user_institute(user_id)
+
+
+@router.get(
+    "/get_user_date_of_birth",
+    description="Получить дату рождения пользователя",
+    response_model=date,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_user_date_of_birth(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    return await db_worker.get_user_date_of_birth(user_id)
+
+
+@router.get(
+    "/get_user_phone",
+    description="Получить номер телефона пользователя",
+    response_model=str,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_user_phone(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    return await db_worker.get_user_phone(user_id)
+
+
+@router.get(
     "/get_user_role",
     description="Получить роль пользователя",
-    response_model=UserRole,
+    response_model=RoleRange,
     status_code=HTTPStatus.OK,
 )
 @exception_handler
@@ -37,7 +116,33 @@ async def get_user_role(
 ):
     role = await db_worker.get_user_role(user_id)
 
-    return {"role": role}
+    return role
+
+
+@router.get(
+    "/get_squad_user",
+    description="Получить номер отделения пользователя",
+    response_model=int,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_squad_user(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    return await db_worker.get_squad_user(user_id)
+
+
+@router.get(
+    "/get_platoon_user",
+    description="Получить номер взвода пользователя",
+    response_model=int,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_platoon_user(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    return await db_worker.get_platoon_user(user_id)
 
 
 @router.get(
@@ -97,31 +202,27 @@ async def get_user_by_tg(
 @router.get(
     "/get_id_from_tg",
     description="Получить id пользователя по его телеграм id",
-    response_model=UserID,
+    response_model=int,
     status_code=HTTPStatus.OK,
 )
 @exception_handler
 async def get_id_from_tg(
         telegram_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
-    user_id = await db_worker.get_id_from_tg(telegram_id)
-
-    return {"id": user_id}
+    return await db_worker.get_id_from_tg(telegram_id)
 
 
 @router.get(
     "/get_id_from_email",
     description="Получить id пользователя по его email",
-    response_model=UserID,
+    response_model=int,
     status_code=HTTPStatus.OK,
 )
 @exception_handler
 async def get_id_from_email(
         email: str, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
-    user_id = await db_worker.get_id_from_email(email)
-
-    return {"id": user_id}
+    return await db_worker.get_id_from_email(email)
 
 
 @router.get(

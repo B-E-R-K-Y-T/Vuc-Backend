@@ -14,7 +14,7 @@ class _SquadRange(Enum):
     three = 3
 
 
-class _RoleRange(Enum):
+class RoleRange(Enum):
     admin = Roles.admin
     professor = Roles.professor
     platoon_commander = Roles.platoon_commander
@@ -23,7 +23,7 @@ class _RoleRange(Enum):
 
 
 class UserRole(BaseModel):
-    role: _RoleRange
+    role: RoleRange
 
 
 class UserRead(fastapi_users_schemas.BaseUser[int]):
@@ -40,7 +40,7 @@ class UserRead(fastapi_users_schemas.BaseUser[int]):
 
 
 class UserSelf(UserRead):
-    role: _RoleRange
+    role: RoleRange
     telegram_id: int
     platoon_number: int
     squad_number: _SquadRange
@@ -70,7 +70,7 @@ class UserCreate(fastapi_users_schemas.BaseUserCreate):
     group_study: str
     platoon_number: int
     squad_number: _SquadRange
-    role: _RoleRange
+    role: RoleRange
     telegram_id: int
 
     password: Optional[str] = None
@@ -90,7 +90,7 @@ class UserDTO(BaseModel):
     group_study: str
     platoon_number: int
     squad_number: _SquadRange
-    role: _RoleRange
+    role: RoleRange
     telegram_id: int
 
 

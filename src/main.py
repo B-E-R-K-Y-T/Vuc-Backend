@@ -17,6 +17,7 @@ from api.v1.user import router as user_router
 from api.v1.professor import router as professor_router
 from api.v1.platoon import router as platoon_router
 from api.v1.subject import router as subject_router
+from api.v1.squad import router as squad_router
 
 app = FastAPI(
     title=app_settings.APP_TITLE,
@@ -42,6 +43,10 @@ app.include_router(
 app.include_router(
     subject_router,
     tags=["Subject"],
+)
+app.include_router(
+    squad_router,
+    tags=["Squad"],
 )
 app.include_router(
     auth_user.get_auth_router(auth_backend),
