@@ -15,8 +15,7 @@ router = APIRouter(prefix="/professor", dependencies=[Depends(auth_user.access_f
     "/get_semesters",
     description="Получить список семестров",
     response_model=Semesters,
-    status_code=HTTPStatus.OK,
-    dependencies=[Depends(auth_user.access_from_professor(current_user))],
+    status_code=HTTPStatus.OK
 )
 @exception_handler
 async def get_semesters(

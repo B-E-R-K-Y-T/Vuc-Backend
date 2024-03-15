@@ -5,13 +5,15 @@ from fastapi import APIRouter, Depends
 
 from exceptions import EmailError
 from schemas.attend import AttendDTO
+from schemas.grading import UserMark
 from schemas.user import (
     UserRole,
     UserRead,
     UserSetAttr,
     UserSetMail,
     UserID,
-    Student, UserSelf,
+    Student,
+    UserDTO,
 )
 from services.auth.auth import auth_user
 from services.util import exception_handler, convert_schema_to_dict
@@ -38,16 +40,30 @@ async def get_user_role(
     return {"role": role}
 
 
-#
-# @router.get(
-#     "/get_marks",
-#     description="Получить список оценок взвода",
-#     response_model=list[SubjectDTO],
-#     status_code=HTTPStatus.OK,
-# )
-# @exception_handler
-# async def get_marks(session: AsyncSession = Depends(get_async_session)):
-#     pass
+@router.get(
+    "/get_marks",
+    description="Получить список оценок студента",
+    response_model=list[UserMark],
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_marks(user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)):
+    marks = await db_worker.get_marks(user_id)
+
+    return [UserMark.model_validate(mark, from_attributes=True) for mark in marks]
+
+
+@router.get(
+    "/get_marks_by_semester",
+    description="Получить список оценок студента по семестру",
+    response_model=list[UserMark],
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_marks(user_id: int, semester: int, db_worker: DatabaseWorker = Depends(get_database_worker)):
+    marks = await db_worker.get_marks_by_semester(user_id, semester)
+
+    return [UserMark.model_validate(mark, from_attributes=True) for mark in marks]
 
 
 @router.get(
@@ -88,7 +104,22 @@ async def get_user_by_tg(
 async def get_id_from_tg(
         telegram_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
-    user_id = await db_worker.get_tg_from_id(telegram_id)
+    user_id = await db_worker.get_id_from_tg(telegram_id)
+
+    return {"id": user_id}
+
+
+@router.get(
+    "/get_id_from_email",
+    description="Получить id пользователя по его email",
+    response_model=UserID,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_id_from_email(
+        email: str, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    user_id = await db_worker.get_id_from_email(email)
 
     return {"id": user_id}
 
@@ -130,7 +161,7 @@ async def get_attendance_status_user(
     "/get_self",
     description="Получить информацию по студенту",
     status_code=HTTPStatus.OK,
-    response_model=UserSelf
+    response_model=UserDTO
 )
 @exception_handler
 async def get_self(
@@ -138,9 +169,7 @@ async def get_self(
 ):
     user_self = await db_worker.get_user(user_id)
 
-    print(user_self)
-
-    return UserSelf.model_validate(user_self, from_attributes=True)
+    return UserDTO.model_validate(user_self, from_attributes=True)
 
 
 @router.patch(

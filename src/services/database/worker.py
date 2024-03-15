@@ -58,6 +58,44 @@ class DatabaseWorker:
 
         return commanders
 
+    async def get_marks(self, user_id: int):
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(
+                message="Данного пользователя не существует",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = (
+            select(Grading).
+            where(Grading.user_id == user_id)
+        )
+
+        marks = await self.session.scalars(query)
+
+        return marks.all()
+
+    async def get_marks_by_semester(self, user_id: int, semester: int):
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(
+                message="Данного пользователя не существует",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = (
+            select(Grading).
+            where(
+                and_(
+                    Grading.user_id == user_id,
+                    Grading.subj_id == Subject.id,
+                    Subject.semester == semester
+                )
+            )
+        )
+
+        marks = await self.session.scalars(query)
+
+        return marks.all()
+
     async def get_attendance_status_user(self, user_id):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
@@ -142,13 +180,21 @@ class DatabaseWorker:
         await self.session.execute(stmt)
         await self.session.commit()
 
-    async def get_tg_from_id(self, telegram_id: int):
+    async def get_id_from_tg(self, telegram_id: int):
         query = select(User.id).where(User.telegram_id == telegram_id)
 
-        telegram_id = await self.session.scalar(query)
+        user_id = await self.session.scalar(query)
         await self.session.commit()
 
-        return telegram_id
+        return user_id
+
+    async def get_id_from_email(self, email: str):
+        query = select(User.id).where(User.email == email)
+
+        user_id = await self.session.scalar(query)
+        await self.session.commit()
+
+        return user_id
 
     async def get_semesters(self, user_id: int) -> dict[str, Sequence]:
         sub_query = (

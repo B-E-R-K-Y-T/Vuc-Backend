@@ -108,7 +108,7 @@ class EditUser(BaseModel):
 
 class UserSetAttr(UserID):
     data: EditUser
-
+    
 
 class UserSetMail(UserID):
     email: EmailStr
