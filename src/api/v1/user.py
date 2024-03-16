@@ -8,11 +8,9 @@ from exceptions import EmailError
 from schemas.attend import AttendDTO
 from schemas.grading import UserMark
 from schemas.user import (
-    UserRole,
     UserRead,
     UserSetAttr,
     UserSetMail,
-    UserID,
     Student,
     UserDTO, RoleRange,
 )
@@ -50,6 +48,19 @@ async def get_user_group_study(
         user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
     return await db_worker.get_user_group_study(user_id)
+
+
+@router.get(
+    "/get_user_name",
+    description="Получить имя пользователя",
+    response_model=str,
+    status_code=HTTPStatus.OK,
+)
+@exception_handler
+async def get_user_name(
+        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    return await db_worker.get_user_name(user_id)
 
 
 @router.get(

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 from typing import Optional
 
@@ -79,7 +79,7 @@ class UserCreate(fastapi_users_schemas.BaseUserCreate):
     is_verified: Optional[bool] = False
 
 
-class UserDTO(BaseModel):
+class UserDTO(UserID):
     name: str
     date_of_birth: datetime
     phone: str
@@ -108,7 +108,7 @@ class EditUser(BaseModel):
 
 class UserSetAttr(UserID):
     data: EditUser
-    
+
 
 class UserSetMail(UserID):
     email: EmailStr

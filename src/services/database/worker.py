@@ -20,7 +20,8 @@ class DatabaseWorker:
     async def get_platoon(self, platoon_number: int):
         if not await self.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
-                message="Platoon not found", status_code=HTTPStatus.NOT_FOUND
+                message=f"Platoon {platoon_number=} not found",
+                status_code=HTTPStatus.NOT_FOUND
             )
 
         query = select(User).where(platoon_number == User.platoon_number)
@@ -61,10 +62,9 @@ class DatabaseWorker:
     async def get_marks(self, user_id: int):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
-                message="Данного пользователя не существует",
+                message=f"User {user_id=} not found",
                 status_code=HTTPStatus.NOT_FOUND
             )
-
         query = (
             select(Grading).
             where(Grading.user_id == user_id)
@@ -77,7 +77,7 @@ class DatabaseWorker:
     async def get_marks_by_semester(self, user_id: int, semester: int):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
-                message="Данного пользователя не существует",
+                message=f"User {user_id=} not found",
                 status_code=HTTPStatus.NOT_FOUND
             )
 
@@ -99,7 +99,7 @@ class DatabaseWorker:
     async def get_attendance_status_user(self, user_id):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
-                message="Данного пользователя не существует",
+                message=f"User {user_id=} not found",
                 status_code=HTTPStatus.NOT_FOUND
             )
 
@@ -114,13 +114,13 @@ class DatabaseWorker:
 
     async def get_gradings_by_student(self, user_id: int, subject_id: int):
         if not await self.user_is_exist(user_id):
-            raise UserError(
-                message="Пользователя не существует",
+            raise UserNotFound(
+                message=f"User {user_id=} not found",
                 status_code=HTTPStatus.NOT_FOUND
             )
         if not await self.subject_is_exist(subject_id):
             raise SubjectError(
-                message="Данного предмета не существует",
+                message=f"Subject {subject_id=} not found",
                 status_code=HTTPStatus.NOT_FOUND
             )
 
@@ -257,6 +257,9 @@ class DatabaseWorker:
     async def get_user_group_study(self, user_id: int) -> str:
         return await self.get_user_attr(user_id, User.group_study)
 
+    async def get_user_name(self, user_id: int) -> str:
+        return await self.get_user_attr(user_id, User.name)
+
     async def get_user_institute(self, user_id: int) -> str:
         return await self.get_user_attr(user_id, User.institute)
 
@@ -266,7 +269,7 @@ class DatabaseWorker:
     async def get_user_attr(self, user_id: int, name_attr: User) -> Any:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
-                message=f"Пользователя c id \"{user_id}\" не существует",
+                message=f"User {user_id=} not found",
                 status_code=HTTPStatus.NOT_FOUND
             )
 

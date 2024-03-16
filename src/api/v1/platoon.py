@@ -4,8 +4,8 @@ from typing import Dict
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
-from schemas.platoon import PlatoonDTO, CountSquadDTO, PlatoonNumberDTO, PlatoonDataDTO
-from schemas.user import UserDTO, UserCreate, UserRead
+from schemas.platoon import PlatoonDTO, PlatoonNumberDTO, PlatoonDataDTO
+from schemas.user import UserDTO, UserRead
 from services.auth.auth import auth_user
 from services.util import exception_handler
 from services.database.worker import DatabaseWorker, get_database_worker
@@ -35,7 +35,7 @@ async def register(
 @router.get(
     "/get_platoon",
     description="Получить список взвода",
-    response_model=list[UserCreate],
+    response_model=list[UserDTO],
     status_code=HTTPStatus.OK,
 )
 @exception_handler
@@ -91,15 +91,13 @@ async def get_platoon_commander(
 @router.get(
     "/get_count_squad_in_platoon",
     description="Получить кол-во отделений во взводе",
-    response_model=CountSquadDTO,
+    response_model=int,
     status_code=HTTPStatus.OK,
 )
 @exception_handler
 async def get_count_squad_in_platoon(
     platoon_number: int, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
-    count_squad = await db_worker.get_count_squad_in_platoon(
+    return await db_worker.get_count_squad_in_platoon(
         platoon_number
     )
-
-    return {"count_squad": count_squad}
