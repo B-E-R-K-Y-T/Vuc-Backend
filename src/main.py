@@ -6,6 +6,9 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler as rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from config import app_settings
 from schemas.user import UserRead, UserCreate
@@ -18,6 +21,12 @@ from api.v1.professor import router as professor_router
 from api.v1.platoon import router as platoon_router
 from api.v1.subject import router as subject_router
 from api.v1.squad import router as squad_router
+from api.v1.auth import router as auth_router
+
+limiter = Limiter(key_func=get_remote_address)
+app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 app = FastAPI(
     title=app_settings.APP_TITLE,
@@ -58,6 +67,11 @@ app.include_router(
     prefix="/auth",
     tags=["Auth"],
 )
+app.include_router(
+    auth_router,
+    prefix="/auth/jwt",
+    tags=["Auth"],
+)
 
 origins = app_settings.CORS_ORIGINS
 
@@ -84,10 +98,10 @@ async def startup_event():
 
 
 @app.exception_handler(MainVucException)
-async def exception_handler(request: Request, exc: MainVucException):
+async def exception_handler(_: Request, exc: MainVucException):
     return ORJSONResponse(
         status_code=exc.status_code,
-        content=f"Detail: {str(exc)}, JSON: {await request.json()}",
+        content=f"Detail: {str(exc)}",
     )
 
 

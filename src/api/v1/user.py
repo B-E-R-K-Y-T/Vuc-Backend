@@ -1,8 +1,10 @@
 from datetime import date
 from http import HTTPStatus
 
+from fastapi import APIRouter, Depends, Request
 from fastapi_cache.decorator import cache
-from fastapi import APIRouter, Depends
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from exceptions import EmailError
 from schemas.attend import AttendDTO
@@ -12,15 +14,17 @@ from schemas.user import (
     UserSetAttr,
     UserSetMail,
     Student,
-    UserDTO, RoleRange,
+    UserDTO,
+    RoleRange,
 )
 from services.auth.auth import auth_user
-from services.util import exception_handler, convert_schema_to_dict
+from services.util import convert_schema_to_dict
 from services.database.worker import DatabaseWorker, get_database_worker
 
+limiter = Limiter(key_func=get_remote_address)
 current_user = auth_user.current_user()
 router = APIRouter(
-    prefix='/users', dependencies=[Depends(auth_user.access_from_student(current_user))]
+    prefix="/users", dependencies=[Depends(auth_user.access_from_student(current_user))]
 )
 
 
@@ -30,9 +34,12 @@ router = APIRouter(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
+@cache(expire=3600)
 async def get_user_direction_of_study(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_direction_of_study(user_id)
 
@@ -43,9 +50,12 @@ async def get_user_direction_of_study(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+# @cache(expire=3600)
+@limiter.limit("5/minute")
 async def get_user_group_study(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_group_study(user_id)
 
@@ -56,9 +66,11 @@ async def get_user_group_study(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_user_name(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_name(user_id)
 
@@ -69,9 +81,11 @@ async def get_user_name(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_user_address(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_address(user_id)
 
@@ -82,9 +96,11 @@ async def get_user_address(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_user_institute(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_institute(user_id)
 
@@ -95,9 +111,11 @@ async def get_user_institute(
     response_model=date,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+# @limiter.limit("5/minute")
 async def get_user_date_of_birth(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_date_of_birth(user_id)
 
@@ -108,9 +126,11 @@ async def get_user_date_of_birth(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_user_phone(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_phone(user_id)
 
@@ -121,9 +141,11 @@ async def get_user_phone(
     response_model=RoleRange,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_user_role(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     role = await db_worker.get_user_role(user_id)
 
@@ -136,9 +158,11 @@ async def get_user_role(
     response_model=int,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_squad_user(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_squad_user(user_id)
 
@@ -149,9 +173,11 @@ async def get_squad_user(
     response_model=int,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_platoon_user(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_platoon_user(user_id)
 
@@ -162,8 +188,12 @@ async def get_platoon_user(
     response_model=list[UserMark],
     status_code=HTTPStatus.OK,
 )
-@exception_handler
-async def get_marks(user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)):
+@limiter.limit("5/minute")
+async def get_marks(
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
     marks = await db_worker.get_marks(user_id)
 
     return [UserMark.model_validate(mark, from_attributes=True) for mark in marks]
@@ -175,8 +205,13 @@ async def get_marks(user_id: int, db_worker: DatabaseWorker = Depends(get_databa
     response_model=list[UserMark],
     status_code=HTTPStatus.OK,
 )
-@exception_handler
-async def get_marks(user_id: int, semester: int, db_worker: DatabaseWorker = Depends(get_database_worker)):
+@limiter.limit("5/minute")
+async def get_marks(
+        user_id: int,
+        semester: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
     marks = await db_worker.get_marks_by_semester(user_id, semester)
 
     return [UserMark.model_validate(mark, from_attributes=True) for mark in marks]
@@ -188,8 +223,12 @@ async def get_marks(user_id: int, semester: int, db_worker: DatabaseWorker = Dep
     response_model=UserRead,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
-async def get_user(user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)):
+@limiter.limit("5/minute")
+async def get_user(
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
     user = await db_worker.get_user(user_id)
 
     return UserRead.model_validate(user, from_attributes=True)
@@ -201,9 +240,11 @@ async def get_user(user_id: int, db_worker: DatabaseWorker = Depends(get_databas
     response_model=UserRead,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_user_by_tg(
-        telegram_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        telegram_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     user = await db_worker.get_user_by_tg(telegram_id)
 
@@ -216,9 +257,11 @@ async def get_user_by_tg(
     response_model=int,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_id_from_tg(
-        telegram_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        telegram_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_id_from_tg(telegram_id)
 
@@ -229,9 +272,11 @@ async def get_id_from_tg(
     response_model=int,
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_id_from_email(
-        email: str, db_worker: DatabaseWorker = Depends(get_database_worker)
+        email: str,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_id_from_email(email)
 
@@ -242,9 +287,10 @@ async def get_id_from_email(
     response_model=list[Student],
     status_code=HTTPStatus.OK,
 )
-@exception_handler
-# @cache(expire=300)
-async def get_students_list(db_worker: DatabaseWorker = Depends(get_database_worker)):
+@limiter.limit("5/minute")
+async def get_students_list(
+        request: Request, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
     students = await db_worker.get_students_list()
 
     return [
@@ -256,16 +302,19 @@ async def get_students_list(db_worker: DatabaseWorker = Depends(get_database_wor
     "/get_attendance_status_user",
     description="Получить посещаемость по студенту",
     status_code=HTTPStatus.OK,
-    response_model=list[AttendDTO]
+    response_model=list[AttendDTO],
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_attendance_status_user(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     attendances = await db_worker.get_attendance_status_user(user_id)
 
     return [
-        AttendDTO.model_validate(attendance, from_attributes=True) for attendance in attendances
+        AttendDTO.model_validate(attendance, from_attributes=True)
+        for attendance in attendances
     ]
 
 
@@ -273,11 +322,13 @@ async def get_attendance_status_user(
     "/get_self",
     description="Получить информацию по студенту",
     status_code=HTTPStatus.OK,
-    response_model=UserDTO
+    response_model=UserDTO,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_self(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     user_self = await db_worker.get_user(user_id)
 
@@ -289,9 +340,11 @@ async def get_self(
     description="Установить атрибут(ы) пользователя в некоторое значение",
     status_code=HTTPStatus.NO_CONTENT,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def set_user_attr(
-        attrs: UserSetAttr, db_worker: DatabaseWorker = Depends(get_database_worker)
+        attrs: UserSetAttr,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     data = {
         attr: value
@@ -306,9 +359,11 @@ async def set_user_attr(
     description="Установить почту пользователя в некоторое значение",
     status_code=HTTPStatus.NO_CONTENT,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def set_user_email(
-        u_email: UserSetMail, db_worker: DatabaseWorker = Depends(get_database_worker)
+        u_email: UserSetMail,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     if await db_worker.email_is_exist(u_email.email):
         raise EmailError(

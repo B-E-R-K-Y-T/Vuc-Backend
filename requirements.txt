@@ -22,3 +22,4 @@ uvicorn==0.27.1
 starlette==0.35.1
 black==23.11.0
 sqladmin[full]==0.16.1
+slowapi==0.1.9

@@ -54,7 +54,7 @@ class UserNotFound(UserError):
     def __init__(
         self,
         *args,
-        message: str = "Пользователь не существует",
+        message: str = "User not found",
         status_code=HTTPStatus.BAD_REQUEST,
     ):
         super().__init__(*args, message=message, status_code=status_code)
@@ -64,7 +64,7 @@ class UserAlreadyExists(UserError):
     def __init__(
         self,
         *args,
-        message: str = "Пользователь уже существует",
+        message: str = "The user already exists",
         status_code=HTTPStatus.BAD_REQUEST,
     ):
         super().__init__(*args, message=message, status_code=status_code)

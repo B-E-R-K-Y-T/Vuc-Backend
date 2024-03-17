@@ -1,12 +1,15 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from services.auth.auth import auth_user
-from services.util import exception_handler
 from schemas.user import UserDTO
 from services.database.worker import DatabaseWorker, get_database_worker
 
+
+limiter = Limiter(key_func=get_remote_address)
 current_user = auth_user.current_user()
 router = APIRouter(
     prefix="/squad",
@@ -20,11 +23,12 @@ router = APIRouter(
     response_model=list[UserDTO],
     status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_subject_by_semester(
-        platoon_number: int,
-        squad_number: int,
-        db_worker: DatabaseWorker = Depends(get_database_worker),
+    platoon_number: int,
+    squad_number: int,
+    request: Request,
+    db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     users = await db_worker.get_users_by_squad(platoon_number, squad_number)
 

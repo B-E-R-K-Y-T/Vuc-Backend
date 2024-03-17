@@ -1,25 +1,34 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from services.auth.auth import auth_user
-from services.util import exception_handler, convert_schema_to_dict
+from services.util import convert_schema_to_dict
 from schemas.professor import Semesters, AttendanceDTO, Professor
 from services.database.worker import DatabaseWorker, get_database_worker
 
+
+limiter = Limiter(key_func=get_remote_address)
 current_user = auth_user.current_user()
-router = APIRouter(prefix="/professor", dependencies=[Depends(auth_user.access_from_student(current_user))])
+router = APIRouter(
+    prefix="/professor",
+    dependencies=[Depends(auth_user.access_from_student(current_user))],
+)
 
 
 @router.get(
     "/get_semesters",
     description="Получить список семестров",
     response_model=Semesters,
-    status_code=HTTPStatus.OK
+    status_code=HTTPStatus.OK,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def get_semesters(
-        user_id: int, db_worker: DatabaseWorker = Depends(get_database_worker)
+    user_id: int,
+    request: Request,
+    db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     semesters = await db_worker.get_semesters(user_id)
 
@@ -31,9 +40,11 @@ async def get_semesters(
     description="Установить посещение для юзера в конкретную дату",
     status_code=HTTPStatus.NO_CONTENT,
 )
-@exception_handler
+@limiter.limit("5/minute")
 async def set_visit_user(
-        attendance: AttendanceDTO, db_worker: DatabaseWorker = Depends(get_database_worker)
+    attendance: AttendanceDTO,
+    request: Request,
+    db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     await db_worker.set_visit_user(**convert_schema_to_dict(attendance))
 
@@ -44,8 +55,10 @@ async def set_visit_user(
     response_model=list[Professor],
     status_code=HTTPStatus.OK,
 )
-@exception_handler
-async def get_professors_list(db_worker: DatabaseWorker = Depends(get_database_worker)):
+@limiter.limit("5/minute")
+async def get_professors_list(
+    request: Request, db_worker: DatabaseWorker = Depends(get_database_worker)
+):
     professors = await db_worker.get_professors_list()
 
     return [

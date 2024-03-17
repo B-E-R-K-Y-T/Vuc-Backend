@@ -1,6 +1,6 @@
 from functools import wraps
 from http import HTTPStatus
-from typing import Callable
+from typing import Callable, Awaitable
 
 from fastapi import HTTPException
 from fastapi_users import FastAPIUsers
@@ -31,14 +31,14 @@ class AuthUser(FastAPIUsers):
     def __init__(self, user_manager, auth_backends):
         super().__init__(user_manager, auth_backends)
         self._role_hierarchy = {
-            Roles.admin:             4,
-            Roles.professor:         3,
+            Roles.admin: 4,
+            Roles.professor: 3,
             Roles.platoon_commander: 2,
-            Roles.squad_commander:   1,
-            Roles.student:           0,
+            Roles.squad_commander: 1,
+            Roles.student: 0,
         }
 
-    def access_from_admin(self, func: Callable) -> Callable:
+    def access_from_admin(self, func: Callable | Awaitable) -> Callable | Awaitable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
             user: User = await func(*args, **kwargs)
@@ -46,7 +46,7 @@ class AuthUser(FastAPIUsers):
 
         return wrapper
 
-    def access_from_professor(self, func: Callable) -> Callable:
+    def access_from_professor(self, func: Callable | Awaitable) -> Callable | Awaitable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
             user: User = await func(*args, **kwargs)
@@ -54,7 +54,7 @@ class AuthUser(FastAPIUsers):
 
         return wrapper
 
-    def access_from_platoon_commander(self, func: Callable) -> Callable:
+    def access_from_platoon_commander(self, func: Callable | Awaitable) -> Callable | Awaitable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
             user: User = await func(*args, **kwargs)
@@ -62,7 +62,7 @@ class AuthUser(FastAPIUsers):
 
         return wrapper
 
-    def access_from_squad_commander(self, func: Callable) -> Callable:
+    def access_from_squad_commander(self, func: Callable | Awaitable) -> Callable | Awaitable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
             user: User = await func(*args, **kwargs)
@@ -70,7 +70,7 @@ class AuthUser(FastAPIUsers):
 
         return wrapper
 
-    def access_from_student(self, func: Callable) -> Callable:
+    def access_from_student(self, func: Callable | Awaitable) -> Callable | Awaitable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
             user = await func(*args, **kwargs)
@@ -89,7 +89,6 @@ auth_user = AuthUser(
     get_user_manager,
     [auth_backend],
 )
-
 
 __all__ = (
     "auth_user",
