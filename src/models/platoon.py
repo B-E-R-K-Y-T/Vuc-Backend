@@ -11,7 +11,6 @@ class Platoon(BaseTable):
     vus: Mapped[int]
     semester: Mapped[int] = mapped_column(default=1)
 
-    schedule = relationship('Schedule', back_populates='platoon')
-    subject = relationship('Subject', back_populates='platoon')
-    user = relationship('User', back_populates='platoon')
-    
+    schedule = relationship("Schedule", back_populates="platoon")
+    subject = relationship("Subject", back_populates="platoon")
+    user = relationship("User", back_populates="platoon")

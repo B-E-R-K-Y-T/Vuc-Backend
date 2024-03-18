@@ -209,9 +209,9 @@ async def test_get_platoons(ac: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == {
-        'count': 2,
-        '0': {'commander': 'string', 'vus': 0, 'semester': 0},
-        '818': {'commander': None, 'vus': 818, 'semester': 818}
+        "count": 2,
+        "0": {"commander": "string", "vus": 0, "semester": 0},
+        "818": {"commander": None, "vus": 818, "semester": 818},
     }
 
 
@@ -251,7 +251,7 @@ async def test_get_platoon_commander(ac: AsyncClient, tst_async_session: AsyncSe
 
 
 async def test_get_platoon_commander_error(
-        ac: AsyncClient, tst_async_session: AsyncSession
+    ac: AsyncClient, tst_async_session: AsyncSession
 ):
     response = await ac.get(
         "/platoons/get_platoon_commander",
@@ -685,7 +685,7 @@ async def test_get_gradings_by_student(ac: AsyncClient):
 
 
 async def test_get_subject_by_now_semester(
-        ac: AsyncClient, tst_async_session: AsyncSession
+    ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -715,7 +715,7 @@ async def test_get_subject_by_now_semester(
 
 
 async def test_get_subject_by_semester(
-        ac: AsyncClient, tst_async_session: AsyncSession
+    ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -756,7 +756,7 @@ async def test_get_subject_by_now_semester_error(ac: AsyncClient):
 
 
 async def test_get_attendance_status_user(
-        ac: AsyncClient, tst_async_session: AsyncSession
+    ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Attend).values(
         user_id=1,
@@ -823,9 +823,19 @@ async def test_get_self(ac: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == {
-        'id': 1, 'name': 'Nik', 'date_of_birth': '2024-02-29T00:00:00', 'phone': '89012345678', 'email': 'user@example.com',
-        'address': 'улица 20', 'institute': 'IKB', 'direction_of_study': 'direction_of_study',
-        'group_study': 'group_study', 'platoon_number': 0, 'squad_number': 1, 'role': 'Студент', 'telegram_id': 98765
+        "id": 1,
+        "name": "Nik",
+        "date_of_birth": "2024-02-29T00:00:00",
+        "phone": "89012345678",
+        "email": "user@example.com",
+        "address": "улица 20",
+        "institute": "IKB",
+        "direction_of_study": "direction_of_study",
+        "group_study": "group_study",
+        "platoon_number": 0,
+        "squad_number": 1,
+        "role": "Студент",
+        "telegram_id": 98765,
     }
 
 
@@ -848,7 +858,14 @@ async def test_get_marks(ac: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == [
-        {'user_id': 1, 'id': 1, 'mark': 1, 'mark_date': '2023-12-22', 'subj_id': 1, 'theme': 'theme'}
+        {
+            "user_id": 1,
+            "id": 1,
+            "mark": 1,
+            "mark_date": "2023-12-22",
+            "subj_id": 1,
+            "theme": "theme",
+        }
     ]
 
 
@@ -871,7 +888,14 @@ async def test_get_marks_by_semester(ac: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == [
-        {'user_id': 1, 'id': 1, 'mark': 1, 'mark_date': '2023-12-22', 'subj_id': 1, 'theme': 'theme'}
+        {
+            "user_id": 1,
+            "id": 1,
+            "mark": 1,
+            "mark_date": "2023-12-22",
+            "subj_id": 1,
+            "theme": "theme",
+        }
     ]
 
     response = await ac.get(
@@ -904,65 +928,65 @@ async def test_get_students_by_squad(ac: AsyncClient):
     assert response.status_code == 200
     assert response.json() == [
         {
-            'id': 2,
-            'address': 'string',
-            'date_of_birth': '2024-02-27T00:00:00',
-            'direction_of_study': 'string',
-            'email': 'user818@example.com',
-            'group_study': 'string',
-            'institute': 'string',
-            'name': 'string',
-            'phone': 'string',
-            'platoon_number': 0,
-            'role': 'Admin',
-            'squad_number': 1,
-            'telegram_id': 818
+            "id": 2,
+            "address": "string",
+            "date_of_birth": "2024-02-27T00:00:00",
+            "direction_of_study": "string",
+            "email": "user818@example.com",
+            "group_study": "string",
+            "institute": "string",
+            "name": "string",
+            "phone": "string",
+            "platoon_number": 0,
+            "role": "Admin",
+            "squad_number": 1,
+            "telegram_id": 818,
         },
         {
-            'id': 3,
-            'address': 'string',
-            'date_of_birth': '2024-02-27T00:00:00',
-            'direction_of_study': 'string',
-            'email': 'user817@example.com',
-            'group_study': 'string',
-            'institute': 'string',
-            'name': 'string',
-            'phone': 'string',
-            'platoon_number': 0,
-            'role': 'Командир взвода',
-            'squad_number': 1,
-            'telegram_id': 817
+            "id": 3,
+            "address": "string",
+            "date_of_birth": "2024-02-27T00:00:00",
+            "direction_of_study": "string",
+            "email": "user817@example.com",
+            "group_study": "string",
+            "institute": "string",
+            "name": "string",
+            "phone": "string",
+            "platoon_number": 0,
+            "role": "Командир взвода",
+            "squad_number": 1,
+            "telegram_id": 817,
         },
         {
-            'id': 4,
-            'address': 'string',
-            'date_of_birth': '2024-02-27T00:00:00',
-            'direction_of_study': 'string',
-            'email': 'user816@example.com',
-            'group_study': 'string',
-            'institute': 'string',
-            'name': 'string',
-            'phone': 'string',
-            'platoon_number': 0,
-            'role': 'Командир отделения',
-            'squad_number': 1,
-            'telegram_id': 816
+            "id": 4,
+            "address": "string",
+            "date_of_birth": "2024-02-27T00:00:00",
+            "direction_of_study": "string",
+            "email": "user816@example.com",
+            "group_study": "string",
+            "institute": "string",
+            "name": "string",
+            "phone": "string",
+            "platoon_number": 0,
+            "role": "Командир отделения",
+            "squad_number": 1,
+            "telegram_id": 816,
         },
         {
-            'id': 1,
-            'address': 'улица 20',
-            'date_of_birth': '2024-02-29T00:00:00',
-            'direction_of_study': 'direction_of_study',
-            'email': 'user@example.com',
-            'group_study': 'group_study',
-            'institute': 'IKB',
-            'name': 'Nik',
-            'phone': '89012345678',
-            'platoon_number': 0,
-            'role': 'Студент',
-            'squad_number': 1,
-            'telegram_id': 98765
-        }
+            "id": 1,
+            "address": "улица 20",
+            "date_of_birth": "2024-02-29T00:00:00",
+            "direction_of_study": "direction_of_study",
+            "email": "user@example.com",
+            "group_study": "group_study",
+            "institute": "IKB",
+            "name": "Nik",
+            "phone": "89012345678",
+            "platoon_number": 0,
+            "role": "Студент",
+            "squad_number": 1,
+            "telegram_id": 98765,
+        },
     ]
 
     response = await ac.get(

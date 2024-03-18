@@ -17,7 +17,9 @@ class CacheCollector:
         self.__keys: dict = {}
 
     @staticmethod
-    def get_key(func: Callable | Awaitable, args: tuple, kwargs: dict, signature: dict) -> str:
+    def get_key(
+        func: Callable | Awaitable, args: tuple, kwargs: dict, signature: dict
+    ) -> str:
         key: str = func.__name__
 
         for kwarg, value in kwargs.items():
@@ -28,10 +30,10 @@ class CacheCollector:
                 continue
 
             if kwarg in signature:
-                key += f'/{kwarg}={value}'
+                key += f"/{kwarg}={value}"
 
         for arg in args:
-            key += f'/{arg}'
+            key += f"/{arg}"
 
         return key
 
@@ -52,7 +54,9 @@ class CacheCollector:
 
         return res
 
-    def cache(self, expire: int = app_settings.CACHE_TIME_DEFAULT) -> Callable | Awaitable:
+    def cache(
+        self, expire: int = app_settings.CACHE_TIME_DEFAULT
+    ) -> Callable | Awaitable:
         def decorator(func: Callable | Awaitable) -> Callable | Awaitable:
             signature = self.filter_depends(self.get_signature(func))
 

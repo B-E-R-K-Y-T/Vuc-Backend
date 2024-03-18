@@ -11,13 +11,17 @@ from config import app_settings, Roles
 from models.user import User
 from services.auth.manager import get_user_manager
 
-cookie_transport = CookieTransport(cookie_name="bonds", cookie_max_age=app_settings.TIME_LIFE_SESSION)
+cookie_transport = CookieTransport(
+    cookie_name="bonds", cookie_max_age=app_settings.TIME_LIFE_SESSION
+)
 
 SECRET_JWT_KEY = app_settings.SECRET_JWT_KEY
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET_JWT_KEY, lifetime_seconds=app_settings.TIME_LIFE_SESSION)
+    return JWTStrategy(
+        secret=SECRET_JWT_KEY, lifetime_seconds=app_settings.TIME_LIFE_SESSION
+    )
 
 
 auth_backend = AuthenticationBackend(
@@ -54,7 +58,9 @@ class AuthUser(FastAPIUsers):
 
         return wrapper
 
-    def access_from_platoon_commander(self, func: Callable | Awaitable) -> Callable | Awaitable:
+    def access_from_platoon_commander(
+        self, func: Callable | Awaitable
+    ) -> Callable | Awaitable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
             user: User = await func(*args, **kwargs)
@@ -62,7 +68,9 @@ class AuthUser(FastAPIUsers):
 
         return wrapper
 
-    def access_from_squad_commander(self, func: Callable | Awaitable) -> Callable | Awaitable:
+    def access_from_squad_commander(
+        self, func: Callable | Awaitable
+    ) -> Callable | Awaitable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
             user: User = await func(*args, **kwargs)
@@ -90,7 +98,4 @@ auth_user = AuthUser(
     [auth_backend],
 )
 
-__all__ = (
-    "auth_user",
-    Roles.__name__
-)
+__all__ = ("auth_user", Roles.__name__)

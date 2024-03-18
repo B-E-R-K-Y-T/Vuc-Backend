@@ -21,7 +21,7 @@ class DatabaseWorker:
         if not await self.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
                 message=f"Platoon {platoon_number=} not found",
-                status_code=HTTPStatus.NOT_FOUND
+                status_code=HTTPStatus.NOT_FOUND,
             )
 
         query = select(User).where(platoon_number == User.platoon_number)
@@ -34,15 +34,12 @@ class DatabaseWorker:
         return result
 
     async def get_platoons(self):
-        query = (
-            select(Platoon, User.name).
-            outerjoin(
-                User,
-                and_(
-                    User.role == Roles.platoon_commander,
-                    User.platoon_number == Platoon.platoon_number
-                )
-            )
+        query = select(Platoon, User.name).outerjoin(
+            User,
+            and_(
+                User.role == Roles.platoon_commander,
+                User.platoon_number == Platoon.platoon_number,
+            ),
         )
 
         platoons = await self.session.execute(query)
@@ -50,10 +47,7 @@ class DatabaseWorker:
         return platoons
 
     async def get_commanders_platoons(self):
-        query = (
-            select(User).
-            where(User.role == Roles.platoon_commander)
-        )
+        query = select(User).where(User.role == Roles.platoon_commander)
 
         commanders = await self.session.scalars(query)
 
@@ -62,13 +56,9 @@ class DatabaseWorker:
     async def get_marks(self, user_id: int):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
-                message=f"User {user_id=} not found",
-                status_code=HTTPStatus.NOT_FOUND
+                message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
             )
-        query = (
-            select(Grading).
-            where(Grading.user_id == user_id)
-        )
+        query = select(Grading).where(Grading.user_id == user_id)
 
         marks = await self.session.scalars(query)
 
@@ -77,18 +67,14 @@ class DatabaseWorker:
     async def get_marks_by_semester(self, user_id: int, semester: int):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
-                message=f"User {user_id=} not found",
-                status_code=HTTPStatus.NOT_FOUND
+                message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
             )
 
-        query = (
-            select(Grading).
-            where(
-                and_(
-                    Grading.user_id == user_id,
-                    Grading.subj_id == Subject.id,
-                    Subject.semester == semester
-                )
+        query = select(Grading).where(
+            and_(
+                Grading.user_id == user_id,
+                Grading.subj_id == Subject.id,
+                Subject.semester == semester,
             )
         )
 
@@ -99,14 +85,10 @@ class DatabaseWorker:
     async def get_attendance_status_user(self, user_id):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
-                message=f"User {user_id=} not found",
-                status_code=HTTPStatus.NOT_FOUND
+                message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
             )
 
-        query = (
-            select(Attend).
-            where(Attend.user_id == user_id)
-        )
+        query = select(Attend).where(Attend.user_id == user_id)
 
         attendances = await self.session.scalars(query)
 
@@ -115,23 +97,16 @@ class DatabaseWorker:
     async def get_gradings_by_student(self, user_id: int, subject_id: int):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
-                message=f"User {user_id=} not found",
-                status_code=HTTPStatus.NOT_FOUND
+                message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
             )
         if not await self.subject_is_exist(subject_id):
             raise SubjectError(
                 message=f"Subject {subject_id=} not found",
-                status_code=HTTPStatus.NOT_FOUND
+                status_code=HTTPStatus.NOT_FOUND,
             )
 
-        query = (
-            select(Grading).
-            where(
-                and_(
-                    Grading.user_id == user_id,
-                    Grading.subj_id == subject_id
-                )
-            )
+        query = select(Grading).where(
+            and_(Grading.user_id == user_id, Grading.subj_id == subject_id)
         )
 
         gradings = await self.session.scalars(query)
@@ -162,12 +137,7 @@ class DatabaseWorker:
 
         is_exist_query = (
             exists(Attend.id)
-            .where(
-                and_(
-                    Attend.user_id == user_id,
-                    Attend.date_v == date_v
-                )
-            )
+            .where(and_(Attend.user_id == user_id, Attend.date_v == date_v))
             .select()
         )
 
@@ -202,13 +172,9 @@ class DatabaseWorker:
         return user_id
 
     async def get_users_by_squad(self, platoon_number: int, squad_number: int):
-        query = (
-            select(User).
-            where(
-                and_(
-                    User.platoon_number == platoon_number,
-                    User.squad_number == squad_number
-                )
+        query = select(User).where(
+            and_(
+                User.platoon_number == platoon_number, User.squad_number == squad_number
             )
         )
 
@@ -269,14 +235,10 @@ class DatabaseWorker:
     async def get_user_attr(self, user_id: int, name_attr: User) -> Any:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
-                message=f"User {user_id=} not found",
-                status_code=HTTPStatus.NOT_FOUND
+                message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
             )
 
-        query = (
-            select(name_attr).
-            where(User.id == user_id)
-        )
+        query = select(name_attr).where(User.id == user_id)
 
         return await self.session.scalar(query)
 
@@ -446,7 +408,7 @@ class DatabaseWorker:
         return False
 
     async def _check_exist_entity_column(
-            self, entity: BaseTable, columns: dict
+        self, entity: BaseTable, columns: dict
     ) -> bool:
         query = select(entity).filter_by(**columns)
         res = await self.session.scalar(query)

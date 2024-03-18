@@ -12,4 +12,4 @@ class MessageQueue(BaseTable):
     telegram_id: Mapped[int] = mapped_column(ForeignKey("user.telegram_id"))
     message: Mapped[str]
 
-    user = relationship("User", back_populates='message_queue', uselist=False)
+    user = relationship("User", back_populates="message_queue", uselist=False)

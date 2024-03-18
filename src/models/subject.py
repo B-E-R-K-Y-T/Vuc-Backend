@@ -14,5 +14,5 @@ class Subject(BaseTable):
     admin_id: Mapped[int]
     name: Mapped[str]
 
-    grading = relationship('Grading', back_populates='subject')
-    platoon = relationship('Platoon', back_populates='subject')
+    grading = relationship("Grading", back_populates="subject")
+    platoon = relationship("Platoon", back_populates="subject")

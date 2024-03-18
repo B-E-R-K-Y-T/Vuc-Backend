@@ -205,9 +205,7 @@ def upgrade() -> None:
         sa.Column("is_active", sa.Boolean(), nullable=False),
         sa.Column("is_superuser", sa.Boolean(), nullable=False),
         sa.Column("is_verified", sa.Boolean(), nullable=False),
-        sa.CheckConstraint(
-            "squad_number IN (1, 2, 3)", name="squad_number_check_c"
-        ),
+        sa.CheckConstraint("squad_number IN (1, 2, 3)", name="squad_number_check_c"),
         sa.ForeignKeyConstraint(
             ["platoon_number"],
             ["platoon.platoon_number"],

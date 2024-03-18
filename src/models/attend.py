@@ -17,4 +17,4 @@ class Attend(BaseTable):
     semester: Mapped[int]
     confirmed: Mapped[bool] = mapped_column(default=False)
 
-    user = relationship('User', back_populates='attend')
+    user = relationship("User", back_populates="attend")

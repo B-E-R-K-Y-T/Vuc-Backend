@@ -15,5 +15,5 @@ class Schedule(BaseTable):
     platoon_number: Mapped[int] = mapped_column(ForeignKey("platoon.platoon_number"))
     day_id: Mapped[datetime.date] = mapped_column(ForeignKey("day.id"))
 
-    platoon = relationship('Platoon', back_populates='schedule')
-    day = relationship('Day', back_populates='schedule')
+    platoon = relationship("Platoon", back_populates="schedule")
+    day = relationship("Day", back_populates="schedule")

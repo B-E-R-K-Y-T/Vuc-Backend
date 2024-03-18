@@ -51,8 +51,8 @@ class AppSettings(BaseSettings):
     @property
     def DATABASE_DSN(self):
         return PostgresDsn(
-            f'postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@'
-            f'{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'
+            f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
+            f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
     model_config = SettingsConfigDict(env_file=f"{BASE_DIR}/.env")
