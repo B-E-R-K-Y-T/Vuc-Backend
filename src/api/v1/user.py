@@ -20,7 +20,7 @@ from services.auth.auth import auth_user
 from services.util import convert_schema_to_dict
 from services.database.worker import DatabaseWorker, get_database_worker
 from services.cache.containers import RedisContainer
-from services.cache.collector import Collector
+from services.cache.cache_collector import CacheCollector
 
 
 limiter = Limiter(key_func=get_remote_address)
@@ -28,7 +28,7 @@ current_user = auth_user.current_user()
 router = APIRouter(
     prefix="/users", dependencies=[Depends(auth_user.access_from_student(current_user))]
 )
-collector = Collector(container=RedisContainer())
+collector = CacheCollector(container=RedisContainer())
 
 
 @router.get(

@@ -4,7 +4,6 @@ from inspect import Signature
 from functools import wraps
 from typing import Awaitable, Callable
 
-from fastapi import APIRouter
 from fastapi.params import Depends
 
 from config import app_settings
@@ -12,7 +11,7 @@ from services.cache.containers import Container
 from services.util import sync_async_call
 
 
-class Collector:
+class CacheCollector:
     def __init__(self, container: Container):
         self.__container: Container = container
         self.__keys: dict = {}
