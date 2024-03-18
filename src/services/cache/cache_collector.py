@@ -66,9 +66,9 @@ class CacheCollector:
                 now = time.time()
 
                 if cached_value is not None:
-                    date_, value = cached_value
+                    ttl, value = cached_value
 
-                    if now - date_ > expire:
+                    if now - ttl > expire:
                         result = await sync_async_call(func, *args, **kwargs)
 
                         await self.__container.set_value(key, [now, result])
