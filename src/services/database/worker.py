@@ -6,7 +6,7 @@ from sqlalchemy import insert, select, func, and_, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
-from exceptions import PlatoonError, UserNotFound, UserError, SubjectError
+from exceptions import PlatoonError, UserNotFound, SubjectError
 from models import User, Platoon, Subject, Attend, Grading
 from models.view.users import Users
 from schemas.platoon import PlatoonDTO
@@ -120,12 +120,12 @@ class DatabaseWorker:
 
         return students
 
-    async def get_professors_list(self):
+    async def get_professors_list(self) -> Sequence:
         query = select(User).where(User.role == Roles.professor)
 
-        students = await self.session.scalars(query)
+        professors = await self.session.scalars(query)
 
-        return students
+        return professors.all()
 
     async def set_visit_user(self, date_v: str, visiting: int, user_id: int):
         if not await self.user_is_exist(user_id):

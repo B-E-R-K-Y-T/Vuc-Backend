@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Dict
 
 from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
@@ -7,7 +8,7 @@ from slowapi.util import get_remote_address
 from services.auth.auth import auth_user
 from services.cache.collector import CacheCollector
 from services.cache.containers import RedisContainer
-from services.util import convert_schema_to_dict
+from services.util import convert_schema_to_dict, result_collection_builder
 from schemas.professor import Semesters, AttendanceDTO, Professor
 from services.database.worker import DatabaseWorker, get_database_worker
 
@@ -54,8 +55,8 @@ async def set_visit_user(
 
 @router.get(
     "/get_professors_list",
-    description="Получить список всех преподавателей",
-    response_model=list[Professor],
+    description="Получить всех преподавателей",
+    response_model=Dict[int | str, Professor],
     status_code=HTTPStatus.OK,
 )
 @limiter.limit("5/minute")
@@ -64,7 +65,4 @@ async def get_professors_list(
 ):
     professors = await db_worker.get_professors_list()
 
-    return [
-        Professor.model_validate(professor, from_attributes=True)
-        for professor in professors
-    ]
+    return await result_collection_builder(professors, schema=Professor)

@@ -1,5 +1,6 @@
 from datetime import date
 from http import HTTPStatus
+from typing import Dict
 
 from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
@@ -17,11 +18,10 @@ from schemas.user import (
     RoleRange,
 )
 from services.auth.auth import auth_user
-from services.util import convert_schema_to_dict
+from services.util import convert_schema_to_dict, result_collection_builder
 from services.database.worker import DatabaseWorker, get_database_worker
 from services.cache.containers import RedisContainer
 from services.cache.collector import CacheCollector
-
 
 limiter = Limiter(key_func=get_remote_address)
 current_user = auth_user.current_user()
@@ -33,15 +33,15 @@ collector = CacheCollector(container=RedisContainer())
 
 @router.get(
     "/get_user_direction_of_study",
-    description="Получить Направление обучения пользователя",
+    description="Получить направление обучения пользователя",
     response_model=str,
     status_code=HTTPStatus.OK,
 )
 @limiter.limit("5/minute")
 async def get_user_direction_of_study(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_direction_of_study(user_id)
 
@@ -54,9 +54,9 @@ async def get_user_direction_of_study(
 )
 @limiter.limit("5/minute")
 async def get_user_group_study(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_group_study(user_id)
 
@@ -69,9 +69,9 @@ async def get_user_group_study(
 )
 @limiter.limit("5/minute")
 async def get_user_name(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_name(user_id)
 
@@ -84,9 +84,9 @@ async def get_user_name(
 )
 @limiter.limit("5/minute")
 async def get_user_address(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_address(user_id)
 
@@ -99,9 +99,9 @@ async def get_user_address(
 )
 @limiter.limit("5/minute")
 async def get_user_institute(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_institute(user_id)
 
@@ -114,9 +114,9 @@ async def get_user_institute(
 )
 # @limiter.limit("5/minute")
 async def get_user_date_of_birth(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_date_of_birth(user_id)
 
@@ -129,9 +129,9 @@ async def get_user_date_of_birth(
 )
 @limiter.limit("5/minute")
 async def get_user_phone(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_user_phone(user_id)
 
@@ -144,9 +144,9 @@ async def get_user_phone(
 )
 @limiter.limit("5/minute")
 async def get_user_role(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     role = await db_worker.get_user_role(user_id)
 
@@ -161,9 +161,9 @@ async def get_user_role(
 )
 @limiter.limit("5/minute")
 async def get_squad_user(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_squad_user(user_id)
 
@@ -176,9 +176,9 @@ async def get_squad_user(
 )
 @limiter.limit("5/minute")
 async def get_platoon_user(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_platoon_user(user_id)
 
@@ -186,36 +186,36 @@ async def get_platoon_user(
 @router.get(
     "/get_marks",
     description="Получить список оценок студента",
-    response_model=list[UserMark],
+    response_model=Dict[str | int, UserMark],
     status_code=HTTPStatus.OK,
 )
 @limiter.limit("5/minute")
 async def get_marks(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     marks = await db_worker.get_marks(user_id)
 
-    return [UserMark.model_validate(mark, from_attributes=True) for mark in marks]
+    return await result_collection_builder(marks, schema=UserMark)
 
 
 @router.get(
     "/get_marks_by_semester",
     description="Получить список оценок студента по семестру",
-    response_model=list[UserMark],
+    response_model=Dict[str | int, UserMark],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit("15/minute")
 async def get_marks(
-    user_id: int,
-    semester: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        semester: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     marks = await db_worker.get_marks_by_semester(user_id, semester)
 
-    return [UserMark.model_validate(mark, from_attributes=True) for mark in marks]
+    return await result_collection_builder(marks, schema=UserMark)
 
 
 @router.get(
@@ -226,9 +226,9 @@ async def get_marks(
 )
 @limiter.limit("5/minute")
 async def get_user(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     user = await db_worker.get_user(user_id)
 
@@ -243,9 +243,9 @@ async def get_user(
 )
 @limiter.limit("5/minute")
 async def get_user_by_tg(
-    telegram_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        telegram_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     user = await db_worker.get_user_by_tg(telegram_id)
 
@@ -260,9 +260,9 @@ async def get_user_by_tg(
 )
 @limiter.limit("5/minute")
 async def get_id_from_tg(
-    telegram_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        telegram_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_id_from_tg(telegram_id)
 
@@ -275,9 +275,9 @@ async def get_id_from_tg(
 )
 @limiter.limit("5/minute")
 async def get_id_from_email(
-    email: str,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        email: str,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.get_id_from_email(email)
 
@@ -285,38 +285,33 @@ async def get_id_from_email(
 @router.get(
     "/get_students_list",
     description="Получить список всех студентов",
-    response_model=list[Student],
+    response_model=Dict[str | int, Student],
     status_code=HTTPStatus.OK,
 )
 @limiter.limit("5/minute")
 async def get_students_list(
-    request: Request, db_worker: DatabaseWorker = Depends(get_database_worker)
+        request: Request, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
     students = await db_worker.get_students_list()
 
-    return [
-        Student.model_validate(student, from_attributes=True) for student in students
-    ]
+    return await result_collection_builder(students, schema=Student)
 
 
 @router.get(
     "/get_attendance_status_user",
     description="Получить посещаемость по студенту",
     status_code=HTTPStatus.OK,
-    response_model=list[AttendDTO],
+    response_model=Dict[str | int, AttendDTO],
 )
 @limiter.limit("5/minute")
 async def get_attendance_status_user(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     attendances = await db_worker.get_attendance_status_user(user_id)
 
-    return [
-        AttendDTO.model_validate(attendance, from_attributes=True)
-        for attendance in attendances
-    ]
+    return await result_collection_builder(attendances, schema=AttendDTO)
 
 
 @router.get(
@@ -327,9 +322,9 @@ async def get_attendance_status_user(
 )
 @limiter.limit("5/minute")
 async def get_self(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     user_self = await db_worker.get_user(user_id)
 
@@ -343,9 +338,9 @@ async def get_self(
 )
 @limiter.limit("5/minute")
 async def set_user_attr(
-    attrs: UserSetAttr,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        attrs: UserSetAttr,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     data = {
         attr: value
@@ -362,9 +357,9 @@ async def set_user_attr(
 )
 @limiter.limit("5/minute")
 async def set_user_email(
-    u_email: UserSetMail,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        u_email: UserSetMail,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     if await db_worker.email_is_exist(u_email.email):
         raise EmailError(

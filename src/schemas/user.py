@@ -27,7 +27,7 @@ class UserRole(BaseModel):
 
 
 class UserRead(fastapi_users_schemas.BaseUser[int]):
-    id: int
+    id: Optional[int] = None
     email: EmailStr
     name: str
     is_active: bool = True

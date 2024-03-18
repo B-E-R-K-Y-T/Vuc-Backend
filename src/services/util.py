@@ -2,7 +2,7 @@ import asyncio
 import random
 import string
 from enum import Enum
-from typing import Callable, Any, Awaitable
+from typing import Callable, Any, Awaitable, Sequence
 
 from pydantic import BaseModel
 
@@ -61,3 +61,37 @@ async def sync_async_call(func: Callable | Awaitable, *args: Any, **kwargs: Any)
         return await func(*args, **kwargs)
     else:
         return func(*args, **kwargs)
+
+
+async def result_item_builder(data: dict, schema: BaseModel, key_field: str = "id") -> dict:
+    """
+    Использовать только на списках сущностей, чтобы сделать их ID индексами в коллекции
+
+    Конвертирует результат из вида: {key_field: 1, "k1": 2, "k2": 3}
+
+    В следующий вид: {1: {"k1": 2, "k2": 3}}
+    """
+    transformed_data: dict = {}
+    key = data.get(key_field)
+
+    transformed_data[key] = schema.model_validate(data, from_attributes=True)
+
+    return transformed_data
+
+
+async def result_collection_builder(items: Sequence, schema: BaseModel, key_field: str = "id") -> dict:
+    """
+    Применяет result_item_builder к коллекции
+    """
+    result = {}
+
+    for item in items:
+        result.update(
+            await result_item_builder(
+                item.convert_to_dict(),
+                schema=schema,
+                key_field=key_field
+            )
+        )
+
+    return result

@@ -498,30 +498,36 @@ async def test_get_subjects(ac: AsyncClient, tst_async_session: AsyncSession):
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {"id": 1, "platoon_id": 0, "semester": 1, "admin_id": 1, "name": "subject"},
-        {
+    assert response.json() == {
+        "1": {
+            "id": 1,
+            "platoon_id": 0,
+            "semester": 1,
+            "admin_id": 1,
+            "name": "subject",
+        },
+        "2": {
             "id": 2,
             "platoon_id": 0,
             "semester": 1,
             "admin_id": 0,
             "name": "Test Subject_0",
         },
-        {
+        "3": {
             "id": 3,
             "platoon_id": 0,
             "semester": 1,
             "admin_id": 0,
             "name": "Test Subject_1",
         },
-        {
+        "4": {
             "id": 4,
             "platoon_id": 0,
             "semester": 1,
             "admin_id": 0,
             "name": "Test Subject_2",
         },
-    ]
+    }
 
 
 async def test_get_subjects_error(ac: AsyncClient):
@@ -625,8 +631,8 @@ async def test_get_students_list(ac: AsyncClient):
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {
+    assert response.json() == {
+        "3": {
             "id": 3,
             "name": "string",
             "role": "Командир взвода",
@@ -634,7 +640,7 @@ async def test_get_students_list(ac: AsyncClient):
             "squad_number": 1,
             "group_study": "string",
         },
-        {
+        "4": {
             "id": 4,
             "name": "string",
             "role": "Командир отделения",
@@ -642,7 +648,7 @@ async def test_get_students_list(ac: AsyncClient):
             "squad_number": 1,
             "group_study": "string",
         },
-        {
+        "1": {
             "id": 1,
             "name": "Nik",
             "role": "Студент",
@@ -650,7 +656,7 @@ async def test_get_students_list(ac: AsyncClient):
             "squad_number": 1,
             "group_study": "group_study",
         },
-    ]
+    }
 
 
 async def test_get_gradings_by_student_error(ac: AsyncClient):
@@ -679,9 +685,9 @@ async def test_get_gradings_by_student(ac: AsyncClient):
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {"id": 1, "mark": 1, "mark_date": "2023-12-22", "theme": "theme"}
-    ]
+    assert response.json() == {
+        "1": {"id": 1, "mark": 1, "mark_date": "2023-12-22", "theme": "theme"}
+    }
 
 
 async def test_get_subject_by_now_semester(
@@ -703,15 +709,15 @@ async def test_get_subject_by_now_semester(
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {
+    assert response.json() == {
+        "5": {
             "id": 5,
             "platoon_id": 818,
             "semester": 2,
             "admin_id": 0,
             "name": "Test Subject_818",
         }
-    ]
+    }
 
 
 async def test_get_subject_by_semester(
@@ -734,15 +740,15 @@ async def test_get_subject_by_semester(
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {
+    assert response.json() == {
+        "6": {
             "id": 6,
             "platoon_id": 818,
             "semester": 1,
             "admin_id": 0,
             "name": "Test Subject_818",
         }
-    ]
+    }
 
 
 async def test_get_subject_by_now_semester_error(ac: AsyncClient):
@@ -776,8 +782,8 @@ async def test_get_attendance_status_user(
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {
+    assert response.json() == {
+        "1": {
             "id": 1,
             "user_id": 1,
             "date_v": "2023-12-22",
@@ -785,7 +791,7 @@ async def test_get_attendance_status_user(
             "semester": 1,
             "confirmed": True,
         },
-        {
+        "2": {
             "id": 2,
             "user_id": 1,
             "date_v": "2024-02-29",
@@ -793,7 +799,7 @@ async def test_get_attendance_status_user(
             "semester": 0,
             "confirmed": False,
         },
-        {
+        "3": {
             "id": 3,
             "user_id": 1,
             "date_v": "2024-12-12",
@@ -801,7 +807,7 @@ async def test_get_attendance_status_user(
             "semester": 1,
             "confirmed": True,
         },
-    ]
+    }
 
 
 async def test_get_attendance_status_user_error(ac: AsyncClient):
@@ -857,8 +863,8 @@ async def test_get_marks(ac: AsyncClient):
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {
+    assert response.json() == {
+        "1": {
             "user_id": 1,
             "id": 1,
             "mark": 1,
@@ -866,7 +872,7 @@ async def test_get_marks(ac: AsyncClient):
             "subj_id": 1,
             "theme": "theme",
         }
-    ]
+    }
 
 
 async def test_get_marks_error(ac: AsyncClient):
@@ -887,8 +893,8 @@ async def test_get_marks_by_semester(ac: AsyncClient):
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {
+    assert response.json() == {
+        "1": {
             "user_id": 1,
             "id": 1,
             "mark": 1,
@@ -896,7 +902,7 @@ async def test_get_marks_by_semester(ac: AsyncClient):
             "subj_id": 1,
             "theme": "theme",
         }
-    ]
+    }
 
     response = await ac.get(
         url="/users/get_marks_by_semester",
@@ -905,7 +911,7 @@ async def test_get_marks_by_semester(ac: AsyncClient):
     )
 
     assert response.status_code == 200
-    assert response.json() == []
+    assert response.json() == {}
 
 
 async def test_get_marks_by_semester_error(ac: AsyncClient):
@@ -926,8 +932,8 @@ async def test_get_students_by_squad(ac: AsyncClient):
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {
+    assert response.json() == {
+        "2": {
             "id": 2,
             "address": "string",
             "date_of_birth": "2024-02-27T00:00:00",
@@ -942,7 +948,7 @@ async def test_get_students_by_squad(ac: AsyncClient):
             "squad_number": 1,
             "telegram_id": 818,
         },
-        {
+        "3": {
             "id": 3,
             "address": "string",
             "date_of_birth": "2024-02-27T00:00:00",
@@ -957,7 +963,7 @@ async def test_get_students_by_squad(ac: AsyncClient):
             "squad_number": 1,
             "telegram_id": 817,
         },
-        {
+        "4": {
             "id": 4,
             "address": "string",
             "date_of_birth": "2024-02-27T00:00:00",
@@ -972,7 +978,7 @@ async def test_get_students_by_squad(ac: AsyncClient):
             "squad_number": 1,
             "telegram_id": 816,
         },
-        {
+        "1": {
             "id": 1,
             "address": "улица 20",
             "date_of_birth": "2024-02-29T00:00:00",
@@ -987,7 +993,7 @@ async def test_get_students_by_squad(ac: AsyncClient):
             "squad_number": 1,
             "telegram_id": 98765,
         },
-    ]
+    }
 
     response = await ac.get(
         url="/squad/get_students_by_squad",
@@ -996,7 +1002,7 @@ async def test_get_students_by_squad(ac: AsyncClient):
     )
 
     assert response.status_code == 200
-    assert response.json() == []
+    assert response.json() == {}
 
 
 async def test_get_squad_user(ac: AsyncClient):

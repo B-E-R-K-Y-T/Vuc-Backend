@@ -11,7 +11,7 @@ from services.auth.auth import auth_user
 from services.cache.collector import CacheCollector
 from services.cache.containers import RedisContainer
 from services.database.worker import DatabaseWorker, get_database_worker
-
+from services.util import result_item_builder, result_collection_builder
 
 limiter = Limiter(key_func=get_remote_address)
 current_user = auth_user.current_user()
@@ -42,7 +42,7 @@ async def register(
 @router.get(
     "/get_platoon",
     description="Получить список взвода",
-    response_model=list[UserDTO],
+    response_model=Dict[int | str, UserDTO | int],
     status_code=HTTPStatus.OK,
 )
 @limiter.limit("5/minute")
@@ -53,7 +53,7 @@ async def get_platoon(
 ):
     platoon = await db_worker.get_platoon(platoon_number)
 
-    return [UserDTO.model_validate(user, from_attributes=True) for user in platoon]
+    return await result_collection_builder(platoon, schema=UserDTO)
 
 
 @router.get(
@@ -73,15 +73,8 @@ async def get_platoons(
 
     for model in data:
         item = model[0].convert_to_dict()
-        platoon_number = item["platoon_number"]
-        transformed_platoons[platoon_number] = PlatoonDataDTO.model_validate(
-            {
-                "commander": model[1],
-                "vus": item["vus"],
-                "semester": item["semester"],
-            },
-            from_attributes=True,
-        )
+        item["commander"] = model[1]
+        transformed_platoons.update(await result_item_builder(item, schema=PlatoonDataDTO, key_field="platoon_number"))
 
     return transformed_platoons
 
