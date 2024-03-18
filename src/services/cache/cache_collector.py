@@ -14,7 +14,6 @@ from services.util import sync_async_call
 class CacheCollector:
     def __init__(self, container: Container):
         self.__container: Container = container
-        self.__keys: dict = {}
 
     @staticmethod
     def get_key(
