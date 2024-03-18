@@ -2,7 +2,6 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.responses import ORJSONResponse
-from redis import asyncio as aioredis
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler as rate_limit_exceeded_handler
 from slowapi.util import get_remote_address

@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from services.database.connector import BaseTable
-from services.database.db_types import intpk
 
 
 class Platoon(BaseTable):
