@@ -2,7 +2,6 @@ from datetime import date
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, Request
-from fastapi_cache.decorator import cache
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
@@ -20,12 +19,16 @@ from schemas.user import (
 from services.auth.auth import auth_user
 from services.util import convert_schema_to_dict
 from services.database.worker import DatabaseWorker, get_database_worker
+from services.cache.containers import RedisContainer
+from services.cache.collector import Collector
+
 
 limiter = Limiter(key_func=get_remote_address)
 current_user = auth_user.current_user()
 router = APIRouter(
     prefix="/users", dependencies=[Depends(auth_user.access_from_student(current_user))]
 )
+collector = Collector(container=RedisContainer())
 
 
 @router.get(
@@ -35,7 +38,6 @@ router = APIRouter(
     status_code=HTTPStatus.OK,
 )
 @limiter.limit("5/minute")
-@cache(expire=3600)
 async def get_user_direction_of_study(
         user_id: int,
         request: Request,
@@ -50,7 +52,6 @@ async def get_user_direction_of_study(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-# @cache(expire=3600)
 @limiter.limit("5/minute")
 async def get_user_group_study(
         user_id: int,

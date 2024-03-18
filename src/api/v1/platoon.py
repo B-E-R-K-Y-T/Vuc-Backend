@@ -2,13 +2,14 @@ from http import HTTPStatus
 from typing import Dict
 
 from fastapi import APIRouter, Depends, Request
-from fastapi_cache.decorator import cache
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from schemas.platoon import PlatoonDTO, PlatoonNumberDTO, PlatoonDataDTO
 from schemas.user import UserDTO, UserRead
 from services.auth.auth import auth_user
+from services.cache.collector import Collector
+from services.cache.containers import RedisContainer
 from services.database.worker import DatabaseWorker, get_database_worker
 
 
@@ -18,6 +19,7 @@ router = APIRouter(
     prefix="/platoons",
     dependencies=[Depends(auth_user.access_from_platoon_commander(current_user))],
 )
+collector = Collector(container=RedisContainer())
 
 
 @router.post(

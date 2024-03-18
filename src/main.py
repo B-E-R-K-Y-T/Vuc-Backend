@@ -2,8 +2,6 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.responses import ORJSONResponse
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler as rate_limit_exceeded_handler
@@ -88,13 +86,6 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     init_admin_panel(app, engine)
-
-    redis = aioredis.from_url(
-        f"redis://{app_settings.REDIS_HOST}:{app_settings.REDIS_PORT}",
-        encoding="utf8",
-        decode_responses=True
-    )
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
 @app.exception_handler(MainVucException)

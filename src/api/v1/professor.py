@@ -5,6 +5,8 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from services.auth.auth import auth_user
+from services.cache.collector import Collector
+from services.cache.containers import RedisContainer
 from services.util import convert_schema_to_dict
 from schemas.professor import Semesters, AttendanceDTO, Professor
 from services.database.worker import DatabaseWorker, get_database_worker
@@ -16,6 +18,7 @@ router = APIRouter(
     prefix="/professor",
     dependencies=[Depends(auth_user.access_from_student(current_user))],
 )
+collector = Collector(container=RedisContainer())
 
 
 @router.get(

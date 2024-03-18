@@ -1,6 +1,9 @@
+import asyncio
 import random
 import string
 from enum import Enum
+from typing import Callable, Any, Awaitable
+
 from pydantic import BaseModel
 
 from config import app_settings
@@ -51,3 +54,10 @@ def convert_schema_to_dict(schema: BaseModel) -> dict:
             res[key] = value
 
     return res
+
+
+async def sync_async_call(func: Callable | Awaitable, *args: Any, **kwargs: Any) -> Any:
+    if asyncio.iscoroutinefunction(func):
+        return await func(*args, **kwargs)
+    else:
+        return func(*args, **kwargs)

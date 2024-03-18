@@ -44,6 +44,9 @@ class AppSettings(BaseSettings):
 
     CORS_ORIGINS: list[str]
 
+    CACHE_ON: bool = Field(False, env="CACHE_ON")
+    CACHE_TIME_DEFAULT: int = Field(3600, env="CACHE_TIME_DEFAULT")
+
     @property
     def DATABASE_DSN(self):
         return PostgresDsn(
