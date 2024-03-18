@@ -28,7 +28,6 @@ class CacheCollector:
                 continue
 
             if kwarg in signature:
-                print(kwarg, type(value), hash(value))
                 key += f'/{kwarg}={value}'
 
         for arg in args:
