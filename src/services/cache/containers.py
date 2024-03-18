@@ -1,5 +1,6 @@
 import pickle
 from abc import ABC, abstractmethod
+from typing import Any
 
 from redis import asyncio as aioredis
 
@@ -26,12 +27,12 @@ class RedisContainer(Container):
             f"redis://{app_settings.REDIS_HOST}:{app_settings.REDIS_PORT}"
         )
 
-    async def set_value(self, key: str, value):
+    async def set_value(self, key: str, value: Any):
         serialized = pickle.dumps(value)
 
         await self.redis.set(key, serialized)
 
-    async def get_value(self, key: str):
+    async def get_value(self, key: str) -> Any:
         value = await self.redis.get(key)
 
         if value is None:
