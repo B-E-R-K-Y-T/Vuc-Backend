@@ -20,7 +20,7 @@ from services.auth.auth import auth_user
 from services.util import convert_schema_to_dict
 from services.database.worker import DatabaseWorker, get_database_worker
 from services.cache.containers import RedisContainer
-from services.cache.cache_collector import CacheCollector
+from services.cache.collector import CacheCollector
 
 
 limiter = Limiter(key_func=get_remote_address)

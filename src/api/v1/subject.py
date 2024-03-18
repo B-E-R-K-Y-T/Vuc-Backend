@@ -8,7 +8,7 @@ from slowapi.util import get_remote_address
 from exceptions import SemesterError
 from services.auth.auth import auth_user
 from schemas.professor import SubjectDTO, Gradings
-from services.cache.cache_collector import CacheCollector
+from services.cache.collector import CacheCollector
 from services.cache.containers import RedisContainer
 from services.database.worker import DatabaseWorker, get_database_worker
 
