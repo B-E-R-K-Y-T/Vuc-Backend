@@ -27,6 +27,7 @@ class AppSettings(BaseSettings):
 
     SECRET_JWT_KEY: str
     AUTH_USER_SECRET_TOKEN: str
+    TIME_LIFE_SESSION: int = Field(3600 * 12, env="TIME_LIFE_SESSION")
 
     DOCS_URL: str
 

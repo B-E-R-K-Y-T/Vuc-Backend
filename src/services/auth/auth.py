@@ -11,13 +11,13 @@ from config import app_settings, Roles
 from models.user import User
 from services.auth.manager import get_user_manager
 
-cookie_transport = CookieTransport(cookie_name="bonds", cookie_max_age=3600)
+cookie_transport = CookieTransport(cookie_name="bonds", cookie_max_age=app_settings.TIME_LIFE_SESSION)
 
 SECRET_JWT_KEY = app_settings.SECRET_JWT_KEY
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET_JWT_KEY, lifetime_seconds=3600)
+    return JWTStrategy(secret=SECRET_JWT_KEY, lifetime_seconds=app_settings.TIME_LIFE_SESSION)
 
 
 auth_backend = AuthenticationBackend(

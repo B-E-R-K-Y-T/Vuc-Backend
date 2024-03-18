@@ -7,7 +7,7 @@ current_user = auth_user.current_user()
 router = APIRouter()
 
 
-@router.post("/refresh")
+# @router.post("/refresh")
 async def refresh_jwt(
         jwt_strategy: JWTStrategy = Depends(get_jwt_strategy),
         user=Depends(current_user)
