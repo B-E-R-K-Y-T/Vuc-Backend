@@ -42,3 +42,23 @@ class RedisContainer(Container):
 
     async def del_value(self, key: str):
         await self.redis.delete(key)
+
+
+class DictContainer(Container):
+    def __init__(self) -> None:
+        self.__container: dict = {}
+
+    async def set_value(self, key: str, value: Any):
+        self.__container[key] = value
+
+    async def get_value(self, key: str) -> Any:
+        value = self.__container.get(key)
+
+        if value is None:
+            return None
+
+        return value
+
+    async def del_value(self, key: str):
+        if key in self.__container:
+            del self.__container[key]
