@@ -7,6 +7,7 @@ from typing import Callable, Any, Awaitable, Sequence
 from pydantic import BaseModel
 
 from config import app_settings
+from services.database.connector import BaseTable
 
 
 class TokenGenerator:
@@ -79,7 +80,7 @@ async def result_item_builder(data: dict, schema: BaseModel, key_field: str = "i
     return transformed_data
 
 
-async def result_collection_builder(items: Sequence, schema: BaseModel, key_field: str = "id") -> dict:
+async def result_collection_builder(items: Sequence[BaseTable], schema: BaseModel, key_field: str = "id") -> dict:
     """
     Применяет result_item_builder к коллекции
     """

@@ -98,4 +98,7 @@ auth_user = AuthUser(
     [auth_backend],
 )
 
-__all__ = ("auth_user", Roles.__name__)
+__all__ = (
+    "auth_user",
+    Roles.__name__,
+)
