@@ -17,7 +17,7 @@ class DatabaseWorker:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_platoon(self, platoon_number: int):
+    async def get_platoon(self, platoon_number: int) -> Sequence:
         if not await self.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
                 message=f"Platoon {platoon_number=} not found",
@@ -53,7 +53,7 @@ class DatabaseWorker:
 
         return commanders
 
-    async def get_marks(self, user_id: int):
+    async def get_marks(self, user_id: int) -> Sequence:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
                 message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
@@ -64,7 +64,7 @@ class DatabaseWorker:
 
         return marks.all()
 
-    async def get_marks_by_semester(self, user_id: int, semester: int):
+    async def get_marks_by_semester(self, user_id: int, semester: int) -> Sequence:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
                 message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
@@ -155,7 +155,7 @@ class DatabaseWorker:
         await self.session.execute(stmt)
         await self.session.commit()
 
-    async def get_id_from_tg(self, telegram_id: int):
+    async def get_id_from_tg(self, telegram_id: int) -> int:
         query = select(User.id).where(User.telegram_id == telegram_id)
 
         user_id = await self.session.scalar(query)
@@ -163,7 +163,7 @@ class DatabaseWorker:
 
         return user_id
 
-    async def get_id_from_email(self, email: str):
+    async def get_id_from_email(self, email: str) -> int:
         query = select(User.id).where(User.email == email)
 
         user_id = await self.session.scalar(query)
@@ -171,7 +171,7 @@ class DatabaseWorker:
 
         return user_id
 
-    async def get_users_by_squad(self, platoon_number: int, squad_number: int):
+    async def get_users_by_squad(self, platoon_number: int, squad_number: int) -> Sequence:
         query = select(User).where(
             and_(
                 User.platoon_number == platoon_number, User.squad_number == squad_number
