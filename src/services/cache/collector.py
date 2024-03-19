@@ -66,7 +66,7 @@ class CacheCollector:
 
                 key = self.get_key(func, args, kwargs, signature)
                 cached_value = await self.__container.get_value(key)
-                now = time.time()
+                now: float = time.time()
 
                 if cached_value is not None:
                     ttl, value = cached_value
