@@ -6,9 +6,10 @@ from sqlalchemy import insert, select, func, and_, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
-from exceptions import PlatoonError, UserNotFound, SubjectError
+from exceptions import PlatoonError, UserNotFound, SubjectError, AttendError
 from models import User, Platoon, Subject, Attend, Grading
 from models.view.users import Users
+from schemas.attend import AttendCreate, ConfirmationAttend
 from schemas.platoon import PlatoonDTO
 from services.database.connector import BaseTable, get_async_session
 
@@ -127,7 +128,7 @@ class DatabaseWorker:
 
         return professors.all()
 
-    async def set_visit_user(self, date_v: str, visiting: int, user_id: int):
+    async def set_visit_user(self, date_v: str, visiting: int, user_id: int) -> int:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
 
@@ -137,7 +138,12 @@ class DatabaseWorker:
 
         is_exist_query = (
             exists(Attend.id)
-            .where(and_(Attend.user_id == user_id, Attend.date_v == date_v))
+            .where(
+                and_(
+                    Attend.user_id == user_id,
+                    Attend.date_v == date_v
+                )
+            )
             .select()
         )
 
@@ -146,14 +152,29 @@ class DatabaseWorker:
         if not is_exist:
             stmt = insert(Attend).values(
                 user_id=user_id, date_v=date_v, visiting=visiting, semester=semester
-            )
+            ).returning(Attend.id)
         else:
-            stmt = update(Attend).values(
-                user_id=user_id, date_v=date_v, visiting=visiting, semester=semester
+            stmt = (
+                update(Attend).
+                values(
+                    user_id=user_id,
+                    date_v=date_v,
+                    visiting=visiting,
+                    semester=semester
+                ).
+                where(
+                    and_(
+                        Attend.date_v == date_v,
+                        Attend.user_id == user_id
+                    )
+                ).
+                returning(Attend.id)
             )
 
-        await self.session.execute(stmt)
+        attend_id = await self.session.execute(stmt)
         await self.session.commit()
+
+        return int(attend_id.scalar())
 
     async def get_id_from_tg(self, telegram_id: int) -> int:
         query = select(User.id).where(User.telegram_id == telegram_id)
@@ -337,6 +358,23 @@ class DatabaseWorker:
         await self.session.execute(stmt)
         await self.session.commit()
 
+    async def confirmation_attend_user(self, attend: ConfirmationAttend):
+        if not await self.attend_is_exist(attend.id):
+            raise AttendError(
+                message=f"{attend.id=} "
+                        f"Not found",
+                status_code=HTTPStatus.NOT_FOUND,
+            )
+
+        stmt = (
+            update(Attend).
+            values(confirmed=attend.confirmed).
+            where(Attend.id == attend.id)
+        )
+
+        await self.session.execute(stmt)
+        await self.session.commit()
+
     async def get_count_squad_in_platoon(self, platoon_number: int) -> int:
         if not await self.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
@@ -362,6 +400,9 @@ class DatabaseWorker:
 
     async def user_is_exist(self, user_id: int) -> bool:
         return await self._check_exist_entity(User, user_id)
+
+    async def attend_is_exist(self, attend_id: int) -> bool:
+        return await self._check_exist_entity(Attend, attend_id)
 
     async def telegram_id_is_exist(self, telegram_id: int) -> bool:
         return await self._check_exist_entity_column(
@@ -408,7 +449,7 @@ class DatabaseWorker:
         return False
 
     async def _check_exist_entity_column(
-        self, entity: BaseTable, columns: dict
+            self, entity: BaseTable, columns: dict
     ) -> bool:
         query = select(entity).filter_by(**columns)
         res = await self.session.scalar(query)

@@ -38,6 +38,10 @@ class PlatoonError(MainVucException):
     pass
 
 
+class AttendError(MainVucException):
+    pass
+
+
 class SubjectError(MainVucException):
     pass
 

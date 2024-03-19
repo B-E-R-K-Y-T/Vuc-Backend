@@ -19,6 +19,7 @@ from api.v1.platoon import router as platoon_router
 from api.v1.subject import router as subject_router
 from api.v1.squad import router as squad_router
 from api.v1.auth import router as auth_router
+from api.v1.attend import router as attend_router
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
@@ -53,6 +54,10 @@ app.include_router(
 app.include_router(
     squad_router,
     tags=["Squad"],
+)
+app.include_router(
+    attend_router,
+    tags=["Attend"],
 )
 app.include_router(
     auth_user.get_auth_router(auth_backend),

@@ -251,7 +251,7 @@ async def test_get_platoon_commander(ac: AsyncClient, tst_async_session: AsyncSe
 
 
 async def test_get_platoon_commander_error(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     response = await ac.get(
         "/platoons/get_platoon_commander",
@@ -580,7 +580,8 @@ async def test_set_visit_user(ac: AsyncClient):
         cookies={"bonds": jwt_token},
     )
 
-    assert response.status_code == 204
+    assert response.status_code == 201
+    assert response.json() == 2
 
 
 async def test_set_visit_user_error(ac: AsyncClient):
@@ -691,7 +692,7 @@ async def test_get_gradings_by_student(ac: AsyncClient):
 
 
 async def test_get_subject_by_now_semester(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -721,7 +722,7 @@ async def test_get_subject_by_now_semester(
 
 
 async def test_get_subject_by_semester(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -762,7 +763,7 @@ async def test_get_subject_by_now_semester_error(ac: AsyncClient):
 
 
 async def test_get_attendance_status_user(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Attend).values(
         user_id=1,
@@ -1122,6 +1123,33 @@ async def test_get_user_name(ac: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == "Nik"
+
+
+async def test_confirmation_attend_user(ac: AsyncClient, tst_async_session: AsyncSession):
+    query = (
+        select(Attend.id).
+        limit(1)
+    )
+
+    id_: int = await tst_async_session.scalar(query)
+
+    response = await ac.patch(
+        url="/attends/confirmation_attend_user",
+        json={"id": id_, "confirmed": True},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 201
+
+
+async def test_confirmation_attend_user_error(ac: AsyncClient):
+    response = await ac.patch(
+        url="/attends/confirmation_attend_user",
+        json={"id": -1, "confirmed": True},
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
 
 
 async def test_logout_user(ac: AsyncClient):

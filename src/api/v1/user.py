@@ -320,7 +320,7 @@ async def get_attendance_status_user(
     status_code=HTTPStatus.OK,
     response_model=UserDTO,
 )
-@limiter.limit("5/minute")
+@limiter.limit("200/minute")
 async def get_self(
         user_id: int,
         request: Request,

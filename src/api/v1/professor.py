@@ -12,7 +12,6 @@ from services.util import convert_schema_to_dict, result_collection_builder
 from schemas.professor import Semesters, AttendanceDTO, Professor
 from services.database.worker import DatabaseWorker, get_database_worker
 
-
 limiter = Limiter(key_func=get_remote_address)
 current_user = auth_user.current_user()
 router = APIRouter(
@@ -30,9 +29,9 @@ collector = CacheCollector(container=RedisContainer())
 )
 @limiter.limit("5/minute")
 async def get_semesters(
-    user_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     semesters = await db_worker.get_semesters(user_id)
 
@@ -42,15 +41,17 @@ async def get_semesters(
 @router.post(
     "/set_visit_user",
     description="Установить посещение для юзера в конкретную дату",
-    status_code=HTTPStatus.NO_CONTENT,
+    status_code=HTTPStatus.CREATED,
+    dependencies=[Depends(auth_user.access_from_squad_commander(current_user))],
+    response_model=int,
 )
 @limiter.limit("5/minute")
 async def set_visit_user(
-    attendance: AttendanceDTO,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        attendance: AttendanceDTO,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
-    await db_worker.set_visit_user(**convert_schema_to_dict(attendance))
+    return await db_worker.set_visit_user(**convert_schema_to_dict(attendance))
 
 
 @router.get(
@@ -61,7 +62,7 @@ async def set_visit_user(
 )
 @limiter.limit("5/minute")
 async def get_professors_list(
-    request: Request, db_worker: DatabaseWorker = Depends(get_database_worker)
+        request: Request, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
     professors = await db_worker.get_professors_list()
 

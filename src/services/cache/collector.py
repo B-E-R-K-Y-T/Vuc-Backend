@@ -17,7 +17,7 @@ class CacheCollector:
 
     @staticmethod
     def get_key(
-        func: Callable | Awaitable, args: tuple, kwargs: dict, signature: dict
+            func: Callable | Awaitable, args: tuple, kwargs: dict, signature: dict
     ) -> str:
         key: str = func.__name__
 
@@ -54,7 +54,7 @@ class CacheCollector:
         return res
 
     def cache(
-        self, expire: int = app_settings.CACHE_TIME_DEFAULT
+            self, expire: int = app_settings.CACHE_TIME_DEFAULT
     ) -> Callable | Awaitable:
         def decorator(func: Callable | Awaitable) -> Callable | Awaitable:
             signature = self.filter_depends(self.get_signature(func))
@@ -87,3 +87,8 @@ class CacheCollector:
             return wrapper
 
         return decorator
+
+
+__all__ = (
+    CacheCollector.__name__,
+)
