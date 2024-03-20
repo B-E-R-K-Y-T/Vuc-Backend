@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from config import app_settings
 from services.auth.auth import auth_user
 from services.cache.collector import CacheCollector
 from services.cache.containers import RedisContainer
@@ -27,7 +28,8 @@ collector = CacheCollector(container=RedisContainer())
     response_model=Semesters,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_semesters(
         user_id: int,
         request: Request,
@@ -45,7 +47,8 @@ async def get_semesters(
     dependencies=[Depends(auth_user.access_from_squad_commander(current_user))],
     response_model=int,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def set_visit_user(
         attendance: AttendanceDTO,
         request: Request,
@@ -60,7 +63,8 @@ async def set_visit_user(
     response_model=Dict[int | str, Professor],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_professors_list(
         request: Request, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):

@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from config import app_settings
 from services.auth.auth import auth_user
 from schemas.user import UserDTO
 from services.cache.collector import CacheCollector
@@ -27,7 +28,8 @@ collector = CacheCollector(container=RedisContainer())
     response_model=Dict[int | str, UserDTO],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_subject_by_semester(
     platoon_number: int,
     squad_number: int,

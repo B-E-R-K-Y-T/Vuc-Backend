@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from config import app_settings
 from schemas.attend import ConfirmationAttend
 from services.auth.auth import auth_user
 from services.cache.collector import CacheCollector
@@ -24,7 +25,8 @@ collector = CacheCollector(container=RedisContainer())
     description="Подтверждение посещения",
     status_code=HTTPStatus.CREATED
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def set_attend_user(
     attend: ConfirmationAttend,
     request: Request,

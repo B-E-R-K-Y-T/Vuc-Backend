@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from config import app_settings
 from exceptions import SemesterError
 from services.auth.auth import auth_user
 from schemas.professor import SubjectDTO, Gradings
@@ -29,7 +30,8 @@ collector = CacheCollector(container=RedisContainer())
     response_model=Dict[str | int, SubjectDTO],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_subject_by_semester(
         platoon_number: int,
         semester: int,
@@ -47,7 +49,8 @@ async def get_subject_by_semester(
     response_model=Dict[str | int, SubjectDTO],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_subject_by_now_semester(
         platoon_number: int,
         request: Request,
@@ -74,7 +77,8 @@ async def get_subject_by_now_semester(
     status_code=HTTPStatus.OK,
     dependencies=[Depends(auth_user.access_from_student(current_user))],
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_gradings_by_student(
         user_id: int,
         subject_id: int,

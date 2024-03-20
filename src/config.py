@@ -49,6 +49,8 @@ class AppSettings(BaseSettings):
     CACHE_ON: bool = Field(False, env="CACHE_ON")
     CACHE_TIME_DEFAULT: int = Field(3600, env="CACHE_TIME_DEFAULT")
 
+    MAX_REQUESTS_TO_ENDPOINT: str
+
     @property
     def DATABASE_DSN(self):
         return PostgresDsn(

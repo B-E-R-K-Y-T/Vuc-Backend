@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from config import app_settings
 from exceptions import EmailError
 from schemas.attend import AttendDTO
 from schemas.grading import UserMark
@@ -37,7 +38,8 @@ collector = CacheCollector(container=RedisContainer())
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_user_direction_of_study(
         user_id: int,
         request: Request,
@@ -52,7 +54,8 @@ async def get_user_direction_of_study(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_user_group_study(
         user_id: int,
         request: Request,
@@ -67,7 +70,8 @@ async def get_user_group_study(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_user_name(
         user_id: int,
         request: Request,
@@ -82,7 +86,8 @@ async def get_user_name(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_user_address(
         user_id: int,
         request: Request,
@@ -97,7 +102,8 @@ async def get_user_address(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_user_institute(
         user_id: int,
         request: Request,
@@ -112,7 +118,8 @@ async def get_user_institute(
     response_model=date,
     status_code=HTTPStatus.OK,
 )
-# @limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_user_date_of_birth(
         user_id: int,
         request: Request,
@@ -127,7 +134,8 @@ async def get_user_date_of_birth(
     response_model=str,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_user_phone(
         user_id: int,
         request: Request,
@@ -142,7 +150,8 @@ async def get_user_phone(
     response_model=RoleRange,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_user_role(
         user_id: int,
         request: Request,
@@ -159,7 +168,8 @@ async def get_user_role(
     response_model=int,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_squad_user(
         user_id: int,
         request: Request,
@@ -174,7 +184,8 @@ async def get_squad_user(
     response_model=int,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_platoon_user(
         user_id: int,
         request: Request,
@@ -189,7 +200,8 @@ async def get_platoon_user(
     response_model=Dict[str | int, UserMark],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_marks(
         user_id: int,
         request: Request,
@@ -206,7 +218,8 @@ async def get_marks(
     response_model=Dict[str | int, UserMark],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("15/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_marks(
         user_id: int,
         semester: int,
@@ -224,7 +237,8 @@ async def get_marks(
     response_model=UserRead,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_self(
         user_id: int,
         request: Request,
@@ -241,7 +255,8 @@ async def get_self(
     response_model=UserRead,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_user_by_tg(
         telegram_id: int,
         request: Request,
@@ -258,7 +273,8 @@ async def get_user_by_tg(
     response_model=int,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_id_from_tg(
         telegram_id: int,
         request: Request,
@@ -273,7 +289,8 @@ async def get_id_from_tg(
     response_model=int,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_id_from_email(
         email: str,
         request: Request,
@@ -288,7 +305,8 @@ async def get_id_from_email(
     response_model=Dict[str | int, Student],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_students_list(
         request: Request, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
@@ -303,7 +321,8 @@ async def get_students_list(
     status_code=HTTPStatus.OK,
     response_model=Dict[str | int, AttendDTO],
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_attendance_status_user(
         user_id: int,
         request: Request,
@@ -320,7 +339,8 @@ async def get_attendance_status_user(
     status_code=HTTPStatus.OK,
     response_model=UserDTO,
 )
-@limiter.limit("200/minute")
+@limiter.limit("100/minute")
+@collector.cache()
 async def get_user(
         user_id: int,
         request: Request,
@@ -336,7 +356,8 @@ async def get_user(
     description="Установить атрибут(ы) пользователя в некоторое значение",
     status_code=HTTPStatus.NO_CONTENT,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def set_user_attr(
         attrs: UserSetAttr,
         request: Request,
@@ -355,7 +376,8 @@ async def set_user_attr(
     description="Установить почту пользователя в некоторое значение",
     status_code=HTTPStatus.NO_CONTENT,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def set_user_email(
         u_email: UserSetMail,
         request: Request,

@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+from config import app_settings
 from schemas.platoon import PlatoonDTO, PlatoonNumberDTO, PlatoonDataDTO
 from schemas.user import UserDTO, UserRead
 from services.auth.auth import auth_user
@@ -28,7 +29,8 @@ collector = CacheCollector(container=RedisContainer())
     response_model=PlatoonNumberDTO,
     status_code=HTTPStatus.CREATED,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def register(
     platoon: PlatoonDTO,
     request: Request,
@@ -45,7 +47,8 @@ async def register(
     response_model=Dict[str,  int | Dict],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_platoon(
     platoon_number: int,
     request: Request,
@@ -64,7 +67,8 @@ async def get_platoon(
     response_model=Dict[int | str, PlatoonDataDTO | int],
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_platoons(
     request: Request, db_worker: DatabaseWorker = Depends(get_database_worker)
 ):
@@ -87,7 +91,8 @@ async def get_platoons(
     response_model=UserRead,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_platoon_commander(
     platoon_number: int,
     request: Request,
@@ -104,7 +109,8 @@ async def get_platoon_commander(
     response_model=int,
     status_code=HTTPStatus.OK,
 )
-@limiter.limit("5/minute")
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
 async def get_count_squad_in_platoon(
     platoon_number: int,
     request: Request,
