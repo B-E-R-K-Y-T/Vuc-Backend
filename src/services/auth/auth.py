@@ -12,9 +12,8 @@ from models.user import User
 from services.auth.manager import get_user_manager
 
 cookie_transport = CookieTransport(
-    cookie_name="bonds", cookie_max_age=app_settings.TIME_LIFE_SESSION
+    cookie_name="bonds", cookie_max_age=app_settings.TIME_LIFE_SESSION, cookie_samesite="none"
 )
-
 SECRET_JWT_KEY = app_settings.SECRET_JWT_KEY
 
 
