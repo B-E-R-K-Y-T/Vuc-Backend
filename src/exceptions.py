@@ -54,6 +54,10 @@ class SemesterError(MainVucException):
     pass
 
 
+class EventErrorException(MainVucException):
+    pass
+
+
 class UserNotFound(UserError):
     def __init__(
         self,
