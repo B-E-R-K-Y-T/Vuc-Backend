@@ -42,7 +42,7 @@ async def register(
 @router.get(
     "/get_platoon",
     description="Получить список взвода",
-    response_model=Dict[int | str, UserDTO | int],
+    response_model=Dict[str,  int | Dict],
     status_code=HTTPStatus.OK,
 )
 @limiter.limit("5/minute")
@@ -52,8 +52,12 @@ async def get_platoon(
     db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     platoon = await db_worker.get_platoon(platoon_number)
+    squad_count: int = await db_worker.get_count_squad_in_platoon(platoon_number)
+    students = await result_collection_builder(platoon, schema=UserDTO)
 
-    return await result_collection_builder(platoon, schema=UserDTO)
+    print(squad_count, type(squad_count))
+
+    return {"squad_count": squad_count, "students": students}
 
 
 @router.get(
@@ -69,7 +73,7 @@ async def get_platoons(
     platoons = await db_worker.get_platoons()
 
     data = platoons.all()
-    transformed_platoons = {"count": len(data)}
+    transformed_platoons = {}
 
     for model in data:
         item = model[0].convert_to_dict()

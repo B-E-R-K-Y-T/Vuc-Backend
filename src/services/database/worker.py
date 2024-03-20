@@ -35,12 +35,16 @@ class DatabaseWorker:
         return result
 
     async def get_platoons(self):
-        query = select(Platoon, User.name).outerjoin(
-            User,
-            and_(
-                User.role == Roles.platoon_commander,
-                User.platoon_number == Platoon.platoon_number,
-            ),
+        query = (
+            select(Platoon, User.name).
+            outerjoin(
+                User,
+                and_(
+                    User.role == Roles.platoon_commander,
+                    User.platoon_number == Platoon.platoon_number,
+                ),
+            ).
+            where(Platoon.platoon_number != 0)  # Это служебный взвод
         )
 
         platoons = await self.session.execute(query)
@@ -396,7 +400,7 @@ class DatabaseWorker:
         count = await self.session.scalar(query)
         await self.session.commit()
 
-        return count
+        return count if count is not None else 0
 
     async def user_is_exist(self, user_id: int) -> bool:
         return await self._check_exist_entity(User, user_id)

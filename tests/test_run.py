@@ -156,52 +156,59 @@ async def test_create_platoon(ac: AsyncClient):
     assert response.json() == {"platoon_number": 818}
 
 
-async def test_get_platoon(ac: AsyncClient):
+async def test_get_platoon(ac: AsyncClient, tst_async_session: AsyncSession):
+    stmt = insert(User).values(
+        name="test",
+        phone="123456789",
+        date_of_birth=datetime.now(),
+        address="TEST",
+        institute="TEST",
+        direction_of_study="TEST",
+        platoon_number=818,
+        squad_number=1,
+        role="Студент",
+        telegram_id=115,
+        token="TOK",
+        group_study="BDSM-13-37",
+        email="MAIL12345S@test.com",
+        registered_at=datetime.now(),
+        is_active=True,
+        is_superuser=False,
+        is_verified=False,
+        hashed_password="adqe2",
+        id=115,
+    )
+
+    await tst_async_session.execute(stmt)
+    await tst_async_session.commit()
+
     response = await ac.get(
         "/platoons/get_platoon",
-        params={"platoon_number": 0},
+        params={"platoon_number": 818},
         cookies={"bonds": jwt_token},
     )
 
     assert response.status_code == 200
-    assert response.json() == [
-        {
-            "email": "user818@example.com",
-            "password": None,
-            "is_active": True,
-            "is_superuser": False,
-            "is_verified": False,
-            "name": "string",
-            "date_of_birth": "2024-02-27T00:00:00",
-            "phone": "string",
-            "address": "string",
-            "institute": "string",
-            "direction_of_study": "string",
-            "group_study": "string",
-            "platoon_number": 0,
-            "squad_number": 1,
-            "role": "Admin",
-            "telegram_id": 818,
+    assert response.json() == {
+        "squad_count": 1,
+        "students": {
+            "115": {
+                "id": 115,
+                "name": "test",
+                "date_of_birth": "2024-03-20T00:00:00",
+                "phone": "123456789",
+                "email": "MAIL12345S@test.com",
+                "address": "TEST",
+                "institute": "TEST",
+                "direction_of_study": "TEST",
+                "group_study": "BDSM-13-37",
+                "platoon_number": 818,
+                "squad_number": 1,
+                "role": "Студент",
+                "telegram_id": 115,
+            }
         },
-        {
-            "email": "user817@example.com",
-            "password": None,
-            "is_active": True,
-            "is_superuser": False,
-            "is_verified": False,
-            "name": "string",
-            "date_of_birth": "2024-02-27T00:00:00",
-            "phone": "string",
-            "address": "string",
-            "institute": "string",
-            "direction_of_study": "string",
-            "group_study": "string",
-            "platoon_number": 0,
-            "squad_number": 1,
-            "role": "Командир взвода",
-            "telegram_id": 817,
-        },
-    ]
+    }
 
 
 async def test_get_platoons(ac: AsyncClient):
@@ -209,13 +216,11 @@ async def test_get_platoons(ac: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == {
-        "count": 2,
-        "0": {"commander": "string", "vus": 0, "semester": 0},
         "818": {"commander": None, "vus": 818, "semester": 818},
     }
 
 
-async def test_get_platoon(ac: AsyncClient):
+async def test_get_platoon_error(ac: AsyncClient):
     response = await ac.get(
         "/platoons/get_platoon",
         params={"platoon_number": -10},
@@ -251,7 +256,7 @@ async def test_get_platoon_commander(ac: AsyncClient, tst_async_session: AsyncSe
 
 
 async def test_get_platoon_commander_error(
-        ac: AsyncClient, tst_async_session: AsyncSession
+    ac: AsyncClient, tst_async_session: AsyncSession
 ):
     response = await ac.get(
         "/platoons/get_platoon_commander",
@@ -649,6 +654,14 @@ async def test_get_students_list(ac: AsyncClient):
             "squad_number": 1,
             "group_study": "string",
         },
+        "115": {
+            "id": 115,
+            "name": "test",
+            "role": "Студент",
+            "platoon_number": 818,
+            "squad_number": 1,
+            "group_study": "BDSM-13-37",
+        },
         "1": {
             "id": 1,
             "name": "Nik",
@@ -692,7 +705,7 @@ async def test_get_gradings_by_student(ac: AsyncClient):
 
 
 async def test_get_subject_by_now_semester(
-        ac: AsyncClient, tst_async_session: AsyncSession
+    ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -722,7 +735,7 @@ async def test_get_subject_by_now_semester(
 
 
 async def test_get_subject_by_semester(
-        ac: AsyncClient, tst_async_session: AsyncSession
+    ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -763,7 +776,7 @@ async def test_get_subject_by_now_semester_error(ac: AsyncClient):
 
 
 async def test_get_attendance_status_user(
-        ac: AsyncClient, tst_async_session: AsyncSession
+    ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Attend).values(
         user_id=1,
@@ -1125,11 +1138,10 @@ async def test_get_user_name(ac: AsyncClient):
     assert response.json() == "Nik"
 
 
-async def test_confirmation_attend_user(ac: AsyncClient, tst_async_session: AsyncSession):
-    query = (
-        select(Attend.id).
-        limit(1)
-    )
+async def test_confirmation_attend_user(
+    ac: AsyncClient, tst_async_session: AsyncSession
+):
+    query = select(Attend.id).limit(1)
 
     id_: int = await tst_async_session.scalar(query)
 
