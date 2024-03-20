@@ -20,7 +20,7 @@ class Logger:
         )
         self.__logger.addHandler(handler)
 
-    def warn(self, *args, **kwargs):
+    def warning(self, *args, **kwargs):
         self.__logger.warning(*args, **kwargs)
 
     def debug(self, *args, **kwargs):
@@ -29,7 +29,7 @@ class Logger:
     def info(self, *args, **kwargs):
         self.__logger.info(*args, **kwargs)
 
-    def err(self, *args, **kwargs):
+    def error(self, *args, **kwargs):
         self.__logger.error(*args, **kwargs)
 
 
