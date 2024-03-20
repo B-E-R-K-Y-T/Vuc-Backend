@@ -55,8 +55,6 @@ async def get_platoon(
     squad_count: int = await db_worker.get_count_squad_in_platoon(platoon_number)
     students = await result_collection_builder(platoon, schema=UserDTO)
 
-    print(squad_count, type(squad_count))
-
     return {"squad_count": squad_count, "students": students}
 
 
