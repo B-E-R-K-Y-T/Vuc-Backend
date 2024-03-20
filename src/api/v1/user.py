@@ -357,7 +357,6 @@ async def get_user(
     status_code=HTTPStatus.NO_CONTENT,
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
-@collector.cache()
 async def set_user_attr(
         attrs: UserSetAttr,
         request: Request,
@@ -377,7 +376,6 @@ async def set_user_attr(
     status_code=HTTPStatus.NO_CONTENT,
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
-@collector.cache()
 async def set_user_email(
         u_email: UserSetMail,
         request: Request,

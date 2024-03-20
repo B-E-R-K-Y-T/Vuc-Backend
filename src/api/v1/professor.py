@@ -48,7 +48,6 @@ async def get_semesters(
     response_model=int,
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
-@collector.cache()
 async def set_visit_user(
         attendance: AttendanceDTO,
         request: Request,
