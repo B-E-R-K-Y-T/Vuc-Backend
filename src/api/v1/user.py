@@ -219,13 +219,13 @@ async def get_marks(
 
 
 @router.get(
-    "/get_user",
+    "/get_self",
     description="Получить пользователя",
     response_model=UserRead,
     status_code=HTTPStatus.OK,
 )
 @limiter.limit("5/minute")
-async def get_user(
+async def get_self(
         user_id: int,
         request: Request,
         db_worker: DatabaseWorker = Depends(get_database_worker),
@@ -315,13 +315,13 @@ async def get_attendance_status_user(
 
 
 @router.get(
-    "/get_self",
+    "/get_user",
     description="Получить информацию по студенту",
     status_code=HTTPStatus.OK,
     response_model=UserDTO,
 )
 @limiter.limit("200/minute")
-async def get_self(
+async def get_user(
         user_id: int,
         request: Request,
         db_worker: DatabaseWorker = Depends(get_database_worker),

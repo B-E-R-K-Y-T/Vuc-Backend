@@ -317,7 +317,7 @@ async def test_get_user(ac: AsyncClient, tst_async_session: AsyncSession):
     user_id = user.convert_to_dict()["id"]
 
     response = await ac.get(
-        "/users/get_user", params={"user_id": user_id}, cookies={"bonds": jwt_token}
+        "/users/get_self", params={"user_id": user_id}, cookies={"bonds": jwt_token}
     )
 
     assert response.status_code == 200
@@ -836,7 +836,7 @@ async def test_get_attendance_status_user_error(ac: AsyncClient):
 
 async def test_get_self(ac: AsyncClient):
     response = await ac.get(
-        url="/users/get_self",
+        url="/users/get_user",
         params={"user_id": 1},
         cookies={"bonds": jwt_token},
     )
