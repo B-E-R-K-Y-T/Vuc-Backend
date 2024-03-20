@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Sequence, Any
+from typing import Sequence, Any, Optional
 
 from fastapi import Depends
 from sqlalchemy import insert, select, func, and_, update, exists
@@ -132,7 +132,7 @@ class DatabaseWorker:
 
         return professors.all()
 
-    async def set_visit_user(self, date_v: str, visiting: int, user_id: int) -> int:
+    async def set_visit_user(self, date_v: str, visiting: int, user_id: int) -> Optional[int]:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
 
@@ -178,9 +178,9 @@ class DatabaseWorker:
         attend_id = await self.session.execute(stmt)
         await self.session.commit()
 
-        return int(attend_id.scalar())
+        return attend_id.scalar()
 
-    async def get_id_from_tg(self, telegram_id: int) -> int:
+    async def get_id_from_tg(self, telegram_id: int) -> Optional[int]:
         query = select(User.id).where(User.telegram_id == telegram_id)
 
         user_id = await self.session.scalar(query)
@@ -188,7 +188,7 @@ class DatabaseWorker:
 
         return user_id
 
-    async def get_id_from_email(self, email: str) -> int:
+    async def get_id_from_email(self, email: str) -> Optional[int]:
         query = select(User.id).where(User.email == email)
 
         user_id = await self.session.scalar(query)
