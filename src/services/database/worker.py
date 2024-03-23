@@ -132,6 +132,21 @@ class DatabaseWorker:
 
         return professors.all()
 
+    async def get_users_telegram_id_by_platoon(self, platoon_number: int) -> Sequence:
+        if not await self.platoon_number_is_exist(platoon_number):
+            raise PlatoonError(
+                message="Platoon not found", status_code=HTTPStatus.NOT_FOUND
+            )
+
+        query = (
+            select(User.telegram_id).
+            where(User.platoon_number == platoon_number)
+        )
+
+        users_telegram_id = await self.session.scalars(query)
+
+        return users_telegram_id.all()
+
     async def set_visit_user(self, date_v: str, visiting: int, user_id: int) -> Optional[int]:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
@@ -464,5 +479,5 @@ class DatabaseWorker:
         return False
 
 
-async def get_database_worker(session: AsyncSession = Depends(get_async_session)):
+async def get_database_worker(session: AsyncSession = Depends(get_async_session)) -> DatabaseWorker:
     yield DatabaseWorker(session)

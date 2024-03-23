@@ -51,6 +51,9 @@ class AppSettings(BaseSettings):
 
     MAX_REQUESTS_TO_ENDPOINT: str
 
+    AUTH_BOT_TOKEN: str
+    BOT_ADDRESS: str
+
     @property
     def DATABASE_DSN(self):
         return PostgresDsn(
@@ -58,7 +61,7 @@ class AppSettings(BaseSettings):
             f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
-    model_config = SettingsConfigDict(env_file=f"{BASE_DIR}/.env")
+    model_config = SettingsConfigDict(env_file=f"{BASE_DIR}/.env-dev")
 
 
 app_settings = AppSettings()

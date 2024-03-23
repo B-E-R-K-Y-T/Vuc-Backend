@@ -160,7 +160,7 @@ async def test_get_platoon(ac: AsyncClient, tst_async_session: AsyncSession):
     stmt = insert(User).values(
         name="test",
         phone="123456789",
-        date_of_birth=datetime.now(),
+        date_of_birth=datetime.strptime("2024-03-21T00:00:00", "%Y-%m-%dT%H:%M:%S"),
         address="TEST",
         institute="TEST",
         direction_of_study="TEST",
@@ -171,7 +171,7 @@ async def test_get_platoon(ac: AsyncClient, tst_async_session: AsyncSession):
         token="TOK",
         group_study="BDSM-13-37",
         email="MAIL12345S@test.com",
-        registered_at=datetime.now(),
+        registered_at=datetime.strptime("2024-03-21T00:00:00", "%Y-%m-%dT%H:%M:%S"),
         is_active=True,
         is_superuser=False,
         is_verified=False,
@@ -195,7 +195,7 @@ async def test_get_platoon(ac: AsyncClient, tst_async_session: AsyncSession):
             "115": {
                 "id": 115,
                 "name": "test",
-                "date_of_birth": "2024-03-20T00:00:00",
+                "date_of_birth": "2024-03-21T00:00:00",
                 "phone": "123456789",
                 "email": "MAIL12345S@test.com",
                 "address": "TEST",

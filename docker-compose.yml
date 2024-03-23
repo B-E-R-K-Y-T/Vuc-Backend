@@ -30,7 +30,7 @@ services:
     container_name: fastapi_app
     command: ["/fastapi_app/docker/app.sh"]
     ports:
-      - 8080:8000
+      - "8080:8000"
     depends_on:
       - db_vuc
       - redis
@@ -58,5 +58,5 @@ services:
       - redis
       - celery
     ports:
-      - 8888:5555
+      - "8888:5555"
     restart: unless-stopped
