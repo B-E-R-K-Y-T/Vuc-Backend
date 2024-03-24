@@ -1,6 +1,6 @@
 # Backend app
 
-A backend base on fastAPI framework.
+A backend app base on FastAPI framework.
 
 ## Requirements
 
