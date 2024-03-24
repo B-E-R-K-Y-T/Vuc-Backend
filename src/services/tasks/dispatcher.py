@@ -33,4 +33,4 @@ def get_task_result(task_id):
     if result.successful():
         return result.get()
 
-    return {"task_id": task_id, "state": result.state}
+    return {"task_id": task_id, "state": result.state, "result": "Not ready"}
