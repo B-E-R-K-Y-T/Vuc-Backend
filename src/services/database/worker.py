@@ -1,3 +1,4 @@
+import datetime
 from http import HTTPStatus
 from typing import Sequence, Any, Optional
 
@@ -6,7 +7,7 @@ from sqlalchemy import insert, select, func, and_, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
-from exceptions import PlatoonError, UserNotFound, SubjectError, AttendError
+from exceptions import PlatoonError, UserNotFound, SubjectError, AttendError, SemesterError, MarkError, GradingError
 from models import User, Platoon, Subject, Attend, Grading
 from models.view.users import Users
 from schemas.attend import AttendCreate, ConfirmationAttend
@@ -75,11 +76,14 @@ class DatabaseWorker:
                 message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
             )
 
-        query = select(Grading).where(
-            and_(
-                Grading.user_id == user_id,
-                Grading.subj_id == Subject.id,
-                Subject.semester == semester,
+        query = (
+            select(Grading).
+            where(
+                and_(
+                    Grading.user_id == user_id,
+                    Grading.subj_id == Subject.id,
+                    Subject.semester == semester,
+                )
             )
         )
 
@@ -133,19 +137,37 @@ class DatabaseWorker:
         return professors.all()
 
     async def get_users_telegram_id_by_platoon(self, platoon_number: int) -> Sequence:
+        users_telegram_id: Sequence = await self.get_users_attrs_by_platoon(
+            platoon_number,
+            User.telegram_id,
+            User.platoon_number == platoon_number
+        )
+
+        return users_telegram_id
+
+    async def get_users_id_by_platoon(self, platoon_number: int) -> Sequence:
+        users_id: Sequence = await self.get_users_attrs_by_platoon(
+            platoon_number,
+            User.id,
+            User.platoon_number == platoon_number
+        )
+
+        return users_id
+
+    async def get_users_attrs_by_platoon(self, platoon_number: int, user_attr: User, pred) -> Sequence:
         if not await self.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
                 message="Platoon not found", status_code=HTTPStatus.NOT_FOUND
             )
 
         query = (
-            select(User.telegram_id).
-            where(User.platoon_number == platoon_number)
+            select(user_attr).
+            where(pred)
         )
 
-        users_telegram_id = await self.session.scalars(query)
+        users_attr = await self.session.scalars(query)
 
-        return users_telegram_id.all()
+        return users_attr.all()
 
     async def set_visit_user(self, date_v: str, visiting: int, user_id: int) -> Optional[int]:
         if not await self.user_is_exist(user_id):
@@ -169,9 +191,16 @@ class DatabaseWorker:
         is_exist = await self.session.scalar(is_exist_query)
 
         if not is_exist:
-            stmt = insert(Attend).values(
-                user_id=user_id, date_v=date_v, visiting=visiting, semester=semester
-            ).returning(Attend.id)
+            stmt = (
+                insert(Attend).
+                values(
+                    user_id=user_id,
+                    date_v=date_v,
+                    visiting=visiting,
+                    semester=semester
+                ).
+                returning(Attend.id)
+            )
         else:
             stmt = (
                 update(Attend).
@@ -194,6 +223,74 @@ class DatabaseWorker:
         await self.session.commit()
 
         return attend_id.scalar()
+
+    async def set_theme_to_subject(self, user_id: int, theme: str, subj_id: int) -> Optional[int]:
+        stmt = (
+            insert(Grading).
+            values(
+                user_id=user_id,
+                theme=theme,
+                subj_id=subj_id,
+                mark=0,
+                mark_date=datetime.date.today()
+            ).
+            returning(Grading.id)
+        )
+
+        grading_id = await self.session.execute(stmt)
+        await self.session.commit()
+
+        return grading_id.scalar() if grading_id is not None else None
+
+    async def update_grading(self, grading_id: int, mark: int):
+        if not 0 < mark < 6:
+            raise MarkError(
+                message="Mark must be between 0 and 6",
+                status_code=HTTPStatus.BAD_REQUEST
+            )
+
+        if not await self.grading_is_exist(grading_id):
+            raise GradingError(
+                message="Grading not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        stmt = (
+            update(Grading).
+            where(Grading.id == grading_id).
+            values(mark=mark)
+        )
+
+        await self.session.execute(stmt)
+        await self.session.commit()
+
+    async def create_subject(self, user_id: int, name, semester: int, platoon_number: int) -> Optional[int]:
+        if semester not in [1, 2]:
+            raise SemesterError(
+                message="Semester in semester must be 1 or 2",
+                status_code=HTTPStatus.BAD_REQUEST
+            )
+
+        if not await self.platoon_number_is_exist(platoon_number):
+            raise PlatoonError(
+                message="Platoon not found", status_code=HTTPStatus.NOT_FOUND
+            )
+
+        stmt = (
+            insert(Subject).
+            values(
+                admin_id=user_id,
+                name=name,
+                semester=semester,
+                platoon_id=platoon_number
+            ).
+            returning(Subject.id)
+        )
+        subject_id = await self.session.execute(stmt)
+
+        await self.session.commit()
+
+        return subject_id.scalar() if subject_id is not None else None
 
     async def get_id_from_tg(self, telegram_id: int) -> Optional[int]:
         query = select(User.id).where(User.telegram_id == telegram_id)
@@ -359,7 +456,7 @@ class DatabaseWorker:
 
         if commander is None:
             raise PlatoonError(
-                message=f'Командир во взводе "{platoon_number}" не найден',
+                message=f'The commander in platoon "{platoon_number}" was not found',
                 status_code=HTTPStatus.NOT_FOUND,
             )
 
@@ -419,6 +516,9 @@ class DatabaseWorker:
 
     async def user_is_exist(self, user_id: int) -> bool:
         return await self._check_exist_entity(User, user_id)
+
+    async def grading_is_exist(self, grading_id: int) -> bool:
+        return await self._check_exist_entity(Grading, grading_id)
 
     async def attend_is_exist(self, attend_id: int) -> bool:
         return await self._check_exist_entity(Attend, attend_id)

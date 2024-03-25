@@ -77,7 +77,9 @@ def init_admin_panel(app, engine):
 
     authentication_backend = AdminPanelAuth()
     administrator = Admin(
-        app=app, engine=engine, authentication_backend=authentication_backend
+        app=app,
+        engine=engine,
+        authentication_backend=authentication_backend
     )
 
     for model in sorted(MODELS, key=lambda model_: model_.__name__):
@@ -86,4 +88,7 @@ def init_admin_panel(app, engine):
     return administrator
 
 
-__all__ = (init_admin_panel.__name__, "MODELS")
+__all__ = (
+    init_admin_panel.__name__,
+    "MODELS"
+)

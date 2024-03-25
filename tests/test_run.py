@@ -256,7 +256,7 @@ async def test_get_platoon_commander(ac: AsyncClient, tst_async_session: AsyncSe
 
 
 async def test_get_platoon_commander_error(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     response = await ac.get(
         "/platoons/get_platoon_commander",
@@ -705,7 +705,7 @@ async def test_get_gradings_by_student(ac: AsyncClient):
 
 
 async def test_get_subject_by_now_semester(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -735,7 +735,7 @@ async def test_get_subject_by_now_semester(
 
 
 async def test_get_subject_by_semester(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Subject).values(
         name=f"Test Subject_818",
@@ -776,7 +776,7 @@ async def test_get_subject_by_now_semester_error(ac: AsyncClient):
 
 
 async def test_get_attendance_status_user(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     stmt = insert(Attend).values(
         user_id=1,
@@ -1139,7 +1139,7 @@ async def test_get_user_name(ac: AsyncClient):
 
 
 async def test_confirmation_attend_user(
-    ac: AsyncClient, tst_async_session: AsyncSession
+        ac: AsyncClient, tst_async_session: AsyncSession
 ):
     query = select(Attend.id).limit(1)
 
@@ -1162,6 +1162,178 @@ async def test_confirmation_attend_user_error(ac: AsyncClient):
     )
 
     assert response.status_code == 404
+
+
+async def test_create_subject(ac: AsyncClient):
+    response = await ac.post(
+        url="/subject/create_subject",
+        params={
+            "platoon_number": 818,
+            "semester": 1,
+            "subject_name": "Test subject",
+        },
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 201
+    assert response.json() == 7
+
+
+async def test_create_subject_error(ac: AsyncClient):
+    response = await ac.post(
+        url="/subject/create_subject",
+        params={
+            "platoon_number": -1,
+            "semester": 1,
+            "subject_name": "Test subject",
+        },
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
+
+    response = await ac.post(
+        url="/subject/create_subject",
+        params={
+            "platoon_number": 818,
+            "semester": -1,
+            "subject_name": "Test subject",
+        },
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 400
+
+
+async def test_set_grading_theme(ac: AsyncClient):
+    response = await ac.post(
+        url="/gradings/set_grading_theme",
+        params={
+            "platoon_number": 818,
+            "theme_of_lesson": "Test theme",
+            "subj_id": 1,
+        },
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 201
+
+
+async def test_set_grading_theme_error(ac: AsyncClient):
+    response = await ac.post(
+        url="/gradings/set_grading_theme",
+        params={
+            "platoon_number": -1,
+            "theme_of_lesson": "Test theme",
+            "subj_id": 1,
+        },
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
+
+
+async def test_edit_grading(ac: AsyncClient):
+    response = await ac.patch(
+        url="/gradings/edit_grading",
+        params={
+            "grading_id": 1,
+            "mark": 3,
+        },
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 200
+
+
+async def test_edit_grading(ac: AsyncClient):
+    response = await ac.patch(
+        url="/gradings/edit_grading",
+        params={
+            "grading_id": -1,
+            "mark": 1,
+        },
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
+
+    response = await ac.patch(
+        url="/gradings/edit_grading",
+        params={
+            "grading_id": 1,
+            "mark": 0,
+        },
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 400
+
+    response = await ac.patch(
+        url="/gradings/edit_grading",
+        params={
+            "grading_id": 1,
+            "mark": 6,
+        },
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 400
+
+
+async def test_update_gradings(ac: AsyncClient):
+    response = await ac.patch(
+        url="/gradings/update_gradings",
+        json=[
+                {
+                    "id": 1,
+                    "mark": 1,
+                },
+                {
+                    "id": 2,
+                    "mark": 1,
+                },
+            ],
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 201
+
+
+async def test_update_gradings_error(ac: AsyncClient):
+    response = await ac.patch(
+        url="/gradings/update_gradings",
+        json=[
+                {
+                    "id": -1,
+                    "mark": 1,
+                },
+                {
+                    "id": 2,
+                    "mark": 1,
+                },
+            ],
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 404
+
+    response = await ac.patch(
+        url="/gradings/update_gradings",
+        json=[
+                {
+                    "id": 1,
+                    "mark": 1,
+                },
+                {
+                    "id": 2,
+                    "mark": 0,
+                },
+            ],
+        cookies={"bonds": jwt_token},
+    )
+
+    assert response.status_code == 400
 
 
 async def test_logout_user(ac: AsyncClient):

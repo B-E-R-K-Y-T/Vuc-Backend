@@ -9,7 +9,7 @@ from slowapi.util import get_remote_address
 from config import app_settings
 from exceptions import EmailError
 from schemas.attend import AttendDTO
-from schemas.grading import UserMark
+from schemas.grading import UserGrading
 from schemas.user import (
     UserRead,
     UserSetAttr,
@@ -197,7 +197,7 @@ async def get_platoon_user(
 @router.get(
     "/get_marks",
     description="Получить список оценок студента",
-    response_model=Dict[str | int, UserMark],
+    response_model=Dict[str | int, UserGrading],
     status_code=HTTPStatus.OK,
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
@@ -209,13 +209,13 @@ async def get_marks(
 ):
     marks = await db_worker.get_marks(user_id)
 
-    return await result_collection_builder(marks, schema=UserMark)
+    return await result_collection_builder(marks, schema=UserGrading)
 
 
 @router.get(
     "/get_marks_by_semester",
     description="Получить список оценок студента по семестру",
-    response_model=Dict[str | int, UserMark],
+    response_model=Dict[str | int, UserGrading],
     status_code=HTTPStatus.OK,
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
@@ -228,7 +228,7 @@ async def get_marks(
 ):
     marks = await db_worker.get_marks_by_semester(user_id, semester)
 
-    return await result_collection_builder(marks, schema=UserMark)
+    return await result_collection_builder(marks, schema=UserGrading)
 
 
 @router.get(

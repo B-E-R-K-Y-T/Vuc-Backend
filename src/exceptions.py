@@ -54,6 +54,14 @@ class SemesterError(MainVucException):
     pass
 
 
+class MarkError(MainVucException):
+    pass
+
+
+class GradingError(MainVucException):
+    pass
+
+
 class EventErrorException(MainVucException):
     pass
 
