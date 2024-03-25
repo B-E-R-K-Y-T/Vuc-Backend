@@ -10,9 +10,9 @@ from config import Roles
 from exceptions import PlatoonError, UserNotFound, SubjectError, AttendError, SemesterError, MarkError, GradingError
 from models import User, Platoon, Subject, Attend, Grading
 from models.view.users import Users
-from schemas.attend import AttendCreate, ConfirmationAttend
+from schemas.attend import ConfirmationAttend
 from schemas.platoon import PlatoonDTO
-from services.database.connector import BaseTable, get_async_session
+from services.database.connector import get_async_session
 
 
 class DatabaseWorker:
@@ -559,7 +559,7 @@ class DatabaseWorker:
 
         return await self.session.scalar(query)
 
-    async def _check_exist_entity(self, entity: BaseTable, entity_id) -> bool:
+    async def _check_exist_entity(self, entity, entity_id) -> bool:
         ent = await self.session.get(entity, entity_id)
 
         if ent is not None:
@@ -568,7 +568,7 @@ class DatabaseWorker:
         return False
 
     async def _check_exist_entity_column(
-            self, entity: BaseTable, columns: dict
+            self, entity, columns: dict
     ) -> bool:
         query = select(entity).filter_by(**columns)
         res = await self.session.scalar(query)
