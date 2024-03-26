@@ -22,6 +22,7 @@ from api.v1.auth import router as auth_router
 from api.v1.attend import router as attend_router
 from api.v1.task import router as task_router
 from api.v1.grading import router as grading_router
+from services.tasks.tasks import set_attend_all_students_by_weekday
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
@@ -104,6 +105,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
+    set_attend_all_students_by_weekday.delay()
     init_admin_panel(app, engine)
 
 

@@ -72,7 +72,7 @@ async def send_platoon_message(
         request: Request,
         db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
-    users_tg: list = list(await db_worker.get_users_telegram_id_by_platoon(platoon_number))
-    result = send_message_platoon.delay(users_tg, message)
+    users_tg = await db_worker.get_users_telegram_id_by_platoon(platoon_number)
+    result = send_message_platoon.delay(list(users_tg), message)
 
     return {"task_id": result.task_id}

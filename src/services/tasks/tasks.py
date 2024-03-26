@@ -1,8 +1,32 @@
 import requests
 
 from config import app_settings
+from services.current_weekday import get_current_day_of_the_week, Day
 from .dispatcher import celery
 from .types import TaskTypes
+from .database import DatabaseWorker
+
+
+@celery.task()
+def set_attend_all_students_by_weekday():
+    db_worker = DatabaseWorker()
+    viewed_days = set()
+
+    while True:
+        weekday: Day = get_current_day_of_the_week()
+
+        if len(viewed_days) == 7:
+            viewed_days.clear()
+
+        if weekday.number in viewed_days:
+            continue
+
+        users_id: list = db_worker.get_current_day_of_week_users_id(weekday.number)
+
+        for user_id in users_id:
+            db_worker.set_attend(user_id)
+
+        viewed_days.add(weekday.number)
 
 
 @celery.task
