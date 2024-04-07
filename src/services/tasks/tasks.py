@@ -7,26 +7,37 @@ from .types import TaskTypes
 from .database import DatabaseWorker
 
 
+def _check_view_day_of_week(viewed_days: set):
+    def checker(day_of_week: Day):
+        if len(viewed_days) == 7:
+            viewed_days.clear()
+
+        if day_of_week.number in viewed_days:
+            return True
+
+        viewed_days.add(day_of_week.number)
+
+        return False
+
+    return checker
+
+
 @celery.task()
 def set_attend_all_students_by_weekday():
     db_worker = DatabaseWorker()
     viewed_days = set()
+    check_day_viewed = _check_view_day_of_week(viewed_days)
 
     while True:
         weekday: Day = get_current_day_of_the_week()
 
-        if len(viewed_days) == 7:
-            viewed_days.clear()
-
-        if weekday.number in viewed_days:
+        if check_day_viewed(weekday):
             continue
 
         users_id: list = db_worker.get_current_day_of_week_users_id(weekday.number)
 
         for user_id in users_id:
             db_worker.set_attend(user_id)
-
-        viewed_days.add(weekday.number)
 
 
 @celery.task

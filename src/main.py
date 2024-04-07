@@ -105,7 +105,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    set_attend_all_students_by_weekday.delay()
+    # set_attend_all_students_by_weekday.delay()
     init_admin_panel(app, engine)
 
 

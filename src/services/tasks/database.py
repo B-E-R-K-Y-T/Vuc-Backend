@@ -40,7 +40,7 @@ class DatabaseWorker:
         self.manager = DatabaseManager()
 
     def get_current_day_of_week_users_id(self, day_number: int) -> list:
-        query = "SELECT id FROM users WHERE users.platoon_number - %s * 100 < 99;"
+        query = "SELECT id FROM users WHERE users.platoon_number - %s * 100 BETWEEN 0 AND 99;"
         self.manager.execute(query, (day_number,))
 
         users_id: list[tuple] = self.manager.fetch_all()
