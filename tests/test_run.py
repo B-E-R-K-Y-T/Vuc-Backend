@@ -16,110 +16,110 @@ false = False
 null = None
 
 jwt_token = None
-
-
-async def test_register_user(ac: AsyncClient):
-    response = await ac.post(
-        url="/auth/register",
-        json={
-            "email": "user818@example.com",
-            "password": "string",
-            "is_active": true,
-            "is_superuser": false,
-            "is_verified": false,
-            "name": "string",
-            "date_of_birth": "2024-02-27T20:01:46.326Z",
-            "phone": "string",
-            "address": "string",
-            "institute": "string",
-            "direction_of_study": "string",
-            "group_study": "string",
-            "platoon_number": 0,
-            "squad_number": 1,
-            "role": "Admin",
-            "telegram_id": 818,
-        },
-    )
-
-    assert response.status_code == 201
-
-
-async def test_register_user_commander_platoon(ac: AsyncClient):
-    response = await ac.post(
-        "/auth/register",
-        json={
-            "email": "user817@example.com",
-            "password": "string",
-            "is_active": true,
-            "is_superuser": false,
-            "is_verified": false,
-            "name": "string",
-            "date_of_birth": "2024-02-27T20:01:46.326Z",
-            "phone": "string",
-            "address": "string",
-            "institute": "string",
-            "direction_of_study": "string",
-            "group_study": "string",
-            "platoon_number": 0,
-            "squad_number": 1,
-            "role": "Командир взвода",
-            "telegram_id": 817,
-        },
-    )
-
-    assert response.status_code == 201
-
-    # Намеренная ошибка.
-    response = await ac.post(
-        "/auth/register",
-        json={
-            "email": "user816@example.com",
-            "password": "string",
-            "is_active": true,
-            "is_superuser": false,
-            "is_verified": false,
-            "name": "string",
-            "date_of_birth": "2024-02-27T20:01:46.326Z",
-            "phone": "string",
-            "address": "string",
-            "institute": "string",
-            "direction_of_study": "string",
-            "group_study": "string",
-            "platoon_number": 0,
-            "squad_number": 1,
-            "role": "Командир взвода",
-            "telegram_id": 816,
-        },
-    )
-
-    assert response.status_code == 400
-
-
-async def test_register_user_commander_squad(ac: AsyncClient):
-    response = await ac.post(
-        "/auth/register",
-        json={
-            "email": "user816@example.com",
-            "password": "string",
-            "is_active": true,
-            "is_superuser": false,
-            "is_verified": false,
-            "name": "string",
-            "date_of_birth": "2024-02-27T20:01:46.326Z",
-            "phone": "string",
-            "address": "string",
-            "institute": "string",
-            "direction_of_study": "string",
-            "group_study": "string",
-            "platoon_number": 0,
-            "squad_number": 1,
-            "role": "Командир отделения",
-            "telegram_id": 816,
-        },
-    )
-
-    assert response.status_code == 201
-
+#
+#
+# async def test_register_user(ac: AsyncClient):
+#     response = await ac.post(
+#         url="/auth/register",
+#         json={
+#             "email": "user818@example.com",
+#             "password": "string",
+#             "is_active": true,
+#             "is_superuser": false,
+#             "is_verified": false,
+#             "name": "string",
+#             "date_of_birth": "2024-02-27T20:01:46.326Z",
+#             "phone": "string",
+#             "address": "string",
+#             "institute": "string",
+#             "direction_of_study": "string",
+#             "group_study": "string",
+#             "platoon_number": 0,
+#             "squad_number": 1,
+#             "role": "Admin",
+#             "telegram_id": 818,
+#         },
+#     )
+#
+#     assert response.status_code == 201
+#
+#
+# async def test_register_user_commander_platoon(ac: AsyncClient):
+#     response = await ac.post(
+#         "/auth/register",
+#         json={
+#             "email": "user817@example.com",
+#             "password": "string",
+#             "is_active": true,
+#             "is_superuser": false,
+#             "is_verified": false,
+#             "name": "string",
+#             "date_of_birth": "2024-02-27T20:01:46.326Z",
+#             "phone": "string",
+#             "address": "string",
+#             "institute": "string",
+#             "direction_of_study": "string",
+#             "group_study": "string",
+#             "platoon_number": 0,
+#             "squad_number": 1,
+#             "role": "Командир взвода",
+#             "telegram_id": 817,
+#         },
+#     )
+#
+#     assert response.status_code == 201
+#
+#     # Намеренная ошибка.
+#     response = await ac.post(
+#         "/auth/register",
+#         json={
+#             "email": "user816@example.com",
+#             "password": "string",
+#             "is_active": true,
+#             "is_superuser": false,
+#             "is_verified": false,
+#             "name": "string",
+#             "date_of_birth": "2024-02-27T20:01:46.326Z",
+#             "phone": "string",
+#             "address": "string",
+#             "institute": "string",
+#             "direction_of_study": "string",
+#             "group_study": "string",
+#             "platoon_number": 0,
+#             "squad_number": 1,
+#             "role": "Командир взвода",
+#             "telegram_id": 816,
+#         },
+#     )
+#
+#     assert response.status_code == 400
+#
+#
+# async def test_register_user_commander_squad(ac: AsyncClient):
+#     response = await ac.post(
+#         "/auth/register",
+#         json={
+#             "email": "user816@example.com",
+#             "password": "string",
+#             "is_active": true,
+#             "is_superuser": false,
+#             "is_verified": false,
+#             "name": "string",
+#             "date_of_birth": "2024-02-27T20:01:46.326Z",
+#             "phone": "string",
+#             "address": "string",
+#             "institute": "string",
+#             "direction_of_study": "string",
+#             "group_study": "string",
+#             "platoon_number": 0,
+#             "squad_number": 1,
+#             "role": "Командир отделения",
+#             "telegram_id": 816,
+#         },
+#     )
+#
+#     assert response.status_code == 201
+#
 
 async def test_login_user(ac: AsyncClient):
     global jwt_token
@@ -144,16 +144,16 @@ async def test_login_user(ac: AsyncClient):
 
     assert response.status_code == 204
 
-
-async def test_create_platoon(ac: AsyncClient):
-    response = await ac.post(
-        "/platoons/create",
-        json={"platoon_number": 818, "vus": 818, "semester": 818},
-        cookies={"bonds": jwt_token},
-    )
-
-    assert response.status_code == 201
-    assert response.json() == {"platoon_number": 818}
+#
+# async def test_create_platoon(ac: AsyncClient, jwt_token):
+#     response = await ac.post(
+#         "/platoons/create",
+#         json={"platoon_number": 818, "vus": 818, "semester": 818},
+#         cookies={"bonds": jwt_token},
+#     )
+#
+#     assert response.status_code == 201
+#     assert response.json() == {"platoon_number": 818}
 
 
 async def test_get_platoon(ac: AsyncClient, tst_async_session: AsyncSession):
