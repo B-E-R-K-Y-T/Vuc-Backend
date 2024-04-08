@@ -24,6 +24,16 @@ class DatabaseManager:
     def fetch_all(self) -> list[tuple]:
         return self.cur.fetchall()
 
+    def scalar(self) -> list:
+        items: list[tuple] = self.cur.fetchall()
+
+        res = []
+
+        for item in items:
+            res.append(item[0])
+
+        return res
+
     def commit(self):
         self.conn.commit()
 
@@ -39,7 +49,7 @@ class DatabaseWorker:
     def __init__(self):
         self.manager = DatabaseManager()
 
-    def get_current_day_of_week_users_id(self, day_number: int) -> list:
+    def get_day_of_week_users_id(self, day_number: int) -> list:
         query = "SELECT id FROM users WHERE users.platoon_number - %s * 100 BETWEEN 0 AND 99;"
         self.manager.execute(query, (day_number,))
 
@@ -51,6 +61,17 @@ class DatabaseWorker:
                 res.append(user_id[0])
 
         return res
+
+    def get_telegram_id(self, user_id: int) -> Optional[int]:
+        query = "SELECT telegram_id FROM users WHERE users.id = %s"
+        self.manager.execute(query, (user_id,))
+
+        res: list = self.manager.scalar()
+
+        if res:
+            return int(res[0])
+
+        return None
 
     def set_attend(self, user_id: int):
         stmt = """ 

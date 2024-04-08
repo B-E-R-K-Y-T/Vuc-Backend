@@ -34,10 +34,42 @@ def set_attend_all_students_by_weekday():
         if check_day_viewed(weekday):
             continue
 
-        users_id: list = db_worker.get_current_day_of_week_users_id(weekday.number)
+        users_id: list = db_worker.get_day_of_week_users_id(weekday.number)
 
         for user_id in users_id:
             db_worker.set_attend(user_id)
+
+
+@celery.task()
+def answer_platoon_about_attend():
+    db_worker = DatabaseWorker()
+    viewed_days = set()
+    check_day_viewed = _check_view_day_of_week(viewed_days)
+
+    while True:
+        weekday: Day = get_current_day_of_the_week()
+
+        if check_day_viewed(weekday):
+            continue
+
+        users_id: list = db_worker.get_day_of_week_users_id(weekday.number + 1 if 1 <= weekday.number < 7 else 1)
+
+        res = []
+
+        for user_id in users_id:
+            res.append(
+                requests.post(
+                    f"{app_settings.BOT_ADDRESS}/tasks",
+                    json={
+                        "type": TaskTypes.ANSWER_ATTEND,
+                        "auth_token": app_settings.AUTH_BOT_TOKEN,
+                        "telegram_id": db_worker.get_telegram_id(user_id),
+                        "message": "Будете ли Вы на следующем занятии?"
+                    }
+                )
+            )
+
+        return [item.json() for item in res]
 
 
 @celery.task
