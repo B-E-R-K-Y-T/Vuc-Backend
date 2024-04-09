@@ -1,6 +1,12 @@
+import pytest
 from httpx import AsyncClient
 
+from tests.api.conftest import Options
 
+
+@pytest.mark.skipif(
+    f'config.getoption("{Options.PROFESSOR.key}") != "{Options.PROFESSOR.default_value}"'
+)
 class TestSemester:
     async def test_get_semesters(self, ac: AsyncClient, jwt_token):
         response = await ac.get(

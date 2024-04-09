@@ -1,6 +1,12 @@
+import pytest
 from httpx import AsyncClient
 
+from tests.api.conftest import Options
 
+
+@pytest.mark.skipif(
+    f'config.getoption("{Options.GRADING.key}") != "{Options.GRADING.default_value}"'
+)
 class TestGradings:
     async def test_set_grading_theme(self, ac: AsyncClient, jwt_token):
         response = await ac.post(

@@ -1,6 +1,12 @@
+import pytest
 from httpx import AsyncClient
 
+from tests.api.conftest import Options
 
+
+@pytest.mark.skipif(
+    f'config.getoption("{Options.SQUAD.key}") != "{Options.SQUAD.default_value}"'
+)
 class TestSquad:
     async def test_get_students_by_squad(self, ac: AsyncClient, jwt_token):
         response = await ac.get(

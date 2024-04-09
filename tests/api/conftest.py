@@ -21,29 +21,28 @@ class Options:
     USER_REG = Option("--user_reg", "true")
     PLATOON = Option("--platoon", "true")
     SUBJECT = Option("--subject", "true")
+    GRADING = Option("--grading", "true")
+    PROFESSOR = Option("--professor", "true")
+    SQUAD = Option("--squad", "true")
 
 
 def pytest_addoption(parser):
-    parser.addoption(
-        Options.USER.key,
-        default=Options.USER.default_value,
-        choices=(Options.USER.default_value, "false"),
-    )
-    parser.addoption(
-        Options.USER_REG.key,
-        default=Options.USER_REG.default_value,
-        choices=(Options.USER_REG.default_value, "false"),
-    )
-    parser.addoption(
-        Options.PLATOON.key,
-        default=Options.PLATOON.default_value,
-        choices=(Options.PLATOON.default_value, "false"),
-    )
-    parser.addoption(
-        Options.SUBJECT.key,
-        default=Options.SUBJECT.default_value,
-        choices=(Options.SUBJECT.default_value, "false"),
-    )
+    options = [
+        Options.GRADING,
+        Options.PLATOON,
+        Options.SUBJECT,
+        Options.USER_REG,
+        Options.USER,
+        Options.PROFESSOR,
+        Options.SQUAD,
+    ]
+
+    for option in options:
+        parser.addoption(
+            option.key,
+            default=option.default_value,
+            choices=(option.default_value, "false"),
+        )
 
 
 @pytest.fixture(scope='session')
