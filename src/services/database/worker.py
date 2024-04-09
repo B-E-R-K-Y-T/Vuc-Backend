@@ -307,6 +307,9 @@ class DatabaseWorker:
         user_id = await self.session.scalar(query)
         await self.session.commit()
 
+        if user_id is None:
+            raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
+
         return user_id
 
     async def get_users_by_squad(self, platoon_number: int, squad_number: int) -> Sequence:
@@ -318,6 +321,9 @@ class DatabaseWorker:
 
         users = await self.session.scalars(query)
         await self.session.commit()
+
+        if users is None:
+            raise UserNotFound("Users not found", status_code=HTTPStatus.NOT_FOUND)
 
         return users.all()
 

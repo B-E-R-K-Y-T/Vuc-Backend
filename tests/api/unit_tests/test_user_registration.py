@@ -1,8 +1,12 @@
 import pytest
 from httpx import AsyncClient
 
+from tests.api.conftest import Options
 
-@pytest.mark.skipif('config.getoption("--user") == "false"')
+
+@pytest.mark.skipif(
+    f'config.getoption("{Options.USER_REG.key}") != "{Options.USER_REG.default_value}"'
+)
 class TestUserRegistration:
     async def test_register_user(self, ac: AsyncClient):
         response = await ac.post(
@@ -30,13 +34,15 @@ class TestUserRegistration:
         assert response.status_code == 201
 
     @pytest.mark.parametrize(
-        ("email", "telegram_id", "result"),
+        ("email", "telegram_id", "result", "platoon_number"),
         [
-            ("user817@example.com", 817, 201),
-            ("user816@example.com", 816, 400),
-        ]
+            ("user817@example.com", 817, 201, 1),
+            ("user816@example.com", 816, 400, 1),
+        ],
     )
-    async def test_register_user_commander_platoon(self, ac: AsyncClient, email, telegram_id, result):
+    async def test_register_user_commander_platoon(
+        self, ac: AsyncClient, email, telegram_id, result, platoon_number
+    ):
         response = await ac.post(
             "/auth/register",
             json={
@@ -52,7 +58,7 @@ class TestUserRegistration:
                 "institute": "string",
                 "direction_of_study": "string",
                 "group_study": "string",
-                "platoon_number": 0,
+                "platoon_number": platoon_number,
                 "squad_number": 1,
                 "role": "Командир взвода",
                 "telegram_id": telegram_id,

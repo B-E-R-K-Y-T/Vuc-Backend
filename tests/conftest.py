@@ -54,15 +54,43 @@ async def prepare_database():
             text("INSERT INTO platoon (vus, platoon_number, semester)VALUES(0,0,0);")
         )
         await conn.execute(
+            text("INSERT INTO platoon (vus, platoon_number, semester)VALUES(0,1,0);")
+        )
+
+        await conn.execute(
             text(
                 "INSERT INTO public.user (name, phone, date_of_birth, address, institute, direction_of_study,"
                 "platoon_number, squad_number, role, telegram_id, token, group_study, email, registered_at, "
                 "is_active, is_superuser, is_verified, hashed_password)"
                 "VALUES('Nik', '89012345678', '2024-02-29T15:07:16.345'::date, 'улица 20', 'IKB',"
                 "'direction_of_study', 0, 1, 'Студент', 98765, 'token', 'group_study',"
-                "'email', '2024-02-29T15:07:16.345'::date, 't', 'f', 'f', 'hashed_password');"
+                "'email@mail.com', '2024-02-29T15:07:16.345'::date, 't', 'f', 'f', 'hashed_password');"
             )
         )
+
+        await conn.execute(
+            text(
+                "INSERT INTO public.user (name, phone, date_of_birth, address, institute, direction_of_study,"
+                "platoon_number, squad_number, role, telegram_id, token, group_study, email, registered_at, "
+                "is_active, is_superuser, is_verified, hashed_password)"
+                "VALUES('TEST_USER', '89012345678', '2024-02-29T15:07:16.345'::date, 'улица 20', 'IKB',"
+                "'direction_of_study', 0, 1, 'Студент', 0, 'token', 'group_study',"
+                "'test@email.ru', '2024-02-29T15:07:16.345'::date, 't', 'f', 'f', 'hashed_password');"
+            )
+        )
+
+        await conn.execute(
+            text(
+                "INSERT INTO public.user (name, phone, date_of_birth, address, institute, direction_of_study,"
+                "platoon_number, squad_number, role, telegram_id, token, group_study, email, registered_at, "
+                "is_active, is_superuser, is_verified, hashed_password)"
+                "VALUES('TEST_USER_PLATOON_COMMANDER', '89012345678', '2024-02-29T15:07:16.345'::date, "
+                "'улица 20', 'IKB',"
+                "'direction_of_study', 0, 1, 'Командир взвода', 2, 'token', 'group_study',"
+                "'pc_test@email.ru', '2024-02-29T15:07:16.345'::date, 't', 'f', 'f', 'hashed_password');"
+            )
+        )
+
         await conn.execute(
             text(
                 "INSERT INTO admins (name, email, password)VALUES('Tim','mail@mail.ru','123');"
