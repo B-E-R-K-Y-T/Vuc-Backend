@@ -1,10 +1,15 @@
+import pytest
 from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import Attend
+from tests.api.conftest import Options
 
 
+@pytest.mark.skipif(
+    f'config.getoption("{Options.ATTEND.key}") != "{Options.ATTEND.default_value}"'
+)
 class TestAttends:
     async def test_confirmation_attend_user(
             self, ac: AsyncClient, tst_async_session: AsyncSession, jwt_token

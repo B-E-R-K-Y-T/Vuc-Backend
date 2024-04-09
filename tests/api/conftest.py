@@ -24,6 +24,7 @@ class Options:
     GRADING = Option("--grading", "true")
     PROFESSOR = Option("--professor", "true")
     SQUAD = Option("--squad", "true")
+    ATTEND = Option("--attend", "true")
 
 
 def pytest_addoption(parser):
@@ -35,6 +36,7 @@ def pytest_addoption(parser):
         Options.USER,
         Options.PROFESSOR,
         Options.SQUAD,
+        Options.ATTEND,
     ]
 
     for option in options:
@@ -71,6 +73,7 @@ async def jwt_token(ac: AsyncClient):
 
     assert response.status_code == 201
 
+    # Входим в систему
     response = await ac.post(
         "/auth/jwt/login",
         data={
@@ -91,7 +94,7 @@ async def jwt_token(ac: AsyncClient):
 
     jwt_token_ = response.cookies["bonds"]
 
-    # Проводим тесты
+    #  Получаем токен, прогоняем тесты
     yield jwt_token_
 
     # Выходим из системы после тестов
