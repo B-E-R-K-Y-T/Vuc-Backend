@@ -8,6 +8,7 @@ router = APIRouter()
 
 
 # @router.post("/refresh")
+# Вырезано в целях безопасности
 async def refresh_jwt(
     jwt_strategy: JWTStrategy = Depends(get_jwt_strategy), user=Depends(current_user)
 ):
