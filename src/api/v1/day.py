@@ -24,7 +24,7 @@ collector = CacheCollector(container=RedisContainer())
     "/set_days",
     description="Ручка для вбивания дней с днём недели в таблице Days в период от n до m",
     response_model=list[int],
-    status_code=HTTPStatus.OK,
+    status_code=HTTPStatus.CREATED,
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
 async def set_days(

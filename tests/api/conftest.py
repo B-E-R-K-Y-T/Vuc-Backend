@@ -25,6 +25,7 @@ class Options:
     PROFESSOR = Option("--professor", "true")
     SQUAD = Option("--squad", "true")
     ATTEND = Option("--attend", "true")
+    DAY = Option("--day", "true")
 
 
 def pytest_addoption(parser):
@@ -37,6 +38,7 @@ def pytest_addoption(parser):
         Options.PROFESSOR,
         Options.SQUAD,
         Options.ATTEND,
+        Options.DAY,
     ]
 
     for option in options:
@@ -47,7 +49,7 @@ def pytest_addoption(parser):
         )
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 async def jwt_token(ac: AsyncClient):
     response = await ac.post(
         url="/auth/register",
@@ -103,7 +105,7 @@ async def jwt_token(ac: AsyncClient):
     assert response.status_code == 204
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 async def create_platoon_commander(ac: AsyncClient):
     response = await ac.post(
         url="/auth/register",

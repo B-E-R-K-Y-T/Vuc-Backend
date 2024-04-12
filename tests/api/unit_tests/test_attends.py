@@ -12,7 +12,7 @@ from tests.api.conftest import Options
 )
 class TestAttends:
     async def test_confirmation_attend_user(
-            self, ac: AsyncClient, tst_async_session: AsyncSession, jwt_token
+        self, ac: AsyncClient, tst_async_session: AsyncSession, jwt_token
     ):
         query = select(Attend.id).limit(1)
 
