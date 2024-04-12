@@ -373,7 +373,7 @@ class TestUser:
                         "id": 2,
                         "user_id": 1,
                         "mark": 1,
-                        "mark_date": "2024-04-12",
+                        "mark_date": str(date.today()),
                         "subj_id": 1,
                         "theme": "Test theme",
                     },
