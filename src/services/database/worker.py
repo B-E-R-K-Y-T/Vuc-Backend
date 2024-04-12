@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
 from exceptions import PlatoonError, UserNotFound, SubjectError, AttendError, SemesterError, MarkError, GradingError
-from models import User, Platoon, Subject, Attend, Grading
+from models import User, Platoon, Subject, Attend, Grading, Day
 from models.view.users import Users
 from schemas.attend import ConfirmationAttend
 from schemas.platoon import PlatoonDTO
@@ -300,6 +300,23 @@ class DatabaseWorker:
         await self.session.commit()
 
         return user_id
+
+    async def set_day(self, date: datetime.date, weekday: int, semester: int, holiday: bool) -> Optional[int]:
+        stmt = (
+            insert(Day).
+            values(
+                date=date,
+                weekday=weekday,
+                semester=semester,
+                holiday=holiday
+            ).
+            returning(Day.id)
+        )
+
+        day_id = await self.session.execute(stmt)
+        await self.session.commit()
+
+        return day_id.scalar()
 
     async def get_id_from_email(self, email: str) -> Optional[int]:
         query = select(User.id).where(User.email == email)

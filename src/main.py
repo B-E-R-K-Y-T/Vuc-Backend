@@ -22,7 +22,7 @@ from api.v1.auth import router as auth_router
 from api.v1.attend import router as attend_router
 from api.v1.task import router as task_router
 from api.v1.grading import router as grading_router
-from services.tasks.tasks import set_attend_all_students_by_weekday
+from api.v1.day import router as day_router
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
@@ -70,6 +70,11 @@ app.include_router(
     grading_router,
     tags=["Grading"],
 )
+app.include_router(
+    day_router,
+    tags=["Day"],
+)
+
 app.include_router(
     auth_user.get_auth_router(auth_backend),
     prefix="/auth/jwt",

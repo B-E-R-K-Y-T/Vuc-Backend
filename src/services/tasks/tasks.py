@@ -1,3 +1,5 @@
+from functools import wraps
+
 import requests
 
 from config import app_settings
@@ -5,6 +7,23 @@ from services.current_weekday import get_current_day_of_the_week, Day
 from .dispatcher import celery
 from .types import TaskTypes, StatusTask
 from .database import DatabaseWorker
+from ..logger import LOGGER
+
+
+def _exception_handler(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            LOGGER.error(e)
+
+            return {
+                "status_task": StatusTask.ERROR,
+                "detail": str(e)
+            }
+
+    return wrapper
 
 
 def _check_view_day_of_week(viewed_days: set):
@@ -23,6 +42,7 @@ def _check_view_day_of_week(viewed_days: set):
 
 
 @celery.task()
+@_exception_handler
 def set_attend_all_students_by_weekday():
     db_worker = DatabaseWorker()
     viewed_days = set()
@@ -41,6 +61,7 @@ def set_attend_all_students_by_weekday():
 
 
 @celery.task()
+@_exception_handler
 def answer_platoon_about_attend():
     db_worker = DatabaseWorker()
     viewed_days = set()
@@ -73,6 +94,7 @@ def answer_platoon_about_attend():
 
 
 @celery.task
+@_exception_handler
 def send_user_message(telegram_id: int, message: str):
     res = requests.post(
         f"{app_settings.BOT_ADDRESS}/tasks",
@@ -88,6 +110,7 @@ def send_user_message(telegram_id: int, message: str):
 
 
 @celery.task
+@_exception_handler
 def send_message_platoon(users_tg: list, message: str):
     res = requests.post(
         f"{app_settings.BOT_ADDRESS}/tasks",
