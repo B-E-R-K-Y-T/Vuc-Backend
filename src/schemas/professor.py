@@ -39,6 +39,7 @@ class Gradings(BaseModel):
 
 
 class Visit(Enum):
+    zero = 0
     one = 1
     two = 2
 

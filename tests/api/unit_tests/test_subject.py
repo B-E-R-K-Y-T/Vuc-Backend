@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import insert
@@ -97,7 +99,7 @@ class TestSubject:
 
         assert response.status_code == 200
         assert response.json() == {
-            "2": {"id": 2, "mark": 1, "mark_date": "2024-04-09", "theme": "Test theme"},
+            "2": {"id": 2, "mark": 1, "mark_date": f"{datetime.date.today()}", "theme": "Test theme"},
             "1": {"id": 1, "mark": 1, "mark_date": "2023-12-22", "theme": "theme"},
         }
 

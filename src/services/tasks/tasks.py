@@ -3,7 +3,7 @@ import requests
 from config import app_settings
 from services.current_weekday import get_current_day_of_the_week, Day
 from .dispatcher import celery
-from .types import TaskTypes
+from .types import TaskTypes, StatusTask
 from .database import DatabaseWorker
 
 
@@ -69,7 +69,7 @@ def answer_platoon_about_attend():
                 )
             )
 
-        return [item.json() for item in res]
+        return [item.json() if item.status_code < 400 else {"status_task": StatusTask.ERROR} for item in res]
 
 
 @celery.task

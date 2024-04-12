@@ -44,7 +44,7 @@ async def get_semesters(
     "/set_visit_user",
     description="Установить посещение для юзера в конкретную дату",
     status_code=HTTPStatus.CREATED,
-    dependencies=[Depends(auth_user.access_from_squad_commander(current_user))],
+    dependencies=[Depends(auth_user.access_from_student(current_user))],
     response_model=int,
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)

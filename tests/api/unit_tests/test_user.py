@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 import pytest
 from httpx import AsyncClient
@@ -338,7 +338,7 @@ class TestUser:
                 "id": 2,
                 "user_id": 1,
                 "mark": 1,
-                "mark_date": "2024-04-09",
+                "mark_date": f"{date.today()}",
                 "subj_id": 1,
                 "theme": "Test theme",
             },
@@ -373,7 +373,7 @@ class TestUser:
                         "id": 2,
                         "user_id": 1,
                         "mark": 1,
-                        "mark_date": "2024-04-09",
+                        "mark_date": "2024-04-12",
                         "subj_id": 1,
                         "theme": "Test theme",
                     },
