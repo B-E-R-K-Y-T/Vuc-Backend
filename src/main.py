@@ -23,6 +23,7 @@ from api.v1.attend import router as attend_router
 from api.v1.task import router as task_router
 from api.v1.grading import router as grading_router
 from api.v1.day import router as day_router
+from api.v1.discipline import router as discipline_router
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
@@ -73,6 +74,10 @@ app.include_router(
 app.include_router(
     day_router,
     tags=["Day"],
+)
+app.include_router(
+    discipline_router,
+    tags=["Discipline"],
 )
 
 app.include_router(

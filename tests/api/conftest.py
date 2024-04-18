@@ -26,6 +26,7 @@ class Options:
     SQUAD = Option("--squad", "true")
     ATTEND = Option("--attend", "true")
     DAY = Option("--day", "true")
+    DISCIPLINE = Option("--discipline", "true")
 
 
 def pytest_addoption(parser):
@@ -39,6 +40,7 @@ def pytest_addoption(parser):
         Options.SQUAD,
         Options.ATTEND,
         Options.DAY,
+        Options.DISCIPLINE,
     ]
 
     for option in options:

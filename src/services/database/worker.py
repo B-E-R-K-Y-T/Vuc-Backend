@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
 from exceptions import PlatoonError, UserNotFound, SubjectError, AttendError, SemesterError, MarkError, GradingError
-from models import User, Platoon, Subject, Attend, Grading, Day
+from models import User, Platoon, Subject, Attend, Grading, Day, Discipline
 from models.view.users import Users
 from schemas.attend import ConfirmationAttend
 from schemas.platoon import PlatoonDTO
@@ -242,6 +242,28 @@ class DatabaseWorker:
         await self.session.commit()
 
         return grading_id.scalar() if grading_id is not None else None
+
+    async def set_discipline(self, user_id: int, type_: str, comment: str, date: datetime.date) -> Optional[int]:
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(
+                message=f"User {user_id=} not found", status_code=HTTPStatus.NOT_FOUND
+            )
+
+        stmt = (
+            insert(Discipline).
+            values(
+                user_id=user_id,
+                type=type_,
+                comment=comment,
+                date=date
+            ).
+            returning(Discipline.id)
+        )
+
+        discipline_id = await self.session.execute(stmt)
+        await self.session.commit()
+
+        return discipline_id.scalar()
 
     async def update_grading(self, grading_id: int, mark: int):
         if not 0 < mark < 6:

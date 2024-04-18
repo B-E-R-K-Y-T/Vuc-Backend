@@ -9,8 +9,8 @@ from services.database.db_types import intpk
 
 
 class _Type(Enum):
-    encouragement = "поощрение"
-    penalty = "взыскание"
+    encouragement = "encouragement"
+    penalty = "penalty"
 
 
 class Discipline(BaseTable):
