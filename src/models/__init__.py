@@ -1,5 +1,5 @@
 # Эти импорты заполняют переменную Base, в которой лежат метаданные, это нужно, чтобы модели были видны при миграциях
-from models.student import Student
+# from models.student import Student
 from models.admin import Admin
 from models.day import Day
 from models.attend import Attend
@@ -9,3 +9,4 @@ from models.user import User
 from models.platoon import Platoon
 from models.schedule import Schedule
 from models.subject import Subject
+from models.discipline import Discipline

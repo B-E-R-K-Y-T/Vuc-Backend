@@ -61,7 +61,7 @@ class AppSettings(BaseSettings):
             f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
-    model_config = SettingsConfigDict(env_file=f"{BASE_DIR}/.env-dev")
+    model_config = SettingsConfigDict(env_file=f"{BASE_DIR}/.env")
 
 
 app_settings = AppSettings()

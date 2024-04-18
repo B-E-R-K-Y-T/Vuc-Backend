@@ -13,8 +13,8 @@ class _UserTable(ModelView, model=User):
 
 
 @_model_collector.bind_model
-class _StudentTable(ModelView, model=Student):
-    column_list = [Student.id, Student.name]
+class _DisciplineTable(ModelView, model=Discipline):
+    column_list = [Discipline.id, Discipline.date, Discipline.comment]
 
 
 @_model_collector.bind_model
