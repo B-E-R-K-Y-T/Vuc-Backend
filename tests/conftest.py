@@ -125,14 +125,6 @@ async def prepare_database():
                 "VALUES(98765, 'message');"
             )
         )
-        await conn.execute(
-            text(
-                "INSERT INTO student (name, phone, date_of_birth, mail, address, institute, direction_of_study,"
-                "group_study, platoon_number, vus, squad_number, telegram_id, token, role)"
-                "VALUES('tim', '89012345678', '12-22-2023'::date, 'mail', 'address', 'institute',"
-                "'direction_of_study', 'group_study', 0, 1, 1, 1000, 'token', 'Студент');"
-            )
-        )
     yield
     async with engine_test.begin() as conn:
         await conn.run_sync(metadata.drop_all)
