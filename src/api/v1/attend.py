@@ -36,7 +36,7 @@ async def set_attend_user(
 
 
 @router.get(
-    "/confirmation_attend_user",
+    "/get_attend_platoon",
     description="Получить посещаемость по всему взводу за семестр",
     response_model=dict,
     status_code=HTTPStatus.OK
@@ -52,8 +52,10 @@ async def get_attend_platoon(
     attends = await db_worker.get_attend_platoon(platoon_number, semester_number)
     res = {}
 
-    for attend in attends:
-        name = attend[0]
-        res[name] = attend[1].convert_to_dict()
+    for item in attends:
+        name = item[0]
+        attend = item[1].convert_to_dict()
+
+        res[name] = {attend.pop("id"): attend}
 
     return res

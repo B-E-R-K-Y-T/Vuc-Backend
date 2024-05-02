@@ -92,8 +92,10 @@ async def get_gradings_by_sem(
     gradings = await db_worker.get_gradings(semester)
     res = {}
 
-    for grading in gradings:
-        name = grading[0]
-        res[name] = grading[1].convert_to_dict()
+    for item in gradings:
+        name = item[0]
+        grading = item[1].convert_to_dict()
+
+        res[name] = {grading.pop("id"): grading}
 
     return res
