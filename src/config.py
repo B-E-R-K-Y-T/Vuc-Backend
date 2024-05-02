@@ -31,6 +31,7 @@ class AppSettings(BaseSettings):
 
     DOCS_URL: str
 
+    TOKEN_ADMIN_PANEL: str
     PASSWORD_ADMIN_PANEL: str
     LOGIN_ADMIN_PANEL: str
 

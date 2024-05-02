@@ -1,5 +1,6 @@
 from sqladmin import ModelView
 
+from config import app_settings
 from models import *
 from .model_worker import ModelCollector
 
@@ -75,7 +76,7 @@ def init_admin_panel(app, engine):
     from sqladmin import Admin
     from .auth import AdminPanelAuth
 
-    authentication_backend = AdminPanelAuth()
+    authentication_backend = AdminPanelAuth(app_settings.TOKEN_ADMIN_PANEL)
     administrator = Admin(
         app=app,
         engine=engine,
