@@ -53,9 +53,13 @@ async def get_attend_platoon(
     res = {}
 
     for item in attends:
-        name = item[0]
         attend = item[1].convert_to_dict()
+        date_v = attend.pop("date_v")
+        attend["name"] = item[0]
 
-        res[name] = {attend.pop("id"): attend}
+        if not res.get(date_v):
+            res[date_v] = [{attend.pop("id"): attend}]
+        else:
+            res[date_v].append({attend.pop("id"): attend})
 
     return res

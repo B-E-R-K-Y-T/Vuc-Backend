@@ -310,6 +310,9 @@ class DatabaseWorker:
                     Grading.user_id == User.id,
                     Grading.subj_id == Subject.id
                 )
+            ).
+            order_by(
+                User.name
             )
         )
 

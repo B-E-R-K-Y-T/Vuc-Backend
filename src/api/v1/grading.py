@@ -93,9 +93,13 @@ async def get_gradings_by_sem(
     res = {}
 
     for item in gradings:
-        name = item[0]
         grading = item[1].convert_to_dict()
+        theme = grading.pop("theme")
+        grading["name"] = item[0]
 
-        res[name] = {grading.pop("id"): grading}
+        if not res.get(theme):
+            res[theme] = [{grading.pop("id"): grading}]
+        else:
+            res[theme].append({grading.pop("id"): grading})
 
     return res
