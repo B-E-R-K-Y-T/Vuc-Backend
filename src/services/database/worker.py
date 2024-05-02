@@ -91,6 +91,32 @@ class DatabaseWorker:
 
         return marks.all()
 
+    async def get_attend_platoon(
+            self,
+            platoon_number: int,
+            semester_number: int
+    ) -> Sequence:
+        if not await self.platoon_number_is_exist(platoon_number):
+            raise PlatoonError(
+                message=f"Platoon {platoon_number=} not found",
+                status_code=HTTPStatus.NOT_FOUND,
+            )
+
+        query = (
+            select(User.name, Attend).
+            where(
+                and_(
+                    Attend.semester == semester_number,
+                    Attend.user_id == User.id
+                )
+            ).
+            order_by(User.name)
+        )
+
+        attends_platoon = await self.session.execute(query)
+
+        return attends_platoon.all()
+
     async def get_attendance_status_user(self, user_id):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(
@@ -198,7 +224,7 @@ class DatabaseWorker:
                     user_id=user_id,
                     date_v=date_v,
                     visiting=visiting,
-                    semester=semester
+                    semester=semester,
                 ).
                 returning(Attend.id)
             )
@@ -264,6 +290,32 @@ class DatabaseWorker:
         await self.session.commit()
 
         return discipline_id.scalar()
+
+    async def get_gradings(self, semester: int) -> Sequence:
+        query = (
+            select(User.name, Grading).
+            select_from(
+                Grading
+            ).
+            join(
+                Subject,
+                Subject.semester == semester
+            ).
+            join(
+                User,
+                User.id == Grading.user_id
+            ).
+            where(
+                and_(
+                    Grading.user_id == User.id,
+                    Grading.subj_id == Subject.id
+                )
+            )
+        )
+
+        gradings = await self.session.execute(query)
+
+        return gradings.all()
 
     async def update_grading(self, grading_id: int, mark: int):
         if not 0 < mark < 6:

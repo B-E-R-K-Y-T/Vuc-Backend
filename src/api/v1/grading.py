@@ -29,11 +29,11 @@ collector = CacheCollector(container=RedisContainer())
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
 async def set_grading_theme(
-    platoon_number: int,
-    theme_of_lesson: str,
-    subj_id: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        platoon_number: int,
+        theme_of_lesson: str,
+        subj_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     platoon_users_id = await db_worker.get_users_id_by_platoon(platoon_number)
     res = []
@@ -53,10 +53,10 @@ async def set_grading_theme(
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
 async def set_grading_theme(
-    grading_id: int,
-    mark: int,
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        grading_id: int,
+        mark: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     await db_worker.update_grading(grading_id, mark)
 
@@ -68,9 +68,32 @@ async def set_grading_theme(
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
 async def update_gradings(
-    gradings: list[UpdateGrading],
-    request: Request,
-    db_worker: DatabaseWorker = Depends(get_database_worker),
+        gradings: list[UpdateGrading],
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     for grading in gradings:
         await db_worker.update_grading(grading.id, grading.mark)
+
+
+@router.get(
+    "/get_gradings_by_sem",
+    description="Получить оценки за семестр",
+    status_code=HTTPStatus.CREATED,
+    response_model=Optional[dict]
+)
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
+async def get_gradings_by_sem(
+        semester: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
+    gradings = await db_worker.get_gradings(semester)
+    res = {}
+
+    for grading in gradings:
+        name = grading[0]
+        res[name] = grading[1].convert_to_dict()
+
+    return res
