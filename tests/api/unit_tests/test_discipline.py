@@ -15,7 +15,7 @@ class TestDiscipline:
                 "date": "2024-04-18",
                 "user_id": 1,
                 "type": "encouragement",
-                "comment": "string"
+                "comment": "string",
             },
             cookies={"bonds": jwt_token},
         )
@@ -29,7 +29,7 @@ class TestDiscipline:
                 "date": "2024-04-19",
                 "user_id": 1,
                 "type": "penalty",
-                "comment": "string"
+                "comment": "string",
             },
             cookies={"bonds": jwt_token},
         )
@@ -44,7 +44,7 @@ class TestDiscipline:
                 "date": "2024-04-18",
                 "user_id": -1,
                 "type": "encouragement",
-                "comment": "string"
+                "comment": "string",
             },
             cookies={"bonds": jwt_token},
         )
@@ -57,9 +57,43 @@ class TestDiscipline:
                 "date": "2024-04-20",
                 "user_id": 1,
                 "type": "-----",
-                "comment": "string"
+                "comment": "string",
             },
             cookies={"bonds": jwt_token},
         )
 
         assert response.status_code == 422
+
+    async def test_get_discipline(self, ac: AsyncClient, jwt_token):
+        response = await ac.get(
+            url="/disciplines/get_discipline",
+            params={"user_id": 1},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {
+                "id": 1,
+                "user_id": 1,
+                "type": "encouragement",
+                "comment": "string",
+                "date": "2024-04-18",
+            },
+            {
+                "id": 2,
+                "user_id": 1,
+                "type": "penalty",
+                "comment": "string",
+                "date": "2024-04-19",
+            },
+        ]
+
+    async def test_get_discipline_error(self, ac: AsyncClient, jwt_token):
+        response = await ac.get(
+            url="/disciplines/get_discipline",
+            params={"user_id": -1},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 404

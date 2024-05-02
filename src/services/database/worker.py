@@ -269,6 +269,19 @@ class DatabaseWorker:
 
         return grading_id.scalar() if grading_id is not None else None
 
+    async def get_discipline(self, user_id):
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
+
+        query = (
+            select(Discipline).
+            where(
+                Discipline.user_id == user_id
+            )
+        )
+
+        return await self.session.scalars(query)
+
     async def set_discipline(self, user_id: int, type_: str, comment: str, date: datetime.date) -> Optional[int]:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(

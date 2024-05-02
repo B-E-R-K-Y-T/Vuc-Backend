@@ -34,3 +34,34 @@ class TestAttends:
         )
 
         assert response.status_code == 404
+
+    async def test_get_attend_platoon(self, ac: AsyncClient, jwt_token):
+        response = await ac.get(
+            url="/attends/get_attend_platoon",
+            params={"platoon_number": 0, "semester_number": 1},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {
+            "2023-12-22": [
+                {
+                    "1": {
+                        "user_id": 1,
+                        "visiting": 1,
+                        "semester": 1,
+                        "confirmed": True,
+                        "name": "Nik",
+                    }
+                }
+            ]
+        }
+
+    async def test_get_attend_platoon_error(self, ac: AsyncClient, jwt_token):
+        response = await ac.get(
+            url="/attends/get_attend_platoon",
+            params={"platoon_number": -1, "semester_number": 1},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 404

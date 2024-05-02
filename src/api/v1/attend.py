@@ -1,11 +1,12 @@
 from http import HTTPStatus
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from config import app_settings
-from schemas.attend import ConfirmationAttend, AttendCreate, AttendID
+from schemas.attend import ConfirmationAttend
 from services.auth.auth import auth_user
 from services.cache.collector import CacheCollector
 from services.cache.containers import RedisContainer
@@ -38,7 +39,7 @@ async def set_attend_user(
 @router.get(
     "/get_attend_platoon",
     description="Получить посещаемость по всему взводу за семестр",
-    response_model=dict,
+    response_model=Optional[dict],
     status_code=HTTPStatus.OK
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)

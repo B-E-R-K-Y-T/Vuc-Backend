@@ -38,3 +38,25 @@ async def set_discipline(
         discipline.comment,
         discipline.date
     )
+
+
+@router.get(
+    "/get_discipline",
+    description="Получить поощрение или взыскание по студенту за семестр",
+    response_model=list[dict],
+    status_code=HTTPStatus.OK,
+)
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
+async def get_discipline(
+        user_id: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker)
+):
+    discipline_sem = await db_worker.get_discipline(user_id)
+    res = []
+
+    for discipline in discipline_sem:
+        res.append(discipline.convert_to_dict())
+
+    return res

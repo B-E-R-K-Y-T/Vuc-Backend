@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
@@ -89,6 +89,9 @@ async def get_gradings_by_sem(
         request: Request,
         db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
+    if semester <= 0:
+        raise HTTPException(HTTPStatus.NOT_FOUND)
+
     gradings = await db_worker.get_gradings(semester)
     res = {}
 
