@@ -138,83 +138,57 @@ class TestGradings:
     async def test_get_gradings_by_sem(self, ac: AsyncClient, jwt_token):
         response = await ac.get(
             url="/gradings/get_gradings_by_sem",
-            params={"semester": 1, "subj_id": 1, "platoon_number": 0},
+            params={"subj_id": 1},
             cookies={"bonds": jwt_token},
         )
 
         assert response.status_code == 201
         assert response.json() == {
-            "theme": [
-                {
-                    "1": {
-                        "subj_id": 1,
-                        "user_id": 1,
-                        "mark": 1,
-                        "mark_date": "2023-12-22",
-                        "name": "Nik",
-                    }
+            "Test theme": {
+                "2": {
+                    "subj_id": 1,
+                    "user_id": 1,
+                    "mark": 1,
+                    "mark_date": "2024-05-09",
+                    "name": "Nik",
+                },
+                "5": {
+                    "subj_id": 1,
+                    "user_id": 4,
+                    "mark": 0,
+                    "mark_date": "2024-05-09",
+                    "name": "string",
+                },
+                "3": {
+                    "subj_id": 1,
+                    "user_id": 2,
+                    "mark": 0,
+                    "mark_date": "2024-05-09",
+                    "name": "TEST_USER",
+                },
+                "4": {
+                    "subj_id": 1,
+                    "user_id": 3,
+                    "mark": 0,
+                    "mark_date": "2024-05-09",
+                    "name": "TEST_USER_PLATOON_COMMANDER",
+                },
+            },
+            "theme": {
+                "1": {
+                    "subj_id": 1,
+                    "user_id": 1,
+                    "mark": 1,
+                    "mark_date": "2023-12-22",
+                    "name": "Nik",
                 }
-            ],
-            "Test theme": [
-                {
-                    "2": {
-                        "subj_id": 1,
-                        "user_id": 1,
-                        "mark": 1,
-                        "mark_date": str(datetime.date.today()),
-                        "name": "Nik",
-                    }
-                },
-                {
-                    "5": {
-                        "subj_id": 1,
-                        "user_id": 4,
-                        "mark": 0,
-                        "mark_date": str(datetime.date.today()),
-                        "name": "string",
-                    }
-                },
-                {
-                    "3": {
-                        "subj_id": 1,
-                        "user_id": 2,
-                        "mark": 0,
-                        "mark_date": str(datetime.date.today()),
-                        "name": "TEST_USER",
-                    }
-                },
-                {
-                    "4": {
-                        "subj_id": 1,
-                        "user_id": 3,
-                        "mark": 0,
-                        "mark_date": str(datetime.date.today()),
-                        "name": "TEST_USER_PLATOON_COMMANDER",
-                    }
-                },
-            ],
+            },
         }
 
     async def test_get_gradings_by_sem_error(self, ac: AsyncClient, jwt_token):
         response = await ac.get(
             url="/gradings/get_gradings_by_sem",
-            params={"semester": -1, "subj_id": 1, "platoon_number": 0},
-            cookies={"bonds": jwt_token},
-        )
-
-        assert response.status_code == 404
-
-        response = await ac.get(
-            url="/gradings/get_gradings_by_sem",
-            params={"semester": 1, "subj_id": -1, "platoon_number": 0},
-            cookies={"bonds": jwt_token},
-        )
-
-        assert response.status_code == 404
-
-        response = await ac.get(
-            url="/gradings/get_gradings_by_sem",
-            params={"semester": 1, "subj_id": 1, "platoon_number": -1},
+            params={"subj_id": -1},
             cookies={"bonds": jwt_token},
         )
 

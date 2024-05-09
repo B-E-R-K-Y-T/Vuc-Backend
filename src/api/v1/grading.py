@@ -85,16 +85,11 @@ async def update_gradings(
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
 @collector.cache()
 async def get_gradings_by_sem(
-        semester: int,
         subj_id: int,
-        platoon_number: int,
         request: Request,
         db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
-    if semester <= 0:
-        raise HTTPException(HTTPStatus.NOT_FOUND)
-
-    gradings = await db_worker.get_gradings(semester, subj_id, platoon_number)
+    gradings = await db_worker.get_gradings(subj_id)
     res = {}
 
     for item in gradings:
@@ -103,8 +98,8 @@ async def get_gradings_by_sem(
         grading["name"] = item[0]
 
         if not res.get(theme):
-            res[theme] = [{grading.pop("id"): grading}]
-        else:
-            res[theme].append({grading.pop("id"): grading})
+            res[theme] = {}
+
+        res[theme][grading.pop("id")] = grading
 
     return res
