@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from httpx import AsyncClient
 
@@ -136,7 +138,7 @@ class TestGradings:
     async def test_get_gradings_by_sem(self, ac: AsyncClient, jwt_token):
         response = await ac.get(
             url="/gradings/get_gradings_by_sem",
-            params={"semester": 1},
+            params={"semester": 1, "discipline": "subject", "platoon_number": 0},
             cookies={"bonds": jwt_token},
         )
 
@@ -159,7 +161,7 @@ class TestGradings:
                         "subj_id": 1,
                         "user_id": 1,
                         "mark": 1,
-                        "mark_date": "2024-05-02",
+                        "mark_date": str(datetime.date.today()),
                         "name": "Nik",
                     }
                 },
@@ -168,7 +170,7 @@ class TestGradings:
                         "subj_id": 1,
                         "user_id": 4,
                         "mark": 0,
-                        "mark_date": "2024-05-02",
+                        "mark_date": str(datetime.date.today()),
                         "name": "string",
                     }
                 },
@@ -177,7 +179,7 @@ class TestGradings:
                         "subj_id": 1,
                         "user_id": 2,
                         "mark": 0,
-                        "mark_date": "2024-05-02",
+                        "mark_date": str(datetime.date.today()),
                         "name": "TEST_USER",
                     }
                 },
@@ -186,7 +188,7 @@ class TestGradings:
                         "subj_id": 1,
                         "user_id": 3,
                         "mark": 0,
-                        "mark_date": "2024-05-02",
+                        "mark_date": str(datetime.date.today()),
                         "name": "TEST_USER_PLATOON_COMMANDER",
                     }
                 },
@@ -196,8 +198,25 @@ class TestGradings:
     async def test_get_gradings_by_sem_error(self, ac: AsyncClient, jwt_token):
         response = await ac.get(
             url="/gradings/get_gradings_by_sem",
-            params={"semester": -1},
+            params={"semester": -1, "discipline": "subject", "platoon_number": 0},
             cookies={"bonds": jwt_token},
         )
 
         assert response.status_code == 404
+
+        response = await ac.get(
+            url="/gradings/get_gradings_by_sem",
+            params={"semester": 1, "discipline": "ERROR", "platoon_number": 0},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 404
+
+        response = await ac.get(
+            url="/gradings/get_gradings_by_sem",
+            params={"semester": 1, "discipline": "subject", "platoon_number": -1},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 404
+

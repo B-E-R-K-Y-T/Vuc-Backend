@@ -304,7 +304,17 @@ class DatabaseWorker:
 
         return discipline_id.scalar()
 
-    async def get_gradings(self, semester: int) -> Sequence:
+    async def get_gradings(self, semester: int, discipline: str, platoon_number: int) -> Sequence:
+        if not await self.subject_is_exist_by_name(discipline):
+            raise SubjectError(
+                message=f"Subject {discipline} not found", status_code=HTTPStatus.NOT_FOUND
+            )
+
+        if not await self.platoon_number_is_exist(platoon_number):
+            raise PlatoonError(
+                message=f"Platoon not found", status_code=HTTPStatus.NOT_FOUND
+            )
+
         query = (
             select(User.name, Grading).
             select_from(
@@ -312,7 +322,10 @@ class DatabaseWorker:
             ).
             join(
                 Subject,
-                Subject.semester == semester
+                and_(
+                    Subject.semester == semester,
+                    Subject.name == discipline
+                )
             ).
             join(
                 User,
@@ -321,7 +334,9 @@ class DatabaseWorker:
             where(
                 and_(
                     Grading.user_id == User.id,
-                    Grading.subj_id == Subject.id
+                    Grading.subj_id == Subject.id,
+                    User.platoon_number == platoon_number,
+
                 )
             ).
             order_by(
@@ -654,6 +669,13 @@ class DatabaseWorker:
 
     async def subject_is_exist(self, subject_id: int) -> bool:
         query = exists(Subject).where(Subject.id == subject_id).select()
+
+        is_exist = await self.session.scalar(query)
+
+        return is_exist
+
+    async def subject_is_exist_by_name(self, name: str) -> bool:
+        query = exists(Subject).where(Subject.name == name).select()
 
         is_exist = await self.session.scalar(query)
 
