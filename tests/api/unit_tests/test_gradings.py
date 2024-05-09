@@ -219,4 +219,3 @@ class TestGradings:
         )
 
         assert response.status_code == 404
-

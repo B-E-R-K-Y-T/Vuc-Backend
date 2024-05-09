@@ -77,3 +77,28 @@ class TestSemester:
         )
 
         assert response.status_code == 404
+
+    async def test_set_visit_users(self, ac: AsyncClient, jwt_token):
+        response = await ac.post(
+            url="/professor/set_visit_users",
+            json=[
+                {"date_v": "2024-02-29", "visiting": 1, "user_id": 1},
+                {"date_v": "2024-02-29", "visiting": 1, "user_id": 2},
+            ],
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 201
+        assert response.json() == [2, 3]
+
+    async def test_set_visit_users_error(self, ac: AsyncClient, jwt_token):
+        response = await ac.post(
+            url="/professor/set_visit_users",
+            json=[
+                {"date_v": "2024-02-29", "visiting": 1, "user_id": -1},
+                {"date_v": "2024-02-29", "visiting": 1, "user_id": 2},
+            ],
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 404

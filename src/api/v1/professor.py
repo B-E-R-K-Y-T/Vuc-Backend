@@ -6,6 +6,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from config import app_settings
+from exceptions import UserNotFound
 from services.auth.auth import auth_user
 from services.cache.collector import CacheCollector
 from services.cache.containers import RedisContainer
@@ -54,6 +55,34 @@ async def set_visit_user(
         db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.set_visit_user(**convert_schema_to_dict(attendance))
+
+
+@router.post(
+    "/set_visit_users",
+    description="Установить посещение для нескольких пользователей в конкретную дату",
+    status_code=HTTPStatus.CREATED,
+    dependencies=[Depends(auth_user.access_from_student(current_user))],
+    response_model=list[int],
+)
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+async def set_visit_users(
+        attendances: list[AttendanceDTO],
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
+    for attendance in attendances:
+        if not await db_worker.user_is_exist(attendance.user_id):
+            raise UserNotFound(
+                message=f"User {attendance.user_id} not found",
+                status_code=HTTPStatus.NOT_FOUND,
+            )
+
+    res = []
+
+    for attendance in attendances:
+        res.append(await db_worker.set_visit_user(**convert_schema_to_dict(attendance)))
+
+    return res
 
 
 @router.get(
