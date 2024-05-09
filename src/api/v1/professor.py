@@ -79,6 +79,7 @@ async def set_visit_users(
 
     res = []
 
+    # TODO: Сделать один insert на список, а не создавать по запросу на элемент списка
     for attendance in attendances:
         res.append(await db_worker.set_visit_user(**convert_schema_to_dict(attendance)))
 
