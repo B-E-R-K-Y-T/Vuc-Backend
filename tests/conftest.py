@@ -1,7 +1,7 @@
 """
 Сначала надо поднять тестовую базу данных.
 
-Команда: docker run --rm --name db-vuc-test -p 8180:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=vuc_test_db -d postgres:15
+Команда: docker run --name db-vuc-test -p 8180:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=vuc_test_db -d postgres:15
 """
 
 import asyncio

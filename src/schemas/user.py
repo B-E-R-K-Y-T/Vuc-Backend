@@ -71,8 +71,8 @@ class UserCreate(fastapi_users_schemas.BaseUserCreate):
     platoon_number: int
     squad_number: _SquadRange
     role: RoleRange
-    telegram_id: int
 
+    telegram_id: Optional[int]
     password: Optional[str] = None
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
@@ -104,6 +104,7 @@ class EditUser(BaseModel):
     group_study: Optional[str] = None
     platoon_number: Optional[int] = None
     squad_number: Optional[_SquadRange] = None
+    telegram_id: Optional[int] = None
 
 
 class UserSetAttr(UserID):

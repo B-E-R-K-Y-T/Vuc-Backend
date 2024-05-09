@@ -21,7 +21,7 @@ class User(SQLAlchemyBaseUserTable[int], BaseTable):
     platoon_number: Mapped[int] = mapped_column(ForeignKey("platoon.platoon_number"))
     squad_number: Mapped[int]
     role: Mapped[str] = mapped_column(default="Студент")
-    telegram_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    telegram_id: Mapped[int] = mapped_column(unique=True, nullable=True)
     token: Mapped[str]
     group_study: Mapped[str]
     email: Mapped[str] = mapped_column(
