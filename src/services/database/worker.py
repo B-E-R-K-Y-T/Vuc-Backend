@@ -312,7 +312,7 @@ class DatabaseWorker:
 
         if not await self.platoon_number_is_exist(platoon_number):
             raise PlatoonError(
-                message=f"Platoon not found", status_code=HTTPStatus.NOT_FOUND
+                message=f"Platoon {platoon_number} not found", status_code=HTTPStatus.NOT_FOUND
             )
 
         query = (
