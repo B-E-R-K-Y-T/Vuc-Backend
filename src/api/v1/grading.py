@@ -86,7 +86,7 @@ async def update_gradings(
 @collector.cache()
 async def get_gradings_by_sem(
         semester: int,
-        discipline: str,
+        subj_id: int,
         platoon_number: int,
         request: Request,
         db_worker: DatabaseWorker = Depends(get_database_worker),
@@ -94,7 +94,7 @@ async def get_gradings_by_sem(
     if semester <= 0:
         raise HTTPException(HTTPStatus.NOT_FOUND)
 
-    gradings = await db_worker.get_gradings(semester, discipline, platoon_number)
+    gradings = await db_worker.get_gradings(semester, subj_id, platoon_number)
     res = {}
 
     for item in gradings:

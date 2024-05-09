@@ -304,10 +304,10 @@ class DatabaseWorker:
 
         return discipline_id.scalar()
 
-    async def get_gradings(self, semester: int, discipline: str, platoon_number: int) -> Sequence:
-        if not await self.subject_is_exist_by_name(discipline):
+    async def get_gradings(self, semester: int, subj_id: int, platoon_number: int) -> Sequence:
+        if not await self.subject_is_exist(subj_id):
             raise SubjectError(
-                message=f"Subject {discipline} not found", status_code=HTTPStatus.NOT_FOUND
+                message=f"Subject {subj_id} not found", status_code=HTTPStatus.NOT_FOUND
             )
 
         if not await self.platoon_number_is_exist(platoon_number):
@@ -324,7 +324,7 @@ class DatabaseWorker:
                 Subject,
                 and_(
                     Subject.semester == semester,
-                    Subject.name == discipline
+                    Subject.id == subj_id
                 )
             ).
             join(

@@ -138,7 +138,7 @@ class TestGradings:
     async def test_get_gradings_by_sem(self, ac: AsyncClient, jwt_token):
         response = await ac.get(
             url="/gradings/get_gradings_by_sem",
-            params={"semester": 1, "discipline": "subject", "platoon_number": 0},
+            params={"semester": 1, "subj_id": 1, "platoon_number": 0},
             cookies={"bonds": jwt_token},
         )
 
@@ -198,7 +198,7 @@ class TestGradings:
     async def test_get_gradings_by_sem_error(self, ac: AsyncClient, jwt_token):
         response = await ac.get(
             url="/gradings/get_gradings_by_sem",
-            params={"semester": -1, "discipline": "subject", "platoon_number": 0},
+            params={"semester": -1, "subj_id": 1, "platoon_number": 0},
             cookies={"bonds": jwt_token},
         )
 
@@ -206,7 +206,7 @@ class TestGradings:
 
         response = await ac.get(
             url="/gradings/get_gradings_by_sem",
-            params={"semester": 1, "discipline": "ERROR", "platoon_number": 0},
+            params={"semester": 1, "subj_id": -1, "platoon_number": 0},
             cookies={"bonds": jwt_token},
         )
 
@@ -214,7 +214,7 @@ class TestGradings:
 
         response = await ac.get(
             url="/gradings/get_gradings_by_sem",
-            params={"semester": 1, "discipline": "subject", "platoon_number": -1},
+            params={"semester": 1, "subj_id": 1, "platoon_number": -1},
             cookies={"bonds": jwt_token},
         )
 
