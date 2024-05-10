@@ -380,9 +380,6 @@ class DatabaseWorker:
             ).
             order_by(
                 asc(Grading.mark_date)
-            ).
-            order_by(
-                User.name
             )
         )
 

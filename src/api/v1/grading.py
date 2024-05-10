@@ -103,7 +103,6 @@ async def get_gradings_by_sem(
 
         res[theme][grading.pop("id")] = grading
 
-    print(res)
     return res
 
 
