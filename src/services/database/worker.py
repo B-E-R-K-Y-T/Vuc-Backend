@@ -144,7 +144,10 @@ class DatabaseWorker:
             )
 
         query = select(Grading).where(
-            and_(Grading.user_id == user_id, Grading.subj_id == subject_id)
+            and_(
+                Grading.user_id == user_id,
+                Grading.subj_id == subject_id
+            )
         )
 
         gradings = await self.session.scalars(query)
