@@ -93,7 +93,6 @@ async def get_gradings_by_sem(
     gradings = await db_worker.get_gradings(subj_id)
     res = {}
 
-    print(gradings)
     for item in gradings:
         grading = item[1].convert_to_dict()
         theme = grading.pop("theme")
@@ -103,9 +102,7 @@ async def get_gradings_by_sem(
             res[theme] = {}
 
         res[theme][grading.pop("id")] = grading
-        print(res)
 
-    print(res)
     return res
 
 
