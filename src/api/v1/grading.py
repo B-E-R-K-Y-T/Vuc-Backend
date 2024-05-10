@@ -1,16 +1,13 @@
-from collections import OrderedDict
 from http import HTTPStatus
-from itertools import groupby
-from operator import itemgetter
 from pprint import pprint
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from config import app_settings
-from schemas.grading import UpdateGrading, UserGrading, UserGradingDTO
+from schemas.grading import UpdateGrading, UserGradingDTO
 from services.auth.auth import auth_user
 from services.cache.collector import CacheCollector
 from services.cache.containers import RedisContainer
@@ -96,6 +93,7 @@ async def get_gradings_by_sem(
     gradings = await db_worker.get_gradings(subj_id)
     res = {}
 
+    print(gradings)
     for item in gradings:
         grading = item[1].convert_to_dict()
         theme = grading.pop("theme")
@@ -105,7 +103,9 @@ async def get_gradings_by_sem(
             res[theme] = {}
 
         res[theme][grading.pop("id")] = grading
+        print(res)
 
+    print(res)
     return res
 
 

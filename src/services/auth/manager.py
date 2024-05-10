@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from fastapi import Depends, Request
 from fastapi.openapi.models import Response
@@ -14,6 +14,9 @@ from services.database.connector import get_async_session
 from services.database.worker import DatabaseWorker
 from services.logger import LOGGER
 from services.util import TokenGenerator, convert_schema_to_dict
+
+if TYPE_CHECKING:
+    from schemas.user import UserCreate
 
 USER_SECRET_TOKEN = app_settings.AUTH_USER_SECRET_TOKEN
 
@@ -41,7 +44,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
     async def create(
         self,
-        user_create: schemas.UC,
+        user_create: "UserCreate",
         safe: bool = False,
         request: Optional[Request] = None,
     ) -> models.UP:
@@ -60,6 +63,12 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
                     f"Взвод {user_create.platoon_number} уже имеет командира!",
                     status_code=HTTPStatus.BAD_REQUEST,
                 )
+
+        if not await DatabaseWorker(self.session).platoon_number_is_exist(user_create.platoon_number):
+            raise PlatoonError(
+                message=f"Platoon number: {user_create.platoon_number} not found",
+                status_code=HTTPStatus.NOT_FOUND,
+            )
 
         user_dict = convert_schema_to_dict(user_create)
 

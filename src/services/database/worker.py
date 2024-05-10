@@ -289,6 +289,18 @@ class DatabaseWorker:
         return res.scalar()
 
     async def set_theme_to_subject(self, user_id: int, theme: str, subj_id: int) -> Optional[int]:
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(
+                message=f"User {user_id} not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        if not await self.subject_is_exist(subj_id):
+            raise SubjectError(
+                message=f"Subject {subj_id} not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
         stmt = (
             insert(Grading).
             values(
