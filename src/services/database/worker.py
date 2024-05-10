@@ -3,7 +3,7 @@ from http import HTTPStatus
 from typing import Sequence, Any, Optional
 
 from fastapi import Depends
-from sqlalchemy import insert, select, func, and_, update, exists
+from sqlalchemy import insert, select, func, and_, update, exists, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import Roles
@@ -251,6 +251,43 @@ class DatabaseWorker:
 
         return attend_id.scalar()
 
+    async def set_grading(
+            self,
+            mark_date: datetime.date,
+            mark: int,
+            user_id: int,
+            subj_id: int,
+            theme: str
+    ) -> int:
+        if not await self.user_is_exist(user_id):
+            raise UserNotFound(
+                message=f"User {user_id} not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        if not await self.subject_is_exist(subj_id):
+            raise SubjectError(
+                message=f"Subject {subj_id} not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        stmt = (
+            insert(Grading).
+            values(
+                mark_date=mark_date,
+                mark=mark,
+                user_id=user_id,
+                subj_id=subj_id,
+                theme=theme
+            ).
+            returning(Grading.id)
+        )
+
+        res = await self.session.execute(stmt)
+        await self.session.commit()
+
+        return res.scalar()
+
     async def set_theme_to_subject(self, user_id: int, theme: str, subj_id: int) -> Optional[int]:
         stmt = (
             insert(Grading).
@@ -317,9 +354,7 @@ class DatabaseWorker:
             ).
             join(
                 Subject,
-                and_(
-                    Subject.id == subj_id
-                )
+                Subject.id == subj_id
             ).
             join(
                 User,
@@ -329,11 +364,10 @@ class DatabaseWorker:
                 and_(
                     Grading.user_id == User.id,
                     Grading.subj_id == Subject.id,
-
                 )
             ).
             order_by(
-                User.name
+                asc(Grading.mark_date)
             )
         )
 
@@ -588,7 +622,7 @@ class DatabaseWorker:
         if await self.platoon_number_is_exist(platoon.platoon_number):
             raise PlatoonError(
                 f"{platoon.platoon_number=} already exist",
-                status_code=HTTPStatus.BAD_REQUEST,
+                status_code=HTTPStatus.CONFLICT,
             )
 
         stmt = insert(Platoon).values(**dict(platoon))

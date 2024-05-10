@@ -326,6 +326,14 @@ class TestUser:
 
         assert response.status_code == 200
         assert response.json() == {
+            "2": {
+                "id": 2,
+                "user_id": 1,
+                "mark": 1,
+                "mark_date": "2024-05-10",
+                "subj_id": 1,
+                "theme": "Test theme",
+            },
             "1": {
                 "id": 1,
                 "user_id": 1,
@@ -334,13 +342,13 @@ class TestUser:
                 "subj_id": 1,
                 "theme": "theme",
             },
-            "2": {
-                "id": 2,
+            "6": {
+                "id": 6,
                 "user_id": 1,
                 "mark": 1,
-                "mark_date": f"{date.today()}",
+                "mark_date": "2024-05-09",
                 "subj_id": 1,
-                "theme": "Test theme",
+                "theme": "test_set_theme",
             },
         }
 
@@ -361,6 +369,14 @@ class TestUser:
                 1,
                 200,
                 {
+                    "2": {
+                        "id": 2,
+                        "user_id": 1,
+                        "mark": 1,
+                        "mark_date": "2024-05-10",
+                        "subj_id": 1,
+                        "theme": "Test theme",
+                    },
                     "1": {
                         "id": 1,
                         "user_id": 1,
@@ -369,13 +385,13 @@ class TestUser:
                         "subj_id": 1,
                         "theme": "theme",
                     },
-                    "2": {
-                        "id": 2,
+                    "6": {
+                        "id": 6,
                         "user_id": 1,
                         "mark": 1,
-                        "mark_date": str(date.today()),
+                        "mark_date": "2024-05-09",
                         "subj_id": 1,
-                        "theme": "Test theme",
+                        "theme": "test_set_theme",
                     },
                 },
             ),

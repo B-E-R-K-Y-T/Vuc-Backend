@@ -149,28 +149,28 @@ class TestGradings:
                     "subj_id": 1,
                     "user_id": 1,
                     "mark": 1,
-                    "mark_date": "2024-05-09",
+                    "mark_date": str(datetime.date.today()),
                     "name": "Nik",
                 },
                 "5": {
                     "subj_id": 1,
                     "user_id": 4,
                     "mark": 0,
-                    "mark_date": "2024-05-09",
+                    "mark_date": str(datetime.date.today()),
                     "name": "string",
                 },
                 "3": {
                     "subj_id": 1,
                     "user_id": 2,
                     "mark": 0,
-                    "mark_date": "2024-05-09",
+                    "mark_date": str(datetime.date.today()),
                     "name": "TEST_USER",
                 },
                 "4": {
                     "subj_id": 1,
                     "user_id": 3,
                     "mark": 0,
-                    "mark_date": "2024-05-09",
+                    "mark_date": str(datetime.date.today()),
                     "name": "TEST_USER_PLATOON_COMMANDER",
                 },
             },
@@ -193,3 +193,19 @@ class TestGradings:
         )
 
         assert response.status_code == 404
+
+    async def test_set_grading(self, ac: AsyncClient, jwt_token):
+        response = await ac.post(
+            url="/gradings/set_grading",
+            json={
+                "user_id": 1,
+                "mark": 1,
+                "mark_date": "2024-05-09",
+                "subj_id": 1,
+                "theme": "test_set_theme",
+            },
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 201
+        assert response.json() == 6

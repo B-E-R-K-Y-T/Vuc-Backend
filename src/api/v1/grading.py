@@ -1,4 +1,8 @@
+from collections import OrderedDict
 from http import HTTPStatus
+from itertools import groupby
+from operator import itemgetter
+from pprint import pprint
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Request, HTTPException
@@ -6,7 +10,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from config import app_settings
-from schemas.grading import UpdateGrading
+from schemas.grading import UpdateGrading, UserGrading, UserGradingDTO
 from services.auth.auth import auth_user
 from services.cache.collector import CacheCollector
 from services.cache.containers import RedisContainer
@@ -103,3 +107,23 @@ async def get_gradings_by_sem(
         res[theme][grading.pop("id")] = grading
 
     return res
+
+
+@router.post(
+    "/set_grading",
+    description="Поставить оценку пользователю",
+    status_code=HTTPStatus.CREATED
+)
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+async def update_gradings(
+        grading: UserGradingDTO,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
+    return await db_worker.set_grading(
+        grading.mark_date,
+        grading.mark,
+        grading.user_id,
+        grading.subj_id,
+        grading.theme
+    )

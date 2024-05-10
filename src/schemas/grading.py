@@ -15,5 +15,13 @@ class UserGrading(GradingID):
     theme: str
 
 
+class UserGradingDTO(BaseModel):
+    user_id: int
+    mark: int
+    mark_date: date
+    subj_id: int
+    theme: str
+
+
 class UpdateGrading(GradingID):
     mark: int
