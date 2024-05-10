@@ -110,7 +110,9 @@ class DatabaseWorker:
                     Attend.user_id == User.id
                 )
             ).
-            order_by(User.name)
+            order_by(
+                Attend.date_v
+            )
         )
 
         attends_platoon = await self.session.execute(query)
