@@ -201,13 +201,15 @@ class DatabaseWorker:
 
         return users_attr.all()
 
-    async def set_visit_user(self, date_v: str, visiting: int, user_id: int) -> Optional[int]:
+    async def set_visit_user(self, date_v: str, visiting: int, user_id: int, semester: Optional[int] = None) -> Optional[int]:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
 
         query = select(Users.c.course_number).where(Users.c.id == user_id)
 
-        semester = await self.session.scalar(query)
+        if semester is None:
+            # TODO: Проверить корректность запроса к БД. Кажется, он не совсем верно находит семестр
+            semester = await self.session.scalar(query)
 
         is_exist_query = (
             exists(Attend.id)

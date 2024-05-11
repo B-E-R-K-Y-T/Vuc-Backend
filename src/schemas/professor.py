@@ -1,5 +1,6 @@
 from datetime import date
 from enum import Enum
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -48,3 +49,10 @@ class AttendanceDTO(BaseModel):
     date_v: date
     visiting: Visit
     user_id: int
+
+
+class AttendancePlatoon(BaseModel):
+    date_v: date
+    visiting: Visit
+    platoon_number: int
+    semester: Optional[int] = None
