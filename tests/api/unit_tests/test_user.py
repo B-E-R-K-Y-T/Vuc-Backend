@@ -267,11 +267,19 @@ class TestUser:
             },
             "4": {
                 "user_id": 1,
+                "date_v": "2024-05-11",
+                "visiting": 0,
+                "semester": 0,
+                "confirmed": False,
+                "id": 4,
+            },
+            "8": {
+                "user_id": 1,
                 "date_v": "2024-12-12",
                 "visiting": 1,
                 "semester": 1,
                 "confirmed": True,
-                "id": 4,
+                "id": 8,
             },
         }
 

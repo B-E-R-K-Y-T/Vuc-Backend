@@ -102,3 +102,22 @@ class TestSemester:
         )
 
         assert response.status_code == 404
+
+    async def test_set_visit_platoon(self, ac: AsyncClient, jwt_token):
+        response = await ac.post(
+            url="/professor/set_visit_platoon",
+            json={"date_v": "2024-05-11", "visiting": 0, "platoon_number": 0},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 201
+        assert response.json() == [4, 5, 6, 7]
+
+    async def test_set_visit_platoon_error(self, ac: AsyncClient, jwt_token):
+        response = await ac.post(
+            url="/professor/set_visit_platoon",
+            json={"date_v": "2024-05-11", "visiting": 0, "platoon_number": -1},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 404

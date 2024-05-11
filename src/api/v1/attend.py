@@ -62,7 +62,5 @@ async def get_attend_platoon(
             res[date_v] = {}
 
         res[date_v][attend.pop("id")] = attend
-            # res[date_v] = [{: attend}]
-            # res[date_v].append({attend.pop("id"): attend})
 
     return res
