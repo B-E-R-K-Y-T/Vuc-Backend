@@ -3,7 +3,7 @@ from typing import Optional, TYPE_CHECKING
 
 from fastapi import Depends, Request
 from fastapi.openapi.models import Response
-from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
+from fastapi_users import BaseUserManager, IntegerIDMixin, models
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import app_settings, Roles
