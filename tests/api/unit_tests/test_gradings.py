@@ -64,7 +64,7 @@ class TestGradings:
             url="/gradings/edit_grading",
             params={
                 "grading_id": 1,
-                "mark": 0,
+                "mark": -1,
             },
             cookies={"bonds": jwt_token},
         )
@@ -127,7 +127,7 @@ class TestGradings:
                 },
                 {
                     "id": 2,
-                    "mark": 0,
+                    "mark": -1,
                 },
             ],
             cookies={"bonds": jwt_token},

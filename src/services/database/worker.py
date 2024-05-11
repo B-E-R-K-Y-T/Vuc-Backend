@@ -393,9 +393,9 @@ class DatabaseWorker:
         return gradings.all()
 
     async def update_grading(self, grading_id: int, mark: int):
-        if not 0 < mark < 6:
+        if not 0 <= mark <= 5:
             raise MarkError(
-                message="Mark must be between 0 and 6",
+                message="Mark must be between 0 and 5 inclusive",
                 status_code=HTTPStatus.BAD_REQUEST
             )
 
