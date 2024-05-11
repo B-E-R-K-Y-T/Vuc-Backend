@@ -59,8 +59,10 @@ async def get_attend_platoon(
         attend["name"] = item[0]
 
         if not res.get(date_v):
-            res[date_v] = [{attend.pop("id"): attend}]
-        else:
-            res[date_v].append({attend.pop("id"): attend})
+            res[date_v] = {}
+
+        res[date_v][attend.pop("id")] = attend
+            # res[date_v] = [{: attend}]
+            # res[date_v].append({attend.pop("id"): attend})
 
     return res

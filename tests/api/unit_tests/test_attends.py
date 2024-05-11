@@ -44,17 +44,15 @@ class TestAttends:
 
         assert response.status_code == 200
         assert response.json() == {
-            "2023-12-22": [
-                {
-                    "1": {
-                        "user_id": 1,
-                        "visiting": 1,
-                        "semester": 1,
-                        "confirmed": True,
-                        "name": "Nik",
-                    }
+            "2023-12-22": {
+                "1": {
+                    "user_id": 1,
+                    "visiting": 1,
+                    "semester": 1,
+                    "confirmed": True,
+                    "name": "Nik",
                 }
-            ]
+            }
         }
 
     async def test_get_attend_platoon_error(self, ac: AsyncClient, jwt_token):
