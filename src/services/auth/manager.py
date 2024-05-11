@@ -53,14 +53,16 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         existing_user = await self.user_db.get_by_email(user_create.email)
 
         if existing_user is not None:
-            raise UserAlreadyExists()
+            raise UserAlreadyExists(
+                message=f"User {user_create.email} already exists."
+            )
 
         if user_create.role.value == Roles.platoon_commander:
             if await DatabaseWorker(self.session).platoon_commander_is_exist(
                 user_create.platoon_number
             ):
                 raise PlatoonError(
-                    f"Взвод {user_create.platoon_number} уже имеет командира!",
+                    f"The platoon {user_create.platoon_number} already has a commander!",
                     status_code=HTTPStatus.BAD_REQUEST,
                 )
 
