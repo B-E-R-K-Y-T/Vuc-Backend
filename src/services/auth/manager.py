@@ -54,7 +54,8 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         if existing_user is not None:
             raise UserAlreadyExists(
-                message=f"User {user_create.email} already exists."
+                message=f"User {user_create.email} already exists.",
+                status_code=HTTPStatus.CONFLICT,
             )
 
         if user_create.role.value == Roles.platoon_commander:
