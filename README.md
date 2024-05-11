@@ -26,9 +26,12 @@ Python 3.12
 
 ### Up database in docker 
 ```bash
-docker run --rm --name db-vuc -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=name_db -d postgres:15
+docker run --name db-vuc -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=name_db -d postgres:15
 ```
-
+### Up test database in docker
+```bash
+docker run --name db-vuc-test -p 8180:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=vuc_test_db -d postgres:15
+```
 
 ### Other
 
