@@ -19,7 +19,7 @@ limiter = Limiter(key_func=get_remote_address)
 current_user = auth_user.current_user()
 router = APIRouter(
     prefix="/professor",
-    dependencies=[Depends(auth_user.access_from_student(current_user))],
+    dependencies=[Depends(auth_user.access_from_professor(current_user))],
 )
 collector = CacheCollector(container=RedisContainer())
 
@@ -28,6 +28,7 @@ collector = CacheCollector(container=RedisContainer())
     "/get_semesters",
     description="Получить список семестров",
     response_model=Semesters,
+    dependencies=[Depends(auth_user.access_from_student(current_user))],
     status_code=HTTPStatus.OK,
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
@@ -62,7 +63,6 @@ async def set_visit_user(
     "/set_visit_users",
     description="Установить посещение для нескольких пользователей в конкретную дату",
     status_code=HTTPStatus.CREATED,
-    dependencies=[Depends(auth_user.access_from_student(current_user))],
     response_model=list[int],
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
@@ -91,7 +91,6 @@ async def set_visit_users(
     "/set_visit_platoon",
     description="Установить посещение для взвода в конкретную дату",
     status_code=HTTPStatus.CREATED,
-    dependencies=[Depends(auth_user.access_from_student(current_user))],
     response_model=list[int],
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
@@ -125,6 +124,7 @@ async def set_visit_platoon(
     "/get_professors_list",
     description="Получить всех преподавателей",
     response_model=Dict[int | str, Professor],
+    dependencies=[Depends(auth_user.access_from_student(current_user))],
     status_code=HTTPStatus.OK,
 )
 @limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
