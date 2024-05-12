@@ -83,6 +83,8 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
         await self.on_after_register(created_user, request)
 
+        LOGGER.info(f"User {created_user.id} has created.")
+
         return created_user
 
 
