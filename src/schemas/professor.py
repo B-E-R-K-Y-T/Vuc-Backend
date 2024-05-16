@@ -40,11 +40,11 @@ class Gradings(BaseModel):
 
 
 class Visit(Enum):
-    zero = 0  # не был
-    one = 1  # был
-    two = 2  # наряд
-    three = 3  # командировка
-    four = 4  # болезнь
+    was_not = 0  # не был
+    was = 1  # был
+    attire = 2  # наряд
+    secondment = 3  # командировка
+    disease = 4  # болезнь
 
 
 class AttendanceDTO(BaseModel):
