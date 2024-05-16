@@ -31,7 +31,7 @@ class TestSemester:
     async def test_set_visit_user_error(self, ac: AsyncClient, jwt_token):
         response = await ac.post(
             url="/professor/set_visit_user",
-            json={"date_v": "2024-02-29", "visiting": 3, "user_id": 1},
+            json={"date_v": "2024-02-29", "visiting": 5, "user_id": 1},
             cookies={"bonds": jwt_token},
         )
 
