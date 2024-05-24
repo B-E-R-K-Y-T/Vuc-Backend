@@ -91,6 +91,20 @@ class DatabaseWorker:
 
         return marks.all()
 
+    async def get_platoon_semester(self, platoon_number: int) -> int:
+        if not await self.platoon_number_is_exist(platoon_number):
+            raise PlatoonError(
+                message=f"Platoon {platoon_number=} not found",
+                status_code=HTTPStatus.NOT_FOUND,
+            )
+
+        query = (
+            select(Platoon.semester).
+            where(Platoon.platoon_number == platoon_number)
+        )
+
+        return await self.session.scalar(query)
+
     async def get_attend_platoon(
             self,
             platoon_number: int,
@@ -201,7 +215,24 @@ class DatabaseWorker:
 
         return users_attr.all()
 
-    async def set_visit_user(self, date_v: str, visiting: int, user_id: int, semester: Optional[int] = None) -> Optional[int]:
+    async def replace_visit(self, attend_id: int, visiting: int):
+        if not await self.attend_is_exist(attend_id):
+            raise AttendError(
+                message=f"Attend {attend_id=} not found",
+                status_code=HTTPStatus.NOT_FOUND
+            )
+
+        stmt = (
+            update(Attend).
+            where(Attend.id == attend_id).
+            values(visiting=visiting)
+        )
+
+        await self.session.execute(stmt)
+        await self.session.commit()
+
+    async def set_visit_user(self, date_v: str, visiting: int, user_id: int,
+                             semester: Optional[int] = None, confirmed: Optional[bool] = False) -> Optional[int]:
         if not await self.user_is_exist(user_id):
             raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
 
@@ -232,6 +263,7 @@ class DatabaseWorker:
                     date_v=date_v,
                     visiting=visiting,
                     semester=semester,
+                    confirmed=confirmed,
                 ).
                 returning(Attend.id)
             )
@@ -242,7 +274,8 @@ class DatabaseWorker:
                     user_id=user_id,
                     date_v=date_v,
                     visiting=visiting,
-                    semester=semester
+                    semester=semester,
+                    confirmed=confirmed,
                 ).
                 where(
                     and_(
@@ -325,7 +358,7 @@ class DatabaseWorker:
 
         return grading_id.scalar() if grading_id is not None else None
 
-    async def get_discipline(self, user_id):
+    async def get_discipline(self, user_id: int):
         if not await self.user_is_exist(user_id):
             raise UserNotFound(status_code=HTTPStatus.NOT_FOUND)
 

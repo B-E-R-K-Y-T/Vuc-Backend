@@ -53,6 +53,11 @@ class AttendanceDTO(BaseModel):
     user_id: int
 
 
+class AttendanceReplace(BaseModel):
+    attend_id: int
+    visiting: Visit
+
+
 class AttendancePlatoon(BaseModel):
     date_v: date
     visiting: Visit

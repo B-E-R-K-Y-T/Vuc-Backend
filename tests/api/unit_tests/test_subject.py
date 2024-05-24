@@ -121,7 +121,7 @@ class TestSubject:
             name=f"Test Subject_818",
             admin_id=0,
             platoon_id=818,
-            semester=2,
+            semester=818,
         )
         await tst_async_session.execute(stmt)
         await tst_async_session.commit()
@@ -137,7 +137,7 @@ class TestSubject:
             "5": {
                 "id": 5,
                 "platoon_id": 818,
-                "semester": 2,
+                "semester": 818,
                 "admin_id": 0,
                 "name": "Test Subject_818",
             }

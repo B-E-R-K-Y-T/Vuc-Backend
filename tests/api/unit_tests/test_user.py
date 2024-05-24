@@ -270,7 +270,7 @@ class TestUser:
                 "date_v": "2024-05-11",
                 "visiting": 0,
                 "semester": 0,
-                "confirmed": False,
+                "confirmed": True,
                 "id": 4,
             },
             "8": {
@@ -575,3 +575,28 @@ class TestUser:
                 "group_study": "group_study",
             },
         }
+
+    async def test_get_me(self, ac: AsyncClient, jwt_token):
+        response = await ac.get(url="/users/get_me", cookies={"bonds": jwt_token})
+
+        assert response.status_code == 200
+        assert response.json() == {
+            "id": 4,
+            "name": "string",
+            "date_of_birth": "2024-02-27T00:00:00",
+            "phone": "string",
+            "email": "admin@mail.ru",
+            "address": "string",
+            "institute": "string",
+            "direction_of_study": "string",
+            "group_study": "string",
+            "platoon_number": 0,
+            "squad_number": 1,
+            "role": "Admin",
+            "telegram_id": 777,
+        }
+
+    async def test_get_me_error(self, ac: AsyncClient, jwt_token):
+        response = await ac.get(url="/users/get_me", cookies={"bonds": "ERROR"})
+
+        assert response.status_code == 401

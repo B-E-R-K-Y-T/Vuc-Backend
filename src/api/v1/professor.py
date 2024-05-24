@@ -12,7 +12,7 @@ from services.auth.auth import auth_user
 from services.cache.collector import CacheCollector
 from services.cache.containers import RedisContainer
 from services.util import convert_schema_to_dict, result_collection_builder
-from schemas.professor import Semesters, AttendanceDTO, Professor, AttendancePlatoon
+from schemas.professor import Semesters, AttendanceDTO, Professor, AttendancePlatoon, AttendanceReplace
 from services.database.worker import DatabaseWorker, get_database_worker
 
 limiter = Limiter(key_func=get_remote_address)
@@ -43,9 +43,29 @@ async def get_semesters(
     return Semesters.model_validate(semesters, from_attributes=True)
 
 
+@router.get(
+    "/get_semesters_platoon",
+    description="Получить список семестров взвода",
+    response_model=Semesters,
+    dependencies=[Depends(auth_user.access_from_student(current_user))],
+    status_code=HTTPStatus.OK,
+)
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+@collector.cache()
+async def get_semesters(
+        platoon_number: int,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
+    user_id = (await db_worker.get_platoon_commander(platoon_number))["id"]
+    semesters = await db_worker.get_semesters(user_id)
+
+    return Semesters.model_validate(semesters, from_attributes=True)
+
+
 @router.post(
     "/set_visit_user",
-    description="Установить посещение для юзера в конкретную дату",
+    description="Создать посещение для юзера в конкретную дату",
     status_code=HTTPStatus.CREATED,
     dependencies=[Depends(auth_user.access_from_student(current_user))],
     response_model=int,
@@ -57,6 +77,37 @@ async def set_visit_user(
         db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     return await db_worker.set_visit_user(**convert_schema_to_dict(attendance))
+
+
+@router.post(
+    "/set_visit_user_confirmed",
+    description="Создать посещение для юзера в конкретную дату",
+    status_code=HTTPStatus.CREATED,
+    dependencies=[Depends(auth_user.access_from_professor(current_user))],
+    response_model=int,
+)
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+async def set_visit_user_confirmed(
+        attendance: AttendanceDTO,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
+    return await db_worker.set_visit_user(**convert_schema_to_dict(attendance), confirmed=True)
+
+
+@router.patch(
+    "/set_visit_user",
+    description="Заменить посещение для юзера в конкретную дату",
+    status_code=HTTPStatus.OK,
+    dependencies=[Depends(auth_user.access_from_student(current_user))]
+)
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+async def set_visit_user(
+        attendance: AttendanceReplace,
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
+    await db_worker.replace_visit(**convert_schema_to_dict(attendance))
 
 
 @router.post(
@@ -113,7 +164,8 @@ async def set_visit_platoon(
                 date_v=attendance_dict["date_v"],
                 visiting=attendance_dict["visiting"],
                 user_id=student_id,
-                semester=semester
+                semester=semester,
+                confirmed=True
             )
         )
 

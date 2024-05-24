@@ -8,6 +8,7 @@ from slowapi.util import get_remote_address
 
 from config import app_settings
 from exceptions import EmailError
+from models import User
 from schemas.attend import AttendDTO
 from schemas.grading import UserGrading
 from schemas.user import (
@@ -347,6 +348,24 @@ async def get_user(
         db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
     user_self = await db_worker.get_user(user_id)
+
+    return UserDTO.model_validate(user_self, from_attributes=True)
+
+
+@router.get(
+    "/get_me",
+    description="Получить информацию о себе",
+    status_code=HTTPStatus.OK,
+    response_model=UserDTO,
+)
+@limiter.limit("100/minute")
+@collector.cache()
+async def get_me(
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+        user: User = Depends(current_user),
+):
+    user_self = await db_worker.get_user(user.id)
 
     return UserDTO.model_validate(user_self, from_attributes=True)
 

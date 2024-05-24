@@ -18,9 +18,29 @@ class TestSemester:
         assert response.status_code == 200
         assert response.json() == {"semesters": [1]}
 
+    async def test_get_semesters_platoon(self, ac: AsyncClient, jwt_token):
+        response = await ac.get(
+            url="/professor/get_semesters_platoon",
+            params={"platoon_number": 0},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"semesters": [1]}
+
     async def test_set_visit_user(self, ac: AsyncClient, jwt_token):
         response = await ac.post(
             url="/professor/set_visit_user",
+            json={"date_v": "2024-02-29", "visiting": 1, "user_id": 1},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 201
+        assert response.json() == 2
+
+    async def test_set_visit_user_confirmed(self, ac: AsyncClient, jwt_token):
+        response = await ac.post(
+            url="/professor/set_visit_user_confirmed",
             json={"date_v": "2024-02-29", "visiting": 1, "user_id": 1},
             cookies={"bonds": jwt_token},
         )
@@ -117,6 +137,24 @@ class TestSemester:
         response = await ac.post(
             url="/professor/set_visit_platoon",
             json={"date_v": "2024-05-11", "visiting": 0, "platoon_number": -1},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 404
+
+    async def test_replace_visit_user(self, ac: AsyncClient, jwt_token):
+        response = await ac.patch(
+            url="/professor/set_visit_user",
+            json={"attend_id": 2, "visiting": 1},
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 200
+
+    async def test_replace_visit_user_error(self, ac: AsyncClient, jwt_token):
+        response = await ac.patch(
+            url="/professor/set_visit_user",
+            json={"attend_id": -1, "visiting": 1},
             cookies={"bonds": jwt_token},
         )
 

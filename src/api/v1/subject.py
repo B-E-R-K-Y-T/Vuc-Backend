@@ -57,15 +57,7 @@ async def get_subject_by_now_semester(
         request: Request,
         db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
-    if 9 <= datetime.date.today().month <= 12:
-        semester = 1
-    elif 1 <= datetime.date.today().month <= 6:
-        semester = 2
-    else:
-        raise SemesterError(
-            message="Сейчас не идет учеба", status_code=HTTPStatus.BAD_REQUEST
-        )
-
+    semester = await db_worker.get_platoon_semester(platoon_number)
     subjects = await db_worker.get_subjects(platoon_number, semester)
 
     return await result_collection_builder(subjects, schema=SubjectDTO)
