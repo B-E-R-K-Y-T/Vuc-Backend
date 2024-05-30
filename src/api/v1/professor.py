@@ -107,7 +107,7 @@ async def set_visit_user(
         request: Request,
         db_worker: DatabaseWorker = Depends(get_database_worker),
 ):
-    await db_worker.replace_visit(**convert_schema_to_dict(attendance))
+    await db_worker.update_visit_user(**convert_schema_to_dict(attendance))
 
 
 @router.post(
@@ -136,6 +136,22 @@ async def set_visit_users(
         res.append(await db_worker.set_visit_user(**convert_schema_to_dict(attendance)))
 
     return res
+
+
+@router.patch(
+    "/set_visit_users",
+    description="Изменить посещение для нескольких пользователей в конкретную дату",
+    status_code=HTTPStatus.OK
+)
+@limiter.limit(app_settings.MAX_REQUESTS_TO_ENDPOINT)
+async def set_visit_users_update(
+        attendances: list[AttendanceReplace],
+        request: Request,
+        db_worker: DatabaseWorker = Depends(get_database_worker),
+):
+    # TODO: Сделать один update на список, а не создавать по запросу на элемент списка
+    for attendance in attendances:
+        await db_worker.update_visit_user(**convert_schema_to_dict(attendance))
 
 
 @router.post(

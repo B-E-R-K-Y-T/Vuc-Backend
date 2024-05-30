@@ -159,3 +159,29 @@ class TestSemester:
         )
 
         assert response.status_code == 404
+
+    async def test_replace_visit_users(self, ac: AsyncClient, jwt_token):
+        response = await ac.patch(
+            url="/professor/set_visit_users",
+            json=[{"attend_id": 2, "visiting": 1}],
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 200
+
+    async def test_replace_visit_users_error(self, ac: AsyncClient, jwt_token):
+        response = await ac.patch(
+            url="/professor/set_visit_users",
+            json=[{"attend_id": -1, "visiting": 1}],
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 404
+
+        response = await ac.patch(
+            url="/professor/set_visit_users",
+            json=[{"attend_id": 2, "visiting": -1}],
+            cookies={"bonds": jwt_token},
+        )
+
+        assert response.status_code == 422

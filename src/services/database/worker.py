@@ -215,7 +215,7 @@ class DatabaseWorker:
 
         return users_attr.all()
 
-    async def replace_visit(self, attend_id: int, visiting: int):
+    async def update_visit_user(self, attend_id: int, visiting: int):
         if not await self.attend_is_exist(attend_id):
             raise AttendError(
                 message=f"Attend {attend_id=} not found",
